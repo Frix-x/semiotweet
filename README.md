@@ -21,7 +21,7 @@ You have to set some variables in yout virtual env.
 First the "secret key" the DEBUG variable for the app (needed by Django). DEBUG is set to True for dev', false for production.
 ```
 $ export SECRET_KEY='someLongStringToImagine'
-$ export DEBUT='True'
+$ export DEBUG='True'
 ```
 Then the credentials (for user and consumer)for your app in order to use Twitter API.
 In order to have those string, you need to create a Twitter App (see [here](https://apps.twitter.com/app/13440041/show)) ; then you can copy-paste them to set them in your virtual env.
