@@ -37,6 +37,7 @@ $ export SECRET='someLongStringToImagine'
 This is a classic website using Django. There's just one app called `viewer` yet. `urls.py` directly redirects to this app.
 `extraction.py` contains functions that are used in the views.
 
-There are only two models : `Tweet` and `User`.
+There are only two models : `Tweet` and `User` :
+![DataBase](UML.png)
 
 Templates are directly put in `viewer/templates/` and not as usual in `viewer/templates/viewer` as it can be the case in most of Django apps.
