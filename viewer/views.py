@@ -8,6 +8,7 @@ from extraction import returnProfile,credentials
 ##
 import random
 import string
+import time
 
 def displayAll(request,screen_name):
     """Display all the tweets for a user"""
@@ -35,7 +36,8 @@ def getUser(request,screen_name):
     newUser.contributors_enabled = userInfo['contributors_enabled']
     newUser.verified = userInfo['verified']
 
-    #TODO : changing date format
+    # Formating the date
+    newUser.created_at = time.strftime('%Y-%m-%d %H:%M:%S', time.strptime(newUser.created_at,'%a %b %d %H:%M:%S +0000 %Y'))
     newUser.save()
     # try:
     #     newUser.save()
