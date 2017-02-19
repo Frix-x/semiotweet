@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %} | Tweet Lists from {{user}} {% endblock %}
+
+{% block content %}
+    <div class="table-responsive-vertical shadow-z-1">
+      <table id="table" class="table table-hover table-mc-light-blue">
+        <tr>
+        {% for t in fields %}
+          {% if i == "id" %}
+          <th> # </th>
+          {% else %}
+          <th> {{i|capfirst}} </th>
+          {% endif %}
+        {% endfor %}
+        </tr>
+        {% for t in listTweets %}
+        <tr>
+            <td> {{t.id}} </td> <td> {{t.text}} </td></td>
+        </tr>
+        {% endfor %}
+    </table>
+  </div>
+{% endblock %}
