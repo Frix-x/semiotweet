@@ -5,22 +5,24 @@ import json
 import os, sys, getenv
 
 
-def oauthRequest(url, key, secret, http_method="GET", post_body="", http_headers=None):
+def oauthRequest(url,credentials,http_method="GET",post_body="",http_headers=None):
     """Prepare a request """
-    consumer = oauth2.Consumer(key="oYYo7f9lxceE8PZJiux8C36cJ", secret="VdnGr0H1tZHC0g1w1rYmYApHvxA1iNhzNFAcOTa4KV4qYmszDL")
-    token = oauth2.Token(key=key, secret=secret) #Token of the app
+    consumer = oauth2.Consumer(key=credentials[0], secret=credentials[1])
+    token = oauth2.Token(key=credentials[2], secret=credentials[3]) #Token of the app
     client = oauth2.Client(consumer, token) #Token of the user using the app
     resp, content = client.request( url, method=http_method, body=post_body, headers=http_headers )
     return content
 
-def returnProfile(user,baseURL,key,secret):
+def returnProfile(user,credentials):
     """Return the profile of the user whose the name 'user' was given"""
-    res = oauthRequest(baseURL+'users/show.json?screen_name='+user, key,secret)
+    global baseURL
+    res = oauthRequest(baseURL+'users/show.json?screen_name='+user,credentials)
     return json.load(StringIO(res))
 
-def returnTweet(user,baseURL,key,secret,nbTweet):
+def returnTweet(user,credentials,nbTweet):
     """Return the last nbTweet he user 'user'"""
-    res = oauthRequest(baseURL+'statuses/user_timeline.json?screen_name='+user+'&count='+str(nbTweet),key,secret)
+    global baseURL
+    res = oauthRequest(baseURL+'statuses/user_timeline.json?screen_name='+user+'&count='+str(nbTweet),credentials)
     res = json.load(StringIO(res)) # converting the string into good json format
 
     for tweet in res: #cleaning the tweets
@@ -55,9 +57,15 @@ def getEnvValue(varName):
     else:
         sys.exit(varName + " is not defined in the environment variables")
 
+# Credentials
+consumerKey=getEnvValue('CONSUMER_KEY')
+consumerSecret=getEnvValue('CONSUMER_SECRET')
 key = getEnvValue('KEY')
 secret = getEnvValue('SECRET')
+credentials = [consumerKey,consumerSecret,key,secret]
+
 baseURL = "https://api.twitter.com/1.1/"
+
 
 # Fields (see : https://dev.twitter.com/overview/api/tweets):
 
@@ -77,16 +85,18 @@ stringFields = ["created_at","filter_level,id_str","in_reply_to_screen_name","in
               "in_reply_to_user_id_str","lang","quoted_status_id_str","source","withheld_scope"]
 
 def main():
-    tweets = returnTweet("EmmanuelMacron",baseURL,key,secret,4)
-    # for tweet in tweets:
-    #     print tweet["text"].encode("utf-8")
+    tweets = returnTweet("EmmanuelMacron",credentials,4)
+    for tweet in tweets:
+        print tweet["text"].encode("utf-8")
 
+    print "---------------"
     remainingFields = [k for k,v in tweets[0].items()]
     for i in remainingFields:
         print i, type(tweets[0][i])
 
-    print tweets[0]["in_reply_to_status_id"]
-    print tweets[0]["in_reply_to_user_id"]
+# Two Null fields :
+    # print tweets[0]["in_reply_to_status_id"]
+    # print tweets[0]["in_reply_to_user_id"]
 
 
 
