@@ -5,7 +5,9 @@
 <section id="part" class="two">
   <div class="container">
     {% if success %}
-    <h1> {{nbTweetToExtract}} tweets extracted from user @{{screen_name}}<h1>
+    <header>
+    <h2> {{nbTweetToExtract}} tweets extracted from user @{{screen_name}}<h2>
+    </header>
       <div class="table-responsive-vertical shadow-z-1">
         <p style="text-align=left;">
         <table id="table" class="table table-hover table-mc-light-blue">
@@ -30,7 +32,9 @@
     </p>
     </div>
     {% else %}
-    <h1> Request fail for user {{screen_name}}<h1>
+    <header>
+    <h2> Request fail for user {{screen_name}}<h2>
+    </header>
     {% endif %}
   </div>
 
