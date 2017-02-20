@@ -30,8 +30,14 @@ def saveTweets(request,screen_name,nbTweetToExtract):
     #              Unit-tests to be developed
     #              Exception handling to be improved
     """Save the last nbTweetToExtract from user 'screen_name'"""
+
+    # Preventing from saving other tweets :
+    if not screen_name in screen_nameToExtract:
+        return False
+
     tweets = returnTweet(screen_name,credentials,int(nbTweetToExtract))
-    if not(tweets): #If the user doesn't exist
+    # If the user doesn't exist or errors during the request
+    if not(tweets):
         return False
 
     userFrom = User.objects.get(screen_name=screen_name)
@@ -85,7 +91,7 @@ def getUser(request,screen_name):
     #NOTE - TODO :Currently working on standard requests
     #              Unit-tests to be developed
     """ Stores info about a user in the database"""
-    # ToClean to True in order to save only the info that matters (see User model)
+    # toClean to True : saves only the info that matters (see User model)
     userInfo = returnProfile(screen_name,credentials,toClean=True)
     success = True
 

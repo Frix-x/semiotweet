@@ -111,13 +111,12 @@ stringFields = ["created_at","filter_level,id_str","in_reply_to_screen_name",
 usefullFieldsUser = ["id","name","screen_name","created_at",
                      "contributors_enabled","verified"]
 
-screen_nameToExtract = ["EmmanuelMacron",
-                        "MLP_officiel",
-                        "FrancoisFillon",
-                        "benoithamon",
-                        "JLMelenchon",
-                        "MarCharlott",
-                        "PhilippePoutou"]
+tweetSources =["HootSuite","Twitter for Android","Twitter Web Client",
+            "Media Studio","Twitter for iPhone","Google","Twitter Ads",
+            "Medium","TweetDeck","Twitter for iPad","SnappyTV"]
+
+screen_nameToExtract = ["EmmanuelMacron","MLP_officiel","FrancoisFillon",
+                        "benoithamon","JLMelenchon","MarCharlott","PhilippePoutou"]
 
 #==============================#
 #=========== TESTS ============#
