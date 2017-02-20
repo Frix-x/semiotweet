@@ -13,29 +13,52 @@ def oauthRequest(url,credentials,http_method="GET",post_body="",http_headers=Non
     resp, content = client.request( url, method=http_method, body=post_body, headers=http_headers )
     return content
 
-def returnProfile(user,credentials,toClean=True):
+def returnProfile(screen_name,credentials,toClean=True):
     """Return the profile of the user whose the name 'user' was given
     toClean true is used in order to keep the main infos, that is the ones
     to be stored in the database"""
     global baseURL
-    res = oauthRequest(baseURL+'users/show.json?screen_name='+user,credentials)
+    res = oauthRequest(baseURL+'users/show.json?screen_name='+screen_name,credentials)
     user = json.load(StringIO(res))
     if toClean:
         user = cleanUser(user)
     return user
 
-def returnTweet(user,credentials,nbTweet):
-    """Return the last nbTweet he user 'user'"""
+def returnTweets(screen_name,credentials,nbTweet,max_id=False):
+    """Return the last nbTweet<200 tweets form user 'screen_name'"""
+    """max_id can be specified"""
     global baseURL
-    res = oauthRequest(baseURL+'statuses/user_timeline.json?screen_name='+user+'&count='+str(nbTweet),credentials)
+    url = baseURL+'statuses/user_timeline.json?screen_name='+screen_name+'&count='+str(nbTweet)
+    if max_id :
+        url+="&max_id="+str(max_id)
+    res = oauthRequest(url,credentials)
     res = json.load(StringIO(res)) # converting the string into good json format
 
     if 'errors' in res or len(res) == 0:
-        return 0
+        return False
 
     for tweet in res: #cleaning the tweets
         tweet = cleanTweet(tweet)
     return res
+
+def returnOldTweets(screen_name,credentials,nbTweet):
+    """Return (approximately) the last nbTweet for user 'screen_name'"""
+    currentId = returnTweets(screen_name,credentials,1)[0]["id"]# id of the user's last tweet
+
+    batchSize = min(nbTweet,200) # batchSize between 1 and 200
+    maxIter = nbTweet/(batchSize+1) + 1 # number of requests to be send
+    iterNum = 0 # counter for the loop
+    lastId = 0
+    tweets = [] # List of the nbTweet tweets
+    while lastId != currentId and iterNum < maxIter:
+        tweets += returnTweets(screen_name,credentials,batchSize,currentId)
+        # Updating the ids
+        lastId = currentId
+        currentId = tweets[-1]["id"]-1
+
+        iterNum = iterNum+1
+
+    return tweets
 
 def cleanTweet(tweet):
     """Clean a Tweet : delete the useless features to store infos in the database"""
@@ -123,24 +146,29 @@ screen_nameToExtract = ["EmmanuelMacron","MLP_officiel","FrancoisFillon",
 #==============================#
 
 def testTweet(screen_name):
-    tweets = returnTweet(screen_name,credentials,1)
+    currentId = 798831991361703936
+    maxIter = 0
+    lastId = 0
+    tweets = []
+    while lastId != currentId and maxIter < 10:
+        batchSize = 200
+        tweets += returnTweets(screen_name,credentials,batchSize,currentId)
+        lastId = currentId
+        currentId = tweets[-1]["id"]-1
+        print "----"
+        print lastId, currentId
+        print currentId," vs ",tweets[-1]["id"]
+        # if tweets:
+        #     remainingFields = [k for k,v in tweets[0].items()]
+        #     print "---------------"
+        #     for t in tweets:
+        #         print t["id"]
+        #     print "---------------"
+        # else:
+        #     print "Fail"
 
-    # for tweet in tweets:
-    #     print tweet["text"].encode("utf-8")
-    #
-    # print "---------------"
-    if tweets:
-        remainingFields = [k for k,v in tweets[0].items()]
-        for i in remainingFields:
-            print i,":", tweets[0][i]
-        print "---------------"
-    else:
-        print "Fail"
-
-# Two Null fields :
-    # print tweets[0]["in_reply_to_status_id"]
-    # print tweets[0]["in_reply_to_user_id"]
-
+        maxIter = maxIter+1
+    print len(tweets)
 
 def testProfile(screen_name,toClean=True):
     user = returnProfile(screen_name,credentials,toClean)
@@ -150,5 +178,5 @@ def testProfile(screen_name,toClean=True):
         print i,":", user[i]
 
 if __name__ == '__main__':
-    # testTweet("aezezfzef")
-    testProfile("EmmanuelMacron",False)
+    testTweet("jjerphan")
+    #testProfile("EmmanuelMacron",False)

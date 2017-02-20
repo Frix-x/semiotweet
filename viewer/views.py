@@ -35,7 +35,7 @@ def saveTweets(request,screen_name,nbTweetToExtract):
     if not screen_name in screen_nameToExtract:
         return False
 
-    tweets = returnTweet(screen_name,credentials,int(nbTweetToExtract))
+    tweets = returnOldTweets(screen_name,credentials,int(nbTweetToExtract))
     # If the user doesn't exist or errors during the request
     if not(tweets):
         return False
@@ -77,11 +77,12 @@ def getTweets(request,screen_name,nbTweetToExtract):
     return render(request,'getTweets.html',locals())
 
 
-def getAllTweets(request):
+def getAllTweets(request,nbTweetToExtract=5):
     """Save latest tweets from all the users defined in screen_nameToExtract"""
+    global screen_nameToExtract
     success = True
     for screen_name in screen_nameToExtract:
-        success = True and saveTweets(request,screen_name,200)
+        success = True and saveTweets(request,screen_name,nbTweetToExtract)
 
     return render(request,'getAllTweets.html',locals())
 
