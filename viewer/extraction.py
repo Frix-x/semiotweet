@@ -27,6 +27,9 @@ def returnTweet(user,credentials,nbTweet):
     res = oauthRequest(baseURL+'statuses/user_timeline.json?screen_name='+user+'&count='+str(nbTweet),credentials)
     res = json.load(StringIO(res)) # converting the string into good json format
 
+    if 'errors' in res or len(res) == 0:
+        return 0
+
     for tweet in res: #cleaning the tweets
         tweet = cleanTweet(tweet)
     return res
@@ -103,28 +106,33 @@ stringFields = ["created_at","filter_level,id_str","in_reply_to_screen_name",
 usefullFieldsUser = ["id","name","screen_name","created_at",
                      "contributors_enabled","verified"]
 
-def testTweet():
-    tweets = returnTweet("EmmanuelMacron",credentials,1)
+def testTweet(screen_name):
+    tweets = returnTweet(screen_name,credentials,1)
 
     # for tweet in tweets:
     #     print tweet["text"].encode("utf-8")
     #
     # print "---------------"
-    remainingFields = [k for k,v in tweets[0].items()]
-    for i in remainingFields:
-        print i,":", tweets[0][i]
-    print "---------------"
+    if tweets:
+        remainingFields = [k for k,v in tweets[0].items()]
+        for i in remainingFields:
+            print i,":", tweets[0][i]
+        print "---------------"
+    else:
+        print "Fail"
+
 # Two Null fields :
     # print tweets[0]["in_reply_to_status_id"]
     # print tweets[0]["in_reply_to_user_id"]
 
-def testProfile():
-    user = returnProfile("EmmanuelMacron",credentials)
+
+def testProfile(screen_name):
+    user = returnProfile(screen_name,credentials)
 
     remainingFields = [k for k,v in user.items()]
     for i in remainingFields:
         print i,":", user[i]
 
 if __name__ == '__main__':
-    # testTweet()
-    testProfile()
+    testTweet("aezezfzef")
+    # testProfile("EmmanuelMacron")

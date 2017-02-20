@@ -3,27 +3,38 @@ from datetime import datetime
 from django.http import HttpResponse,Http404
 from django.shortcuts import render,redirect
 from .models import Tweet,User
-from extraction import returnProfile,credentials
-
-##
+from extraction import *
 import random
 import string
 import time
 
+#TODO
 def displayAll(request,screen_name):
     """Display all the tweets for a user"""
     # idUser = User.objects.get(screen_name=screen_name)
     # tweetList = Tweet.objects.all()
     return HttpResponse(screen_name)
-    # return render(request,'displayAll.html',locals())
+    return render(request,'displayAll.html',locals())
 
+#TODO :
 def getTweets(request,screen_name,nbTweetToExtract):
+    """Get the last nbTweetToExtract from user 'screen_name'"""
+    tweets = returnTweet(screen_name,credentials,int(nbTweetToExtract))
+    success = True
+    if not(tweets): #If the user doesn't exist
+        success = False
 
-    return HttpResponse(nbTweetToExtract+" tweets to extract from user :"+screen_name)
+    return render(request,'getTweets.html',locals())
 
+#TODO :
 def getUser(request,screen_name):
-    newUser = User()
     userInfo = returnProfile(screen_name,credentials)
+    success = True
+    if not(userInfo): #If the user doesn't exist
+        success = False
+        return render(request,'getUser.html',locals())
+
+    newUser = User()
     remainingFields = [k for k,v in userInfo.items()]
     string = ""
     for i in remainingFields:
@@ -38,9 +49,10 @@ def getUser(request,screen_name):
 
     # Formating the date
     newUser.created_at = time.strftime('%Y-%m-%d %H:%M:%S', time.strptime(newUser.created_at,'%a %b %d %H:%M:%S +0000 %Y'))
-    newUser.save()
+    # newUser.save()
     # try:
     #     newUser.save()
     # except BaseException:
     #     string = "Utilisateur deja inscrit <br/>"+ string
-    return HttpResponse(string)
+    # return HttpResponse(string)
+    return render(request,'getUser.html',locals())
