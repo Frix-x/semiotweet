@@ -111,6 +111,14 @@ stringFields = ["created_at","filter_level,id_str","in_reply_to_screen_name",
 usefullFieldsUser = ["id","name","screen_name","created_at",
                      "contributors_enabled","verified"]
 
+screen_nameToExtract = ["EmmanuelMacron",
+                        "MLP_officiel",
+                        "FrancoisFillon",
+                        "benoithamon",
+                        "JLMelenchon",
+                        "MarCharlott",
+                        "PhilippePoutou"]
+
 #==============================#
 #=========== TESTS ============#
 #==============================#
