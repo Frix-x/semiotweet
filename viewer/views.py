@@ -8,13 +8,19 @@ import random
 import string
 import time
 
+def home(request):
+    return render(request,'home.html',locals())
+
 #TODO
-def displayAll(request,screen_name):
+def displayInfo(request,screen_name):
     """Display all the tweets for a user"""
-    # idUser = User.objects.get(screen_name=screen_name)
-    # tweetList = Tweet.objects.all()
-    return HttpResponse(screen_name)
-    return render(request,'displayAll.html',locals())
+    userInfo = returnProfile(screen_name,credentials,toClean=False)
+    success = True
+    if not(userInfo): #If the user doesn't exist
+        success = False
+    else:
+        userInfo["profile_image_url_https"] = userInfo["profile_image_url_https"].replace('_normal.jpg','.jpg')
+    return render(request,'displayInfo.html',locals())
 
 #TODO :
 def getTweets(request,screen_name,nbTweetToExtract):
