@@ -38,7 +38,7 @@ def returnTweet(user,credentials,nbTweet):
     return res
 
 def cleanTweet(tweet):
-    """Clean a Tweet : delete the useless features and encode string in UTF8"""
+    """Clean a Tweet : delete the useless features to store infos in the database"""
     global uselessFields
     global stringFields
 
