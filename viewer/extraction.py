@@ -13,12 +13,15 @@ def oauthRequest(url,credentials,http_method="GET",post_body="",http_headers=Non
     resp, content = client.request( url, method=http_method, body=post_body, headers=http_headers )
     return content
 
-def returnProfile(user,credentials):
-    """Return the profile of the user whose the name 'user' was given"""
+def returnProfile(user,credentials,toClean=True):
+    """Return the profile of the user whose the name 'user' was given
+    toClean true is used in order to keep the main infos, that is the ones
+    to be stored in the database"""
     global baseURL
     res = oauthRequest(baseURL+'users/show.json?screen_name='+user,credentials)
     user = json.load(StringIO(res))
-    user = cleanUser(user)
+    if toClean:
+        user = cleanUser(user)
     return user
 
 def returnTweet(user,credentials,nbTweet):
@@ -64,7 +67,9 @@ def cleanUser(user):
 
     return user
 
-#####
+#==============================#
+#==== SETTINGS & VARIABLES ====#
+#==============================#
 
 # Settings :
 def getEnvValue(varName):
@@ -106,6 +111,10 @@ stringFields = ["created_at","filter_level,id_str","in_reply_to_screen_name",
 usefullFieldsUser = ["id","name","screen_name","created_at",
                      "contributors_enabled","verified"]
 
+#==============================#
+#=========== TESTS ============#
+#==============================#
+
 def testTweet(screen_name):
     tweets = returnTweet(screen_name,credentials,1)
 
@@ -126,13 +135,13 @@ def testTweet(screen_name):
     # print tweets[0]["in_reply_to_user_id"]
 
 
-def testProfile(screen_name):
-    user = returnProfile(screen_name,credentials)
+def testProfile(screen_name,toClean=True):
+    user = returnProfile(screen_name,credentials,toClean)
 
     remainingFields = [k for k,v in user.items()]
     for i in remainingFields:
         print i,":", user[i]
 
 if __name__ == '__main__':
-    testTweet("aezezfzef")
-    # testProfile("EmmanuelMacron")
+    # testTweet("aezezfzef")
+    testProfile("EmmanuelMacron",False)
