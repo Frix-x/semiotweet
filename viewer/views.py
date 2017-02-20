@@ -27,7 +27,7 @@ def displayInfo(request,screen_name):
 def saveTweets(request,screen_name,nbTweetToExtract):
     #NOTE - TODO : Currently working on standard requests
     #              WARNING : this is not a view !
-    #              Tests to be develop
+    #              Unit-tests to be developed
     #              Exception handling to be improved
     """Save the last nbTweetToExtract from user 'screen_name'"""
     tweets = returnTweet(screen_name,credentials,int(nbTweetToExtract))
@@ -83,7 +83,7 @@ def getAllTweets(request):
 
 def getUser(request,screen_name):
     #NOTE - TODO :Currently working on standard requests
-    #              Tests to be develop
+    #              Unit-tests to be developed
     """ Stores info about a user in the database"""
     # ToClean to True in order to save only the info that matters (see User model)
     userInfo = returnProfile(screen_name,credentials,toClean=True)
