@@ -1,0 +1,41 @@
+{% extends "template.html" %}
+{% block title %} | Get user @{{screen_name}} {% endblock %}
+
+{% block content %}
+<section id="part" class="two">
+  <div class="container">
+    {% if success %}
+    <header>
+      <h2 class="alt"> User @{{screen_name}} extracted<h2>
+    </header>
+      <div class="table-responsive-vertical shadow-z-1">
+        <p style="text-align=left;">
+        <table id="table" class="table table-hover table-mc-light-blue">
+          <tr>
+            <th> # ID </th>
+            <th> Name </th>
+            <th> Screen name </th>
+            <th> Created at </th>
+            <th> Contributors ? </th>
+            <th> Verified ? </th>
+          </tr>
+          <tr>
+            <td> {{userInfo.id}} </td>
+            <td> {{userInfo.name}} </td>
+            <td> @{{userInfo.screen_name}} </td>
+            <td> {{userInfo.created_at}} </td>
+            <td> {{userInfo.contributors_enabled}} </td>
+            <td> {{userInfo.verified}} </td>
+          </tr>
+      </table>
+    </p>
+    </div>
+    {% else %}
+    <header>
+    <h2> Request fail for user {{screen_name}}<h2>
+    </header>
+    {% endif %}
+  </div>
+
+</section>
+{% endblock %}
