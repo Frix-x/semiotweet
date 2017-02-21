@@ -54,7 +54,7 @@ def returnTweetsMultiple(screen_name,lastId=0):
     Else :          only returns the latest
     Uses returnTweetsBatch() since the Twitter API limits response to 200 Tweets"""
 
-    # Preventing from getting tweets from others users :
+    # Preventing from getting tweets from other users :
     if not screen_name in screen_nameToExtract:
         return []
 
@@ -113,11 +113,16 @@ def cleanTweet(tweet):
 #=========== USERS  ===========#
 #==============================#
 
-def returnProfile(screen_name,credentials,toClean=True):
+def returnUser(screen_name,toClean=True):
     """Return the profile of the user whose the name 'user' was given
     toClean true is used in order to keep the main infos, that is the ones
     to be stored in the database"""
     global baseURL
+    global credentials
+    # Preventing from getting other users :
+    if not screen_name in screen_nameToExtract:
+        return {}
+
     res = oauthRequest(baseURL+'users/show.json?screen_name='+screen_name,credentials)
     user = json.load(StringIO(res))
     if toClean:
@@ -135,27 +140,6 @@ def cleanUser(user):
 
     return user
 
-#NOTE - TODO : to be transfered in views :
-def saveUser(userInfo):
-    """Saves one user in database"""
-    newUser = User()
-
-    newUser.id = userInfo['id']
-    newUser.name = userInfo['name']
-    newUser.screen_name = userInfo['screen_name']
-    newUser.created_at = userInfo['created_at']
-    newUser.contributors_enabled = userInfo['contributors_enabled']
-    newUser.verified = userInfo['verified']
-
-    # Formating the date
-    newUser.created_at = time.strftime('%Y-%m-%d %H:%M:%S', time.strptime(newUser.created_at,'%a %b %d %H:%M:%S +0000 %Y'))
-
-    # Saving the user in the database
-    try:
-        newUser.save()
-        return True
-    except BaseException:
-        return False
 
 #==============================#
 #==== SETTINGS & VARIABLES ====#
@@ -245,7 +229,7 @@ def testBatch(screen_name,count=False,max_id=False,since_id=False):
     print len(res)
 
 def testProfile(screen_name,toClean=True):
-    user = returnProfile(screen_name,credentials,toClean)
+    user = returnUser(screen_name,credentials,toClean)
 
     remainingFields = [k for k,v in user.items()]
     for i in remainingFields:

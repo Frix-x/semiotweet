@@ -9,6 +9,10 @@ import string
 import time
 from django.db.models import Max
 
+#==============================#
+#=========== OTHERS ===========#
+#==============================#
+
 def home(request):
     """Redirect to the home page"""
     return render(request,'home.html',locals())
@@ -17,13 +21,17 @@ def displayInfo(request,screen_name):
     #NOTE - TODO : Profile images dont't appear : how about stocking them ?
     #              Front-end to be done
     """Display all the tweets for a user"""
-    userInfo = returnProfile(screen_name,credentials,toClean=False)
+    userInfo = returnUser(screen_name,toClean=False)
     success = True
     if not(userInfo): #If the user doesn't exist
         success = False
     else:
         userInfo["profile_image_url_https"] = userInfo["profile_image_url_https"].replace('_normal.jpg','.jpg')
     return render(request,'displayInfo.html',locals())
+
+#==============================#
+#=========== TWEETS ===========#
+#==============================#
 
 def saveTweet(tweet,user):
     """Saves one tweet from user in database"""
@@ -68,20 +76,53 @@ def getTweets(request,option):
 
     return render(request,'getTweets.html',locals())
 
+#==============================#
+#=========== USERS  ===========#
+#==============================#
+
+def saveUser(userInfo):
+    """Saves one user in database"""
+    newUser = User()
+
+    newUser.id = userInfo['id']
+    newUser.name = userInfo['name']
+    newUser.screen_name = userInfo['screen_name']
+    newUser.created_at = userInfo['created_at']
+    newUser.contributors_enabled = userInfo['contributors_enabled']
+    newUser.verified = userInfo['verified']
+
+    # Formating the date
+    newUser.created_at = time.strftime('%Y-%m-%d %H:%M:%S', time.strptime(newUser.created_at,'%a %b %d %H:%M:%S +0000 %Y'))
+
+    # Saving the user in the database
+    try:
+        newUser.save()
+        return True
+    except BaseException:
+        return False
 
 def getUser(request,screen_name):
     #NOTE - TODO :Currently working on standard requests
     #              Unit-tests to be developed
-    """ Stores info about a user in the database"""
-    # toClean to True : saves only the info that matters (see User model)
-    userInfo = returnProfile(screen_name,credentials,toClean=True)
-    success = True
+    """ Stores info about a users in the database
+    If screen_name == "all" : store all
+    Else : only store info of one user"""
+    global screen_nameToExtract
 
-    if not(userInfo): #If the user doesn't exist
-        success = False
-        return render(request,'getUser.html',locals())
+    usersToExtract = []
+    if screen_name == "all":
+        usersToExtract = screen_nameToExtract
+    else:
+        usersToExtract.append(screen_name)
 
-    # Saving the user
-    success = saveUser(userInfo)
+    for user in usersToExtract:
+        userInfo = returnUser(user,toClean=True)
+
+        if not(userInfo): #If the user doesn't exist
+            success = False
+            return render(request,'getUser.html',locals())
+
+        # Saving the user
+        success = saveUser(userInfo)
 
     return render(request,'getUser.html',locals())
