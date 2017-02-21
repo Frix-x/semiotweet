@@ -1,4 +1,5 @@
-# Semiotweet
+# ![DataBase](./viewer/static/images/semiotweet.jpg =40x) Semiotweet
+
 Tweets analysis from politics.
 
 ## What's the goal
@@ -8,12 +9,13 @@ It shows what are the most commons words in those tweets, and what are the diffe
 
 
 ## How it works
-
 Stack is subjects to know changes.
+
 ### Back-end :
  - Django,
  - SQLite
  - Twitter API,
+
 ### Front-end ; to be chosen between :
  - D3.js
  - chart.js
@@ -24,7 +26,7 @@ Stack is subjects to know changes.
  - flot
  - p5.js
 
-## Architecture, data Structures & models
+## Architecture, data structures & models
 
 There's just one app called `viewer` yet. `urls.py` directly redirects to this app.
 `extraction.py` contains functions that are used in the views.
@@ -75,5 +77,15 @@ $ python manage.py runserver
   - Extracting old tweet (60%)
 
 ## Things to do :
+  - Getting all the users at once
   - Extract new tweet (40%)
+  - Semantic fields
   - JS libraries
+  - Deployement on Heroku
+  - README.md
+
+## Ressources
+
+  - Logo from [graphicdesignblg](https://www.instagram.com/graphicdesignblg/ "graphicdesignblg on Instagram")
+  - [Twitter API documentation](https://dev.twitter.com/ "Twitter API documentation")
+  - Marco Bonzanini, [Mining Twitter Data with Python](https://marcobonzanini.com/2015/03/02/mining-twitter-data-with-python-part-1/ "Mining Twitter Data with Python")
