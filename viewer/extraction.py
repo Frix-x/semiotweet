@@ -4,6 +4,13 @@ from StringIO import StringIO
 import json
 import os, sys, getenv
 
+# NOTE - TODO : ERROR during import ; the better way would be to save tweets in the views
+from django.db.models import Max
+#from models import Tweet,User
+
+#==============================#
+#========== REQUESTS ==========#
+#==============================#
 
 def oauthRequest(url,credentials,http_method="GET",post_body="",http_headers=None):
     """Prepare a request """
@@ -13,24 +20,26 @@ def oauthRequest(url,credentials,http_method="GET",post_body="",http_headers=Non
     resp, content = client.request( url, method=http_method, body=post_body, headers=http_headers )
     return content
 
-def returnProfile(screen_name,credentials,toClean=True):
-    """Return the profile of the user whose the name 'user' was given
-    toClean true is used in order to keep the main infos, that is the ones
-    to be stored in the database"""
-    global baseURL
-    res = oauthRequest(baseURL+'users/show.json?screen_name='+screen_name,credentials)
-    user = json.load(StringIO(res))
-    if toClean:
-        user = cleanUser(user)
-    return user
+#==============================#
+#=========== TWEETS ===========#
+#==============================#
 
-def returnTweets(screen_name,credentials,nbTweet,max_id=False):
-    """Return the last nbTweet<200 tweets form user 'screen_name'"""
-    """max_id can be specified"""
+def returnTweetsBatch(screen_name,count=False,max_id=False,since_id=False):
+    """Return nbTweet<200 tweets form 'screen_name' with id in [max_id,since_id]"""
+    """max_id and since_id can be specified"""
+    global credentials
     global baseURL
-    url = baseURL+'statuses/user_timeline.json?screen_name='+screen_name+'&count='+str(nbTweet)
+    url = baseURL+'statuses/user_timeline.json?screen_name='+screen_name
+    if count:
+        url +='&count='+str(count)
+
     if max_id :
-        url+="&max_id="+str(max_id)
+        url += "&max_id="+str(max_id)
+
+    if since_id :
+        url += "&since_id="+str(since_id)
+
+    # Request
     res = oauthRequest(url,credentials)
     res = json.load(StringIO(res)) # converting the string into good json format
 
@@ -41,22 +50,45 @@ def returnTweets(screen_name,credentials,nbTweet,max_id=False):
         tweet = cleanTweet(tweet)
     return res
 
-def returnOldTweets(screen_name,credentials,nbTweet):
-    """Return (approximately) the last nbTweet for user 'screen_name'"""
-    currentId = returnTweets(screen_name,credentials,1)[0]["id"]# id of the user's last tweet
+def returnTweetsMultiple(screen_name,option="latest"):
+    """Return +/- the last nbTweet for user 'screen_name'.
+    Uses returnTweetsBatch since the Twitter API limits to 200 Tweets"""
+    # Preventing from saving other tweets :
+    if not screen_name in screen_nameToExtract:
+        return False
 
-    batchSize = min(nbTweet,200) # batchSize between 1 and 200
-    maxIter = nbTweet/(batchSize+1) + 1 # number of requests to be send
-    iterNum = 0 # counter for the loop
-    lastId = 0
     tweets = [] # List of the nbTweet tweets
-    while lastId != currentId and iterNum < maxIter:
-        tweets += returnTweets(screen_name,credentials,batchSize,currentId)
-        # Updating the ids
-        lastId = currentId
-        currentId = tweets[-1]["id"]-1
+    currentId = returnTweetsBatch(screen_name,1)[0]["id"]# id of the user's last tweet
+    if option == "all": # We only want to get ALL the tweets ; it supposes there are no tweets in the DB
+        nbTweet = 3000 # NOTE : important setting
+        batchSize = min(nbTweet,200) # batchSize between 1 and 200
+        maxIter = nbTweet/(batchSize+1) + 1 # number of requests to send
+        iterNum = 0 # counter for the loop
+        lastId = 0
+        while lastId != currentId and iterNum < maxIter:
+            tweets += returnTweetsBatch(screen_name,batchSize,currentId,False)
+            # Updating the ids
+            lastId = currentId
+            currentId = tweets[-1]["id"]-1
 
-        iterNum = iterNum+1
+            iterNum = iterNum+1
+    else: # We only want to get the latest here ; it supposes there already exist some tweets in the DB
+        lastId = Tweet.objects.all().aggregate(Max('id'))
+        while lastId < currentId :
+            tweets += returnTweetsBatch(screen_name,batchSize,currentId,lastId)
+            # Updating the id
+            currentId = tweets[-1]["id"]-1
+
+    # If the user doesn't exist or errors during the request
+    if not(tweets):
+        return False
+
+    userFrom = User.objects.get(screen_name=screen_name)
+    success = True
+
+    # Saving tweets in database
+    for t in tweets:
+        success = saveTweet(t,userFrom) and success
 
     return tweets
 
@@ -76,8 +108,53 @@ def cleanTweet(tweet):
     tweet["user_id"] = tweet["user"]["id"]
     del tweet["user"]
 
+    # Getting the source ; x.find(y) returns -1 if string y not in string x
+    for s in tweetSources:
+        if tweet["source"].lower().find(s.lower()) != -1:
+            tweet["source"] = s
+            break
+
     return tweet
 
+def saveTweet(tweet,user):
+    """Saves one tweet from user in database"""
+    newTweet = Tweet()
+    newTweet.id = tweet['id']
+    newTweet.user_id = user
+    newTweet.text = tweet['text']
+    newTweet.created_at = tweet['created_at']
+    newTweet.is_quote_status = tweet['is_quote_status']
+    newTweet.in_reply_to_status_id = tweet['in_reply_to_status_id']
+    newTweet.favorite_count = tweet['favorite_count']
+    newTweet.retweet_count = tweet['retweet_count']
+    newTweet.source = tweet['source']
+    newTweet.in_reply_to_user_id = tweet['in_reply_to_user_id']
+    newTweet.lang = tweet['lang']
+
+    # Formating the date
+    newTweet.created_at = time.strftime('%Y-%m-%d %H:%M:%S', time.strptime(newTweet.created_at,'%a %b %d %H:%M:%S +0000 %Y'))
+
+    # Saving the tweet
+    try:
+        newTweet.save()
+        return True
+    except BaseException:
+        return False
+
+#==============================#
+#=========== USERS  ===========#
+#==============================#
+
+def returnProfile(screen_name,credentials,toClean=True):
+    """Return the profile of the user whose the name 'user' was given
+    toClean true is used in order to keep the main infos, that is the ones
+    to be stored in the database"""
+    global baseURL
+    res = oauthRequest(baseURL+'users/show.json?screen_name='+screen_name,credentials)
+    user = json.load(StringIO(res))
+    if toClean:
+        user = cleanUser(user)
+    return user
 
 def cleanUser(user):
     """Clean a Tweet : delete the useless features and encode string in UTF8"""
@@ -89,6 +166,27 @@ def cleanUser(user):
         del user[key]
 
     return user
+
+def saveUser(userInfo):
+    """Saves one user in database"""
+    newUser = User()
+
+    newUser.id = userInfo['id']
+    newUser.name = userInfo['name']
+    newUser.screen_name = userInfo['screen_name']
+    newUser.created_at = userInfo['created_at']
+    newUser.contributors_enabled = userInfo['contributors_enabled']
+    newUser.verified = userInfo['verified']
+
+    # Formating the date
+    newUser.created_at = time.strftime('%Y-%m-%d %H:%M:%S', time.strptime(newUser.created_at,'%a %b %d %H:%M:%S +0000 %Y'))
+
+    # Saving the user in the database
+    try:
+        newUser.save()
+        return True
+    except BaseException:
+        return False
 
 #==============================#
 #==== SETTINGS & VARIABLES ====#
@@ -145,30 +243,12 @@ screen_nameToExtract = ["EmmanuelMacron","MLP_officiel","FrancoisFillon",
 #=========== TESTS ============#
 #==============================#
 
-def testTweet(screen_name):
-    currentId = 798831991361703936
-    maxIter = 0
-    lastId = 0
-    tweets = []
-    while lastId != currentId and maxIter < 10:
-        batchSize = 200
-        tweets += returnTweets(screen_name,credentials,batchSize,currentId)
-        lastId = currentId
-        currentId = tweets[-1]["id"]-1
-        print "----"
-        print lastId, currentId
-        print currentId," vs ",tweets[-1]["id"]
-        # if tweets:
-        #     remainingFields = [k for k,v in tweets[0].items()]
-        #     print "---------------"
-        #     for t in tweets:
-        #         print t["id"]
-        #     print "---------------"
-        # else:
-        #     print "Fail"
+def testBatch(screen_name,count=False,max_id=False,since_id=False):
+    res = returnTweetsBatch(screen_name,count,max_id,since_id)
+    for t in res:
+        print t["id"], t["text"]
 
-        maxIter = maxIter+1
-    print len(tweets)
+    print len(res)
 
 def testProfile(screen_name,toClean=True):
     user = returnProfile(screen_name,credentials,toClean)
@@ -178,5 +258,6 @@ def testProfile(screen_name,toClean=True):
         print i,":", user[i]
 
 if __name__ == '__main__':
-    testTweet("jjerphan")
+    testBatch("EmmanuelMacron",count=4,max_id=833962028842770432,since_id=832997764984401920)
+    # testTweet("jjerphan")
     #testProfile("EmmanuelMacron",False)
