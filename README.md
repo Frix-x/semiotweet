@@ -67,21 +67,30 @@ $ python manage.py migrate
 $ python manage.py runserver
 ```
 
-## Things done
-  - Connection to Twitter API (100%)
-  - Basic architecture (100%)
-  - Defining models (100%)
-  - Defining Env' Variables (100%)
-  - Extracting user info (80%)
-  - Extracting old tweet (60%)
+## Getting users data and tweets
 
-## Things to do :
-  - Getting all the users at once
-  - Extract new tweet (40%)
-  - Semantic fields
-  - JS libraries
-  - Deployement on Heroku
-  - README.md
+Once the server is running, you have to extract the user info first, and then the tweets from them.
+
+In order to do that, you just have to click on "_Get all the users_" and "_Get all the tweets_" ; this will redirect you respectively to the
+URL : `http://127.0.0.1:8000/getUser/all/` and `http://127.0.0.1:8000/getTweets/`.
+
+If you want to get only the info from an user (say _@myUser_) just go to `http://127.0.0.1:8000/getUser/myUser/` ; and if you want to get the latest tweets you do not have simply get to `http://127.0.0.1:8000/getTweets/latest`.
+
+## Project Progress
+
+| Things done                                                         |    Things to do    |
+| -------------                                                       | ------------- |
+| Connection to Twitter API (100%) | Semantic fields (10%)|
+| Basic architecture (100%) | JS libraries (3.14 %) |
+| Defining models (100%) | Deployement on Heroku (0%) |
+| Defining Env' Variables (100%) | README.md (50%)|
+| Extracting user info (100%) ||
+| Extracting old tweets (100%) ||
+| Extracting latest tweets (100%) ||
+| Modular code for extraction (100%) ||
+| Getting all the users at once (100%) ||
+| Extract new tweet (80%, last 20% : effective tests to be done) || |
+
 
 ## Ressources
 
