@@ -7,6 +7,7 @@ from extraction import *
 import random
 import string
 import time
+from django.db.models import Max
 
 def home(request):
     """Redirect to the home page"""
@@ -24,25 +25,48 @@ def displayInfo(request,screen_name):
         userInfo["profile_image_url_https"] = userInfo["profile_image_url_https"].replace('_normal.jpg','.jpg')
     return render(request,'displayInfo.html',locals())
 
+def saveTweet(tweet,user):
+    """Saves one tweet from user in database"""
+    newTweet = Tweet()
+    newTweet.id = tweet['id']
+    newTweet.user_id = user
+    newTweet.text = tweet['text']
+    newTweet.created_at = tweet['created_at']
+    newTweet.is_quote_status = tweet['is_quote_status']
+    newTweet.in_reply_to_status_id = tweet['in_reply_to_status_id']
+    newTweet.favorite_count = tweet['favorite_count']
+    newTweet.retweet_count = tweet['retweet_count']
+    newTweet.source = tweet['source']
+    newTweet.in_reply_to_user_id = tweet['in_reply_to_user_id']
+    newTweet.lang = tweet['lang']
 
-def getLatestTweets(request):
+    # Formating the date
+    newTweet.created_at = time.strftime('%Y-%m-%d %H:%M:%S', time.strptime(newTweet.created_at,'%a %b %d %H:%M:%S +0000 %Y'))
+
+    # Saving the tweet
+    try:
+        newTweet.save()
+        return True
+    except BaseException:
+        return False
+
+def getTweets(request,option):
     """Save the latest tweets from all the users defined in screen_nameToExtract"""
     global screen_nameToExtract
     success = True
+    lastId =0
+    if option == "latest":
+        lastId = Tweet.objects.all().aggregate(Max('id'))
     for screen_name in screen_nameToExtract:
-        success = returnTweetsMultiple(screen_name,"latest") and success
+        tweets = returnTweetsMultiple(screen_name,lastId)
+
+        userFrom = User.objects.get(screen_name=screen_name)
+
+        # Saving tweets in database
+        for t in tweets:
+            success = saveTweet(t,userFrom) and success
 
     return render(request,'getTweets.html',locals())
-
-
-def getAllTweets(request):
-    """Save all the tweets from all the users defined in screen_nameToExtract"""
-    global screen_nameToExtract
-    success = True
-    for screen_name in screen_nameToExtract:
-        success = returnTweetsMultiple(screen_name,"all") and success
-
-    return render(request,'getAllTweets.html',locals())
 
 
 def getUser(request,screen_name):
