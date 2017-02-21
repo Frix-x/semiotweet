@@ -1,5 +1,4 @@
-# ![DataBase](./viewer/static/images/semiotweet.jpg =40x) Semiotweet
-
+# <img src="viewer/static/images/semiotweet.jpg" width="60" height="60" alt = "Logo"/> Semiotweet
 Tweets analysis from politics.
 
 ## What's the goal
