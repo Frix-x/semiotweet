@@ -87,12 +87,12 @@ def cleanTweet(tweet):
     global uselessFields
     global stringFields
 
-    fieldsToDelete = [k for k,v in tweet.items() if k not in usefullFields]
+    fieldsToDelete = [k for k in tweet.keys() if k not in usefullFields]
     for key in fieldsToDelete:
         del tweet[key]
 
     # NOTE : To encode string : no more usefull now
-    # remainingStrFields = [k for k,v in tweet.items() if k in stringFields]
+    # remainingStrFields = [k for k in tweet.keys() if k in stringFields]
     # for key in remainingStrFields:
     #     tweet[key] = str(tweet[key]).encode("utf-8")
 
@@ -134,7 +134,7 @@ def cleanUser(user):
     global usefullFieldsUser
     global stringFields
 
-    fieldsToDelete = [k for k,v in user.items() if k not in usefullFieldsUser]
+    fieldsToDelete = [k for k in user.keys() if k not in usefullFieldsUser]
     for key in fieldsToDelete:
         del user[key]
 
@@ -231,7 +231,7 @@ def testBatch(screen_name,count=False,max_id=False,since_id=False):
 def testProfile(screen_name,toClean=True):
     user = returnUser(screen_name,credentials,toClean)
 
-    remainingFields = [k for k,v in user.items()]
+    remainingFields = user.keys()
     for i in remainingFields:
         print i,":", user[i]
 
