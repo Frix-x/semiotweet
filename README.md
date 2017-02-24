@@ -18,12 +18,7 @@ Stack is subjects to know changes.
 ### Front-end ; to be chosen between :
  - D3.js
  - chart.js
- - anychart
- - canvasjs
- - c3.js
- - chartist.js
- - flot
- - p5.js
+ - vis.js
 
 ## Architecture, data structures & models
 
@@ -72,9 +67,9 @@ $ python manage.py runserver
 Once the server is running, you have to extract the user info first, and then the tweets from them.
 
 In order to do that, you just have to click on "_Get all the users_" and "_Get all the tweets_" ; this will redirect you respectively to the
-URL : `http://127.0.0.1:8000/getUser/all/` and `http://127.0.0.1:8000/getTweets/`.
+URL : `http://127.0.0.1:8000/getUser/all/` and `http://127.0.0.1:8000/getTweets/all`.
 
-If you want to get only the info from an user (say _@myUser_) just go to `http://127.0.0.1:8000/getUser/myUser/` ; and if you want to get the latest tweets you do not have simply get to `http://127.0.0.1:8000/getTweets/latest`.
+If you want to get only the info from an user (say @myUser) just go to `http://127.0.0.1:8000/getUser/myUser/` ; and if you want to get the latest tweets you do not have simply get to `http://127.0.0.1:8000/getTweets/latest` or to click "_Get the latest tweets_".
 
 ## Project Progress
 

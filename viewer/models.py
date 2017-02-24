@@ -23,7 +23,7 @@ class Tweet(models.Model):
     lang = models.CharField(null=True,max_length=5)
 
     def __str__(self):
-        return "Tweet of "+ self.user_id +' ('+self.created_at+') : '+self.text
+        return "Tweet of "+ str(self.user_id) +' ('+self.created_at+') : '+self.text
 
 class User(models.Model):
     """User class"""

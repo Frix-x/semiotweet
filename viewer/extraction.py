@@ -9,7 +9,7 @@ import os, sys, getenv
 #==============================#
 
 def oauthRequest(url,credentials,http_method="GET",post_body="",http_headers=None):
-    """Prepare a request """
+    """Send a request to the Twitter API ; returns the result"""
     consumer = oauth2.Consumer(key=credentials[0], secret=credentials[1])
     token = oauth2.Token(key=credentials[2], secret=credentials[3]) #Token of the app
     client = oauth2.Client(consumer, token) #Token of the user using the app
@@ -21,7 +21,7 @@ def oauthRequest(url,credentials,http_method="GET",post_body="",http_headers=Non
 #==============================#
 
 def returnTweetsBatch(screen_name,count=False,max_id=False,since_id=False):
-    """Return nbTweet<200 tweets form 'screen_name' with id in [max_id,since_id]"""
+    """Return nbTweet<200 tweets from user 'screen_name' with id in [max_id,since_id]"""
     """The parameters count, max_id and since_id can be specified"""
     global credentials
     global baseURL
@@ -86,7 +86,8 @@ def returnTweetsMultiple(screen_name,lastId=0):
     return tweets
 
 def cleanTweet(tweet):
-    """Clean a Tweet : delete the useless features to store infos in the database"""
+    """Clean a Tweet : delete the some fields and modify others in order
+    to store info in the database"""
     global uselessFields
     global stringFields
 
