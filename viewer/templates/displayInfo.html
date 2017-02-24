@@ -6,7 +6,9 @@
   <div class="container">
     {% if success %}
     <header>
-    <h2>{{userInfo.name}} (@{{userInfo.screen_name}}){% if userInfo.verified %} | Verified {% endif %}</h2>
+    <h2>{{userInfo.name}} (@{{userInfo.screen_name}})
+      {% if userInfo.verified %}<img src="/static/images/verified.png" height="40" width="40" alt="Verified" />
+      {% endif %}</h2>
       {% if userInfo.profile_image_url_https %}
         <img src="{{userInfo.profile_image_url_https}}" alt="{{userInfo.screen_name}}" />
       {% endif %}
