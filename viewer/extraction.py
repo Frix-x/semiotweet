@@ -207,7 +207,7 @@ tweetSources =["Twitter Web Client",
                "Storify",
                "Tweetbot for iOS",
                "Instagram",
-               "Tweetbot for iΟS"]
+               "Tweetbot for iOS"]
 
 ### Users' Fields (see : https://dev.twitter.com/overview/api/users):
 
