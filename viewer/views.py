@@ -66,7 +66,7 @@ def getTweets(request,option):
     for screen_name in screen_nameToExtract:
         if option == "latest": # We get the id of the user's last tweet
             idUser = User.objects.filter(screen_name=screen_name).values('id')[0]["id"]
-            lastId = Tweet.objects.filter(user_id=idUser).aggregate(Max('id'))
+            lastId = Tweet.objects.filter(user_id=idUser).aggregate(Max('id'))["id__max"]
 
         tweets = returnTweetsMultiple(screen_name,lastId)
         userFrom = User.objects.get(screen_name=screen_name)
