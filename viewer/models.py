@@ -36,4 +36,4 @@ class User(models.Model):
     verified = models.BooleanField(default=True)
 
     def __str__(self):
-        return "User : "+ self.name +' (@'+self.screen_name+' ; if :'+self.id+')'
+        return "User : "+ self.name +' (@'+self.screen_name+' ; id :'+str(self.id)+')'

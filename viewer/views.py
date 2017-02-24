@@ -63,18 +63,19 @@ def getTweets(request,option):
     global screen_nameToExtract
     success = True
     lastId =0
-    if option == "latest":
-        lastId = Tweet.objects.all().aggregate(Max('id'))
     for screen_name in screen_nameToExtract:
-        tweets = returnTweetsMultiple(screen_name,lastId)
+        if option == "latest": # We get the id of the user's last tweet
+            idUser = User.objects.filter(screen_name=screen_name).values('id')[0]["id"]
+            lastId = Tweet.objects.filter(user_id=idUser).aggregate(Max('id'))["id__max"]
 
+        tweets = returnTweetsMultiple(screen_name,lastId)
         userFrom = User.objects.get(screen_name=screen_name)
 
         # Saving tweets in database
         for t in tweets:
             success = saveTweet(t,userFrom) and success
 
-    return render(request,'getTweets.html',locals())
+    return render(request,'getTweets.html',{"success" : success, "nbTweets" : len(tweets)})
 
 #==============================#
 #=========== USERS  ===========#

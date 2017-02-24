@@ -60,10 +60,10 @@ def returnTweetsMultiple(screen_name,lastId=0):
 
     tweets = [] # List of the nbTweet tweets
     currentId = returnTweetsBatch(screen_name,1)[0]["id"]# id of the user's last tweet
+    nbTweet = 3000 # NOTE : important setting
+    batchSize = min(nbTweet,200) # batchSize between 1 and 200
 
     if lastId == 0: # We only want to get ALL the tweets ; it supposes there are no tweets in the DB
-        nbTweet = 3000 # NOTE : important setting
-        batchSize = min(nbTweet,200) # batchSize between 1 and 200
         maxIter = nbTweet/(batchSize+1) + 1 # number of requests to send
         iterNum = 0 # counter for the loop
         lastId = 0
@@ -75,10 +75,13 @@ def returnTweetsMultiple(screen_name,lastId=0):
 
             iterNum = iterNum+1
     else: # We only want to get the latest here ; it supposes there already exist some tweets in the DB
-        while lastId < currentId :
-            tweets += returnTweetsBatch(screen_name,batchSize,currentId,lastId)
+        catch = returnTweetsBatch(screen_name,batchSize,currentId,lastId)
+        while catch :
+            tweets += catch
             # Updating the id
             currentId = tweets[-1]["id"]-1
+            catch = returnTweetsBatch(screen_name,batchSize,currentId,lastId)
+
 
     return tweets
 
@@ -206,8 +209,7 @@ tweetSources =["Twitter Web Client",
                "Twitter for Mac",
                "Storify",
                "Tweetbot for iOS",
-               "Instagram",
-               "Tweetbot for iOS"]
+               "Instagram"]
 
 ### Users' Fields (see : https://dev.twitter.com/overview/api/users):
 
@@ -228,6 +230,14 @@ def testBatch(screen_name,count=False,max_id=False,since_id=False):
 
     print len(res)
 
+def testMultiple(screen_name,since_id=False):
+    res = returnTweetsMultiple(screen_name,since_id)
+    for t in res:
+        print t["id"], t["text"]
+
+    print len(res)
+
+
 def testProfile(screen_name,toClean=True):
     user = returnUser(screen_name,credentials,toClean)
 
@@ -236,6 +246,8 @@ def testProfile(screen_name,toClean=True):
         print i,":", user[i]
 
 if __name__ == '__main__':
-    testBatch("EmmanuelMacron",count=4,max_id=833962028842770432,since_id=832997764984401920)
+    # testBatch("EmmanuelMacron",count=4,max_id=833962028842770432,since_id=832997764984401920)
+    testMultiple("JLMelenchon",since_id=834891272267653122)
+    # testBatch("JLMelenchon",since_id=834891272267653122)
     #testTweet("jjerphan")
     #testProfile("jjerphan",False)
