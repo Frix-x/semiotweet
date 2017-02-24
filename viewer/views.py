@@ -2,13 +2,14 @@
 from datetime import datetime
 from django.http import HttpResponse,Http404
 from django.shortcuts import render,redirect
-from .models import Tweet,User
-from extraction import *
+from .models import Tweet,User,Word
 import random
 import string
 import time
 from django.db.models import Max
 
+from extraction import *
+from semanticFields import *
 #==============================#
 #=========== OTHERS ===========#
 #==============================#
@@ -127,3 +128,25 @@ def getUser(request,screen_name):
         success = saveUser(userInfo)
 
     return render(request,'getUser.html',locals())
+
+#==============================#
+#=========== WORDS  ===========#
+#==============================#
+
+def getWords(request):
+    """ Stores common words and semantic fields of the specifiedWords """
+    global specifiedWords
+
+    # Saving the common words
+    for word in commonWords:
+        newWord = Word(word=word,semanticField="#")
+        newWord.save()
+
+    # Saving the semantic field of the specifiedWords
+    for word in specifiedWords:
+        semanticField = getSemanticField(word)
+        for relatedWord in semanticField:
+            newWord = Word(word=relatedWord,semanticField=word)
+            newWord.save()
+
+    return render(request,'getWords.html',{"success": True, "specifiedWords" : specifiedWords})
