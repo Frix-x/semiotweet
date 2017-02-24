@@ -37,3 +37,13 @@ class User(models.Model):
 
     def __str__(self):
         return "User : "+ self.name +' (@'+self.screen_name+' ; id :'+str(self.id)+')'
+
+
+class Word(models.Model):
+    """Word class"""
+
+    word = models.CharField(primary_key=True,max_length=100)
+    semanticField = models.CharField(null=False,max_length=100)
+
+    def __str__(self):
+        return self.word + " (semantic field : "+ self.semanticField +")"
