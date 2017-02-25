@@ -5,15 +5,30 @@
 <section id="part" class="two">
   <div class="container">
     {% if success %}
+
+
+
     <header>
-    <h2>{{userInfo.name}} (@{{userInfo.screen_name}})
-      {% if userInfo.verified %}<img src="/static/images/verified.png" height="40" width="40" alt="Verified" />
-      {% endif %}</h2>
-      {% if userInfo.profile_image_url_https %}
-        <img src="{{userInfo.profile_image_url_https}}" alt="{{userInfo.screen_name}}" />
-      {% endif %}
-      <h3>Followers : {{userInfo.followers_count}}</h3>
+    <div class="row">
+      <div class="col-lg-3">
+        {% if userInfo.profile_image_url_https %}
+        <img src="{{userInfo.profile_image_url_https}}" style="width:100%;" alt="{{userInfo.screen_name}}" />
+        {% endif %}
+        <p class = "candidate-followers">{{userInfo.followers_count}} followers<p>
+      </div>
+
+      <div class="col-lg-9">
+        <h1 class="candidate-title">{{userInfo.name}}</h1>
+        @{{userInfo.screen_name}}{% if userInfo.verified %}<img src="/static/images/verified.png" height="25" width="25" alt="Verified" />{% endif %}
+        <p class="candidate-description">{{userInfo.description}}</p>
+      </div>
+    </div>
+
+
+
     </header>
+
+
     {% else %}
     <header>
     <h2> Request fail for user {{screen_name}}<h2>

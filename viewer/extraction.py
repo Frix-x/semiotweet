@@ -129,6 +129,7 @@ def returnUser(screen_name,toClean=True):
 
     res = oauthRequest(baseURL+'users/show.json?screen_name='+screen_name,credentials)
     user = json.load(StringIO(res))
+    print(user)
     if toClean:
         user = cleanUser(user)
     return user
