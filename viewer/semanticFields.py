@@ -5,6 +5,7 @@ import nltk.data
 
 from nltk.corpus import stopwords
 from nltk.tokenize import WordPunctTokenizer
+from collections import Counter,defaultdict
 
 def getSemanticField(word):
     """Get the semantic field of the word"""
@@ -14,24 +15,36 @@ def getSemanticField(word):
     semanticField = tree.xpath('//a[starts-with(@href,"'+aim+'")]/text()')
     return semanticField
 
-def tokenizeTweet(tweetText):
+def tokenizeText(text):
     #NOTE - TODO : to be modify to include hashtag and mentions
-    """Tokenize a tweet : gives a list of the meaningful words"""
+    """Tokenize a text : returns a list of the meaningful words"""
     # French Tokenizer :
     # tokenizerLocation = 'tokenizers/punkt/french.pickle' #Python 2
     # tokenizerLocation = 'tokenizers/punkt/PY3/french.pickle' #Python 3
     # tokenizer = nltk.data.load(tokenizerLocation)
+    global commonWords
 
     tokenizer = WordPunctTokenizer()
-    words = tokenizer.tokenize(tweetText)
+    words = tokenizer.tokenize(text)
 
     # French stopwords
-    frenchStopwords = set(stopwords.words('french'))
+    frenchStopwords = set(stopwords.words('french')).union(set(commonWords))
 
     # Filtering
     words = [w.lower() for w in words if not (len(w) < 2 or w.lower() in frenchStopwords)]
 
     return words
+
+def countWords(listTweetText):
+    """Takes a list of text and returns the words occurences"""
+    wordOccurences = defaultdict(lambda: 0)
+    for currentTweet in listTweetText:
+        currentOccurences = dict(Counter(tokenizeText(currentTweet)))
+        for k in currentOccurences.keys():
+            wordOccurences[k] += 1
+
+    return dict(wordOccurences)
+
 
 # ~ 76 most common words in french (see : https://en.wiktionary.org/wiki/Wiktionary:French_frequency_lists/1-2000)
 commonWords =["de", "la", "le", "et", "les", "des", "en", "un", "du", "une",
@@ -49,4 +62,8 @@ specifiedWords = ["colère","combat","peur","victoire","aide","argent","mensonge
 
 if __name__ == '__main__':
     # print(getSemanticField("médicament"))
-    tokenizeTweet("J'aime les beignets à la framboise #Love @jjerphan")
+    # tokenizeText("J'aime les beignets à la framboise #Love @jjerphan prout prout ")
+    listTweetText = ["J'aime les barbes à papa #swag","Mon cheval mange des carottes-cakes en Hiver ! #Yolo #QuelleIdée !","Quelle idée d'avoir des doigts :'("]
+    res = countWords(listTweetText)
+    for i in res.keys():
+        print i,res[i]
