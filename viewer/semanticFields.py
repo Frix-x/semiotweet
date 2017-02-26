@@ -1,6 +1,10 @@
 #coding:utf-8
 from lxml import html
 import requests
+import nltk.data
+
+from nltk.corpus import stopwords
+from nltk.tokenize import WordPunctTokenizer
 
 def getSemanticField(word):
     """Get the semantic field of the word"""
@@ -10,6 +14,24 @@ def getSemanticField(word):
     semanticField = tree.xpath('//a[starts-with(@href,"'+aim+'")]/text()')
     return semanticField
 
+def tokenizeTweet(tweetText):
+    #NOTE - TODO : to be modify to include hashtag and mentions
+    """Tokenize a tweet : gives a list of the meaningful words"""
+    # French Tokenizer :
+    # tokenizerLocation = 'tokenizers/punkt/french.pickle' #Python 2
+    # tokenizerLocation = 'tokenizers/punkt/PY3/french.pickle' #Python 3
+    # tokenizer = nltk.data.load(tokenizerLocation)
+
+    tokenizer = WordPunctTokenizer()
+    words = tokenizer.tokenize(tweetText)
+
+    # French stopwords
+    frenchStopwords = set(stopwords.words('french'))
+
+    # Filtering
+    words = [w.lower() for w in words if not (len(w) < 2 or w.lower() in frenchStopwords)]
+
+    return words
 
 # ~ 76 most common words in french (see : https://en.wiktionary.org/wiki/Wiktionary:French_frequency_lists/1-2000)
 commonWords =["de", "la", "le", "et", "les", "des", "en", "un", "du", "une",
@@ -26,4 +48,5 @@ commonWords =["de", "la", "le", "et", "les", "des", "en", "un", "du", "une",
 specifiedWords = ["colère","combat","peur","victoire","aide","argent","mensonge","société"]
 
 if __name__ == '__main__':
-    print(getSemanticField("médicament"))
+    # print(getSemanticField("médicament"))
+    tokenizeTweet("J'aime les beignets à la framboise #Love @jjerphan")
