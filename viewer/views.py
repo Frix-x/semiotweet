@@ -28,9 +28,9 @@ def displayInfo(request,screen_name):
     if not(userInfo): # If the user doesn't exist
         success = False
         return render(request,'displayInfo.html',locals())
-    else:
-        userInfo["profile_image_url_https"] = userInfo["profile_image_url_https"].replace('_normal.jpg','.jpg')
 
+    userInfo["profile_image_url_https"] = userInfo["profile_image_url_https"].replace('_normal.jpg','.jpg')
+    
     # Most common words said by the user
     idUser = userInfo["id"]
     listTweetText = Tweet.objects.filter(user_id=idUser).values('text')
