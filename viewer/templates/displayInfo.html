@@ -11,7 +11,7 @@
         {% if userInfo.profile_image_url_https %}
         <img src="{{userInfo.profile_image_url_https}}" style="width:100%;" alt="{{userInfo.screen_name}}" />
         {% endif %}
-        <p class = "candidate-followers">{{userInfo.followers_count}} followers<p>
+        <p class="center">{{userInfo.followers_count}} followers<p>
       </div>
 
       <div class="col-lg-9">
@@ -40,8 +40,7 @@
 
 
 {%block script%}
-    <script>
-
+<script>
 var svg = d3.select("svg"),
     width = +svg.attr("width");
 
