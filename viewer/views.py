@@ -21,29 +21,23 @@ def home(request):
     return render(request,'home.html',locals())
 
 def displayInfo(request,screen_name):
-    #NOTE - TODO : Profile images dont't appear : how about stocking them ?
-    #              Front-end to be done
-    """Display all the tweets for a user"""
+    """Display all the tweets for a user
+    Requests the Twitter API directly and search for the most common words"""
     userInfo = returnUser(screen_name,toClean=False)
     success = True
-    if not(userInfo): #If the user doesn't exist
+    if not(userInfo): # If the user doesn't exist
         success = False
+        return render(request,'displayInfo.html',locals())
     else:
         userInfo["profile_image_url_https"] = userInfo["profile_image_url_https"].replace('_normal.jpg','.jpg')
 
-    ###
+    # Most common words said by the user
     idUser = userInfo["id"]
     listTweetText = Tweet.objects.filter(user_id=idUser).values('text')
     listTweetText = [t["text"] for t in listTweetText]
 
-    words = simplejson.dumps(toJson(countWords(listTweetText)))
-    print words
-    # print words
-    # for i,j in words.items():
-    #     print i,j
-    # print toJson(words)
-    # js_data = simplejson.dumps(my_dict)
-    # render_template_to_response("my_template.html", {"my_data": js_data, …})
+    # words is a JSON list of dict like : {"word":"foo", "occur":42}
+    words = simplejson.dumps(toJsonForBubbles(countWords(listTweetText)))
     return render(request,'displayInfo.html',locals())
 
 #==============================#
@@ -79,7 +73,7 @@ def getTweets(request,option):
     """Save the latest tweets from all the users defined in screen_nameToExtract"""
     global screen_nameToExtract
     success = True
-    lastId =0
+    lastId = 0
     for screen_name in screen_nameToExtract:
         if option == "latest": # We get the id of the user's last tweet
             idUser = User.objects.filter(screen_name=screen_name).values('id')[0]["id"]

@@ -16,7 +16,7 @@ def getSemanticField(word):
     return semanticField
 
 def tokenizeText(text):
-    #NOTE - TODO : to be modify to include hashtag and mentions
+    #NOTE - TODO : to be modify to include hashtag and mentions and to remove URL
     """Tokenize a text : returns a list of the meaningful words"""
     # French Tokenizer :
     # tokenizerLocation = 'tokenizers/punkt/french.pickle' #Python 2
@@ -45,7 +45,8 @@ def countWords(listTweetText,nbWordsToExtract=30):
 
     return dict(Counter(wordOccurences).most_common(nbWordsToExtract))
 
-def toJson(dict):
+def toJsonForBubbles(dict):
+    """Return a list of dict used next for the Bubble Graph"""
     output = []
     for key,val in dict.items():
         output.append({"word":key,"occur":val})
