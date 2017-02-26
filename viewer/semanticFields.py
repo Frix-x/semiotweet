@@ -35,16 +35,22 @@ def tokenizeText(text):
 
     return words
 
-def countWords(listTweetText):
+def countWords(listTweetText,nbWordsToExtract=30):
     """Takes a list of text and returns the words occurences"""
     wordOccurences = defaultdict(lambda: 0)
     for currentTweet in listTweetText:
         currentOccurences = dict(Counter(tokenizeText(currentTweet)))
         for k in currentOccurences.keys():
-            wordOccurences[k] += 1
+            wordOccurences[k] += currentOccurences[k]
 
-    return dict(wordOccurences)
+    return dict(Counter(wordOccurences).most_common(nbWordsToExtract))
 
+def toJson(dict):
+    output = []
+    for key,val in dict.items():
+        output.append({"word":key,"occur":val})
+
+    return output
 
 # ~ 76 most common words in french (see : https://en.wiktionary.org/wiki/Wiktionary:French_frequency_lists/1-2000)
 commonWords =["de", "la", "le", "et", "les", "des", "en", "un", "du", "une",
@@ -62,8 +68,8 @@ specifiedWords = ["colère","combat","peur","victoire","aide","argent","mensonge
 
 if __name__ == '__main__':
     # print(getSemanticField("médicament"))
-    # tokenizeText("J'aime les beignets à la framboise #Love @jjerphan prout prout ")
-    listTweetText = ["J'aime les barbes à papa #swag","Mon cheval mange des carottes-cakes en Hiver ! #Yolo #QuelleIdée !","Quelle idée d'avoir des doigts :'("]
-    res = countWords(listTweetText)
-    for i in res.keys():
-        print i,res[i]
+    print dict(Counter(tokenizeText("J'aime les beignets à la framboise #Love @jjerphan prout prout ")))
+    # listTweetText = ["J'aime les barbes à papa #swag","Mon cheval mange des carottes-cakes en Hiver ! #Yolo #QuelleIdée !","Quelle idée d'avoir des doigts :'("]
+    # res = countWords(listTweetText)
+    # for i in res.keys():
+    #     print i,res[i]

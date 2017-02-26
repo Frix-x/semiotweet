@@ -41,6 +41,9 @@
 
 {%block script%}
 <script>
+var words = {{words|safe}};
+console.log(words[0].word);
+
 var svg = d3.select("svg"),
     width = +svg.attr("width");
 

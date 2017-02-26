@@ -8,6 +8,8 @@ import string
 import time
 from django.db.models import Max
 
+import json as simplejson
+
 from extraction import *
 from semanticFields import *
 #==============================#
@@ -28,6 +30,20 @@ def displayInfo(request,screen_name):
         success = False
     else:
         userInfo["profile_image_url_https"] = userInfo["profile_image_url_https"].replace('_normal.jpg','.jpg')
+
+    ###
+    idUser = userInfo["id"]
+    listTweetText = Tweet.objects.filter(user_id=idUser).values('text')
+    listTweetText = [t["text"] for t in listTweetText]
+
+    words = simplejson.dumps(toJson(countWords(listTweetText)))
+    print words
+    # print words
+    # for i,j in words.items():
+    #     print i,j
+    # print toJson(words)
+    # js_data = simplejson.dumps(my_dict)
+    # render_template_to_response("my_template.html", {"my_data": js_data, …})
     return render(request,'displayInfo.html',locals())
 
 #==============================#
