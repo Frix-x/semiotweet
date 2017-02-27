@@ -12,7 +12,7 @@ Stack is subjects to know changes.
 
 ### Back-end :
  - Django,
- - SQLite
+ - SQLite,
  - Twitter API,
 
 ### Front-end ; to be chosen between :
