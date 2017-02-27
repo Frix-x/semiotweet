@@ -30,7 +30,7 @@ def displayInfo(request,screen_name):
         return render(request,'displayInfo.html',locals())
 
     userInfo["profile_image_url_https"] = userInfo["profile_image_url_https"].replace('_normal.jpg','.jpg')
-    
+
     # Most common words said by the user
     idUser = userInfo["id"]
     listTweetText = Tweet.objects.filter(user_id=idUser).values('text')
@@ -74,19 +74,21 @@ def getTweets(request,option):
     global screen_nameToExtract
     success = True
     lastId = 0
+    nbTweets = 0 # number of extracted tweets
     for screen_name in screen_nameToExtract:
         if option == "latest": # We get the id of the user's last tweet
             idUser = User.objects.filter(screen_name=screen_name).values('id')[0]["id"]
             lastId = Tweet.objects.filter(user_id=idUser).aggregate(Max('id'))["id__max"]
 
         tweets = returnTweetsMultiple(screen_name,lastId)
-        userFrom = User.objects.get(screen_name=screen_name)
+        nbTweets += len(tweets)
 
         # Saving tweets in database
+        userFrom = User.objects.get(screen_name=screen_name)
         for t in tweets:
             success = saveTweet(t,userFrom) and success
 
-    return render(request,'getTweets.html',{"success" : success, "nbTweets" : len(tweets)})
+    return render(request,'getTweets.html',{"success" : success, "nbTweets" : nbTweets})
 
 #==============================#
 #=========== USERS  ===========#
