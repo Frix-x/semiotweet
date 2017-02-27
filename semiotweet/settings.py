@@ -33,7 +33,7 @@ SECRET_KEY = getEnvValue('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = getEnvValue('DEBUG')
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["semiotweet.herokuapp.com"]
 
 
 # Application definition
