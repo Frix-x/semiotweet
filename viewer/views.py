@@ -1,5 +1,6 @@
 #-*- coding: utf-8 -*-
-from datetime import datetime
+# from datetime import datetime
+from django.utils import timezone
 from django.http import HttpResponse,Http404
 from django.shortcuts import render,redirect
 from .models import Tweet,User,Word
