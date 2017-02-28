@@ -33,7 +33,7 @@ SECRET_KEY = getEnvValue('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = getEnvValue('DEBUG')
 
-ALLOWED_HOSTS = ["semiotweet.herokuapp.com", "localhost"]
+ALLOWED_HOSTS = ["semiotweet.herokuapp.com", "localhost","127.0.0.1"]
 
 
 # Application definition
@@ -127,3 +127,5 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.10/howto/static-files/
 
 STATIC_URL = '/static/'
+
+STATIC_ROOT = STATIC_URL
