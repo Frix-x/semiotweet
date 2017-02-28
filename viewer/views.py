@@ -10,7 +10,7 @@ import time
 from django.db.models import Max
 from django.db import connection #for direct SQL requests
 
-import json as simplejson
+import json
 
 from extraction import *
 from semanticFields import *
@@ -22,9 +22,39 @@ def home(request):
     """Redirect to the home page : global statistics"""
     cursor = connection.cursor()
     cursor.execute('SELECT DISTINCT source, COUNT(source) AS nb  FROM viewer_tweet GROUP BY source ORDER BY nb DESC')
-    sources = cursor.fetchall()
+    res = cursor.fetchall()
+    sources = []
+    num = []
+    for (s,n) in res:
+        sources.append(s)
+        num.append(n)
 
+    # Keeping only the most commons stats
+    if len(sources)>5 :
+        sources = sources[0:5]
+        sources.append("Others")
+        num[6] = sum(num[6:-1])
+        num = num[0:6]
 
+    # JSON Formating
+    sources = json.dumps(sources)
+    num = json.dumps(num)
+
+    listTweetText = Tweet.objects.values('text')
+    listTweetText = [t["text"] for t in listTweetText]
+    listTweetText = countWords(listTweetText)
+
+    words = []
+    occurences = []
+    for w,o in listTweetText.items():
+        words.append(w)
+        occurences.append(o)
+
+    colorsForBars = ['rgba(54, 162, 235, 1)']*len(words)
+
+    # JSON Formating
+    words = json.dumps(words)
+    occurences = json.dumps(occurences)
     return render(request,'home.html',locals())
 
 def displayInfo(request,screen_name):
@@ -44,7 +74,7 @@ def displayInfo(request,screen_name):
     listTweetText = [t["text"] for t in listTweetText]
 
     # words is a JSON list of dict like : {"word":"foo", "occur":42}
-    words = simplejson.dumps(toJsonForBubbles(countWords(listTweetText)))
+    words = json.dumps(toJsonForBubbles(countWords(listTweetText)))
     return render(request,'displayInfo.html',locals())
 
 #==============================#
