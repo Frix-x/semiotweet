@@ -8,6 +8,7 @@ import random
 import string
 import time
 from django.db.models import Max
+from django.db import connection #for direct SQL requests
 
 import json as simplejson
 
@@ -18,7 +19,12 @@ from semanticFields import *
 #==============================#
 
 def home(request):
-    """Redirect to the home page"""
+    """Redirect to the home page : global statistics"""
+    cursor = connection.cursor()
+    cursor.execute('SELECT DISTINCT source, COUNT(source) AS nb  FROM viewer_tweet GROUP BY source ORDER BY nb DESC')
+    sources = cursor.fetchall()
+
+
     return render(request,'home.html',locals())
 
 def displayInfo(request,screen_name):
