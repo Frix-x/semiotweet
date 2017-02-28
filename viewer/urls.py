@@ -7,4 +7,5 @@ urlpatterns = [
     url(r'^getUser/(?P<screen_name>.+)/$',views.getUser,name='getUser'),
     url(r'^getTweets/(?P<option>.+)/$',views.getTweets,name='getTweets'),
     url(r'^getWords/$',views.getWords,name='getWords'),
+    url(r'^displayNetwork/$',views.displayNetwork,name='displayNetwork'),
 ]

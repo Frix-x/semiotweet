@@ -163,3 +163,12 @@ def getWords(request):
             newWord.save()
 
     return render(request,'getWords.html',{"success": True, "specifiedWords" : specifiedWords})
+
+#==============================#
+#===== SEMANTIC NETWORK =======#
+#==============================#
+
+def displayNetwork(request):
+    """Display a force network with users linked to their matching keywords"""
+
+    return render(request,'displayNetwork.html',{"success": True})
