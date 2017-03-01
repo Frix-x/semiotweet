@@ -99,7 +99,8 @@ def saveUser(userInfo):
     try:
         newUser.save()
         return True
-    except BaseException:
+    except BaseException, e:
+        print "Error :{0} : {1}".format(e.errno, e.strerror):
         return False
 
 def getUser(request,screen_name):
@@ -127,5 +128,5 @@ def getUser(request,screen_name):
         # Saving the user
         success = saveUser(userInfo)
 
-    error = "All was OK"
+    error = "Error during DB save"
     return render(request,'getUser.html',locals())
