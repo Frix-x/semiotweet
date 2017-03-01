@@ -3,8 +3,10 @@ from lxml import html
 import requests
 import nltk.data
 
+import string
+
 from nltk.corpus import stopwords
-from nltk.tokenize import WordPunctTokenizer
+from nltk.tokenize import WordPunctTokenizer,TweetTokenizer
 from collections import Counter,defaultdict
 
 def getSemanticField(word):
@@ -15,6 +17,13 @@ def getSemanticField(word):
     semanticField = tree.xpath('//a[starts-with(@href,"'+aim+'")]/text()')
     return semanticField
 
+def personnalTokenizer(text):
+    """Personnal Tokenizer"""
+    text = unicode(text, "utf-8")
+    text = text.translate(string.maketrans("",""), "!\"$%&()*+,-./:;<=>?[\]^_`{|}~")
+    words = text.lower().split()
+    return words
+
 def tokenizeText(text):
     #NOTE - TODO : to be modify to include hashtag and mentions and to remove URL
     """Tokenize a text : returns a list of the meaningful words"""
@@ -24,7 +33,8 @@ def tokenizeText(text):
     # tokenizer = nltk.data.load(tokenizerLocation)
     global commonWords
 
-    tokenizer = WordPunctTokenizer()
+    # tokenizer = WordPunctTokenizer()
+    tokenizer = TweetTokenizer(strip_handles=True, reduce_len=True)
     words = tokenizer.tokenize(text)
 
     # French stopwords
