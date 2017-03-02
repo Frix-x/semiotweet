@@ -36,6 +36,7 @@ DEBUG = getEnvValue('DEBUG')
 ALLOWED_HOSTS = ["semiotweet.herokuapp.com","127.0.0.1","localhost"]
 
 
+
 # Application definition
 
 INSTALLED_APPS = [

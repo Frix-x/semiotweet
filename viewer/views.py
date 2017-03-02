@@ -1,32 +1,80 @@
 #-*- coding: utf-8 -*-
-from datetime import datetime
+# from datetime import datetime
+from django.utils import timezone
 from django.http import HttpResponse,Http404
 from django.shortcuts import render,redirect
-from .models import Tweet,User
-from extraction import *
+from .models import Tweet,User,Word
 import random
 import string
 import time
 from django.db.models import Max
+from django.db import connection #for direct SQL requests
 
+import json
+
+from extraction import *
+from semanticFields import *
 #==============================#
 #=========== OTHERS ===========#
 #==============================#
 
 def home(request):
-    """Redirect to the home page"""
+    """Redirect to the home page : global statistics"""
+    cursor = connection.cursor()
+    cursor.execute('SELECT DISTINCT source, COUNT(source) AS nb  FROM viewer_tweet GROUP BY source ORDER BY nb DESC')
+    res = cursor.fetchall()
+    sources = []
+    num = []
+    for (s,n) in res:
+        sources.append(s)
+        num.append(n)
+
+    # Keeping only the most commons stats
+    if len(sources)>5 :
+        sources = sources[0:5]
+        sources.append("Others")
+        num[6] = sum(num[6:-1])
+        num = num[0:6]
+
+    # JSON Formating
+    sources = json.dumps(sources)
+    num = json.dumps(num)
+
+    listTweetText = Tweet.objects.values('text')
+    listTweetText = [t["text"] for t in listTweetText]
+    listTweetText = countWords(listTweetText)
+
+    words = []
+    occurences = []
+    for w,o in listTweetText.items():
+        words.append(w)
+        occurences.append(o)
+
+    colorsForBars = ['rgba(54, 162, 235, 1)']*len(words)
+
+    # JSON Formating
+    words = json.dumps(words)
+    occurences = json.dumps(occurences)
     return render(request,'home.html',locals())
 
 def displayInfo(request,screen_name):
-    #NOTE - TODO : Profile images dont't appear : how about stocking them ?
-    #              Front-end to be done
-    """Display all the tweets for a user"""
+    """Display all the tweets for a user
+    Requests the Twitter API directly and search for the most common words"""
     userInfo = returnUser(screen_name,toClean=False)
     success = True
-    if not(userInfo): #If the user doesn't exist
+    if not(userInfo): # If the user doesn't exist
         success = False
-    else:
-        userInfo["profile_image_url_https"] = userInfo["profile_image_url_https"].replace('_normal.jpg','.jpg')
+        return render(request,'displayInfo.html',locals())
+
+    userInfo["profile_image_url_https"] = userInfo["profile_image_url_https"].replace('_normal.jpg','.jpg')
+
+    # Most common words said by the user
+    idUser = userInfo["id"]
+    listTweetText = Tweet.objects.filter(user_id=idUser).values('text')
+    listTweetText = [t["text"] for t in listTweetText]
+
+    # words is a JSON list of dict like : {"word":"foo", "occur":42}
+    words = json.dumps(toJsonForBubbles(countWords(listTweetText)))
     return render(request,'displayInfo.html',locals())
 
 #==============================#
@@ -62,20 +110,22 @@ def getTweets(request,option):
     """Save the latest tweets from all the users defined in screen_nameToExtract"""
     global screen_nameToExtract
     success = True
-    lastId =0
+    lastId = 0
+    nbTweets = 0 # number of extracted tweets
     for screen_name in screen_nameToExtract:
         if option == "latest": # We get the id of the user's last tweet
             idUser = User.objects.filter(screen_name=screen_name).values('id')[0]["id"]
             lastId = Tweet.objects.filter(user_id=idUser).aggregate(Max('id'))["id__max"]
 
         tweets = returnTweetsMultiple(screen_name,lastId)
-        userFrom = User.objects.get(screen_name=screen_name)
+        nbTweets += len(tweets)
 
         # Saving tweets in database
+        userFrom = User.objects.get(screen_name=screen_name)
         for t in tweets:
             success = saveTweet(t,userFrom) and success
 
-    return render(request,'getTweets.html',{"success" : success, "nbTweets" : len(tweets)})
+    return render(request,'getTweets.html',{"success" : success, "nbTweets" : nbTweets})
 
 #==============================#
 #=========== USERS  ===========#
@@ -129,3 +179,34 @@ def getUser(request,screen_name):
 
     error = "Error during saving in DB"
     return render(request,'getUser.html',locals())
+
+#==============================#
+#=========== WORDS  ===========#
+#==============================#
+
+def getWords(request):
+    """ Stores common words and semantic fields of the specifiedWords """
+    global specifiedWords
+
+    # Saving the common words
+    for word in commonWords:
+        newWord = Word(word=word,semanticField="#")
+        newWord.save()
+
+    # Saving the semantic field of the specifiedWords
+    for word in specifiedWords:
+        semanticField = getSemanticField(word)
+        for relatedWord in semanticField:
+            newWord = Word(word=relatedWord,semanticField=word)
+            newWord.save()
+
+    return render(request,'getWords.html',{"success": True, "specifiedWords" : specifiedWords})
+
+#==============================#
+#===== SEMANTIC NETWORK =======#
+#==============================#
+
+def displayNetwork(request):
+    """Display a force network with users linked to their matching keywords"""
+
+    return render(request,'displayNetwork.html',{"success": True})
