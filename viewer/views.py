@@ -106,16 +106,22 @@ def saveTweet(tweet,user):
     except BaseException:
         return False
 
-def getTweets(request,option):
+def getTweets(request):
     """Save the latest tweets from all the users defined in screen_nameToExtract"""
     global screen_nameToExtract
     success = True
     lastId = 0
     nbTweets = 0 # number of extracted tweets
     for screen_name in screen_nameToExtract:
-        if option == "latest": # We get the id of the user's last tweet
+        try:
             idUser = User.objects.filter(screen_name=screen_name).values('id')[0]["id"]
+        except SomeModel.DoesNotExist: # If the user does not exist
+            continue # continue with the next user
+
+        try: # We try to get the id of the user's last tweet
             lastId = Tweet.objects.filter(user_id=idUser).aggregate(Max('id'))["id__max"]
+        except SomeModel.DoesNotExist:
+            lastId = 0 # No tweet in the data base
 
         tweets = returnTweetsMultiple(screen_name,lastId)
         nbTweets += len(tweets)
