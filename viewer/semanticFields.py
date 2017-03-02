@@ -81,6 +81,7 @@ commonWordsTwitter = ["…","rt","ils","faut","https","://","http","...","ça",
                       "to","the","j'ai","via","ça","000","veux","être","devons"
                       ,"doit","j'étais"]
 
+
 specifiedWords = ["colère","combat","peur","victoire","aide","argent","mensonge","société"]
 
 if __name__ == '__main__':
