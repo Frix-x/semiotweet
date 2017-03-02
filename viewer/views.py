@@ -106,12 +106,34 @@ def saveTweet(tweet,user):
     except BaseException:
         return False
 
-def getTweets(request):
+def getData(request):
     """Save the latest tweets from all the users defined in screen_nameToExtract"""
+    """Stores info about a users in the database
+    If screen_name == "all" : store all
+    Else : only store info of one user"""
     global screen_nameToExtract
-    success = True
+
+    # SAVING USERS
+    for screen_name in screen_nameToExtract:
+        userInfo = returnUser(screen_name,toClean=True)
+
+        if not(userInfo): #If the user doesn't exist
+            success = False
+            error = "The user doesn't exist"
+            return render(request,'getData.html',{"success" : success,
+                                                  "error" : error})
+
+        # Saving the user
+        success = saveUser(userInfo)
+        if not(sucess):
+            error = "Error during saving in DB"
+            return render(request,'getData.html',{"success" : success,
+                                                  "error" : error})
+
+    # SAVING TWEETS
     lastId = 0
     nbTweets = 0 # number of extracted tweets
+
     for screen_name in screen_nameToExtract:
         try:
             idUser = User.objects.filter(screen_name=screen_name).values('id')[0]["id"]
@@ -131,7 +153,10 @@ def getTweets(request):
         for t in tweets:
             success = saveTweet(t,userFrom) and success
 
-    return render(request,'getTweets.html',{"success" : success, "nbTweets" : nbTweets})
+
+    return render(request,'getData.html',{"success" : success,
+                                          "nbTweets" : nbTweets,
+                                          "screen_nameToExtract": screen_nameToExtract})
 
 #==============================#
 #=========== USERS  ===========#
@@ -157,34 +182,6 @@ def saveUser(userInfo):
         return True
     except BaseException:
         return False
-
-def getUser(request,screen_name):
-    #NOTE - TODO :Currently working on standard requests
-    #              Unit-tests to be developed
-    """ Stores info about a users in the database
-    If screen_name == "all" : store all
-    Else : only store info of one user"""
-    global screen_nameToExtract
-
-    usersToExtract = []
-    if screen_name == "all":
-        usersToExtract = screen_nameToExtract
-    else:
-        usersToExtract.append(screen_name)
-
-    for user in usersToExtract:
-        userInfo = returnUser(user,toClean=True)
-
-        if not(userInfo): #If the user doesn't exist
-            success = False
-            error = "The user doesn't exist"
-            return render(request,'getUser.html',locals())
-
-        # Saving the user
-        success = saveUser(userInfo)
-
-    error = "Error during saving in DB"
-    return render(request,'getUser.html',locals())
 
 #==============================#
 #=========== WORDS  ===========#
