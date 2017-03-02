@@ -31,14 +31,15 @@ def tokenizeText(text):
     # tokenizerLocation = 'tokenizers/punkt/french.pickle' #Python 2
     # tokenizerLocation = 'tokenizers/punkt/PY3/french.pickle' #Python 3
     # tokenizer = nltk.data.load(tokenizerLocation)
-    global commonWords
+    global commonWordsWiki
 
     # tokenizer = WordPunctTokenizer()
     tokenizer = TweetTokenizer(strip_handles=True, reduce_len=True)
     words = tokenizer.tokenize(text)
 
     # French stopwords
-    frenchStopwords = set(stopwords.words('french')).union(set(commonWords))
+    frenchStopwords = set(stopwords.words('french')).union(set(commonWordsWiki))
+    frenchStopwords = frenchStopwords.union(set(commonWordsTwitter))
 
     # Filtering
     words = [w.lower() for w in words if not (len(w) < 2 or w.lower() in frenchStopwords)]
@@ -64,7 +65,7 @@ def toJsonForBubbles(dict):
     return output
 
 # ~ 76 most common words in french (see : https://en.wiktionary.org/wiki/Wiktionary:French_frequency_lists/1-2000)
-commonWords =["de", "la", "le", "et", "les", "des", "en", "un", "du", "une",
+commonWordsWiki =["de", "la", "le", "et", "les", "des", "en", "un", "du", "une",
               "que", "est", "pour", "qui", "dans", "a", "par", "plus", "pas",
               "au", "sur", "ne", "se", "ce", "il", "sont",
               "ou", "avec", "son", "aux", "d'un", "cette", "d'une",
@@ -75,11 +76,14 @@ commonWords =["de", "la", "le", "et", "les", "des", "en", "un", "du", "une",
               "faire", "elle", "c'est", "peu", "vous","prix",
               "dont", "lui", "également", "effet", "pays", "cas"]
 
+# Others common works on Twitter, not so meaningful
+commonWordsTwitter = ["…","rt","ils","faut","https","://","http","...","ça","to","the"]
+
 specifiedWords = ["colère","combat","peur","victoire","aide","argent","mensonge","société"]
 
 if __name__ == '__main__':
     # print(getSemanticField("médicament"))
-    print dict(Counter(tokenizeText("J'aime les beignets à la framboise #Love @jjerphan prout prout ")))
+    print dict(Counter(tokenizeText("J'aime les beignets à la framboise #Love @jjerphan oups oups  ")))
     # listTweetText = ["J'aime les barbes à papa #swag","Mon cheval mange des carottes-cakes en Hiver ! #Yolo #QuelleIdée !","Quelle idée d'avoir des doigts :'("]
     # res = countWords(listTweetText)
     # for i in res.keys():
