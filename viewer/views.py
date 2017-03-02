@@ -125,7 +125,7 @@ def getData(request):
 
         # Saving the user
         success = saveUser(userInfo)
-        if not(sucess):
+        if not(success):
             error = "Error during saving in DB"
             return render(request,'getData.html',{"success" : success,
                                                   "error" : error})
