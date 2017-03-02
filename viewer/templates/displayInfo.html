@@ -22,7 +22,7 @@
     </div>
     <div class="row">
       <div class="col-lg-12">
-        <h1>Mots-clefs les plus utilisés :</h1>
+        <div style="width:960px; height:800px; margin:auto;"> <canvas id="MostCommonWords"></canvas> </div>
         <svg width="960" height="880"></svg>
       </div>
     </div>
@@ -42,62 +42,97 @@
 {%block script%}
 <script>
 var words = {{words|safe}};
+var word = [];
+var occur = [];
+var colorsForBars = ['rgba(54, 162, 235, 1)']*words.length;
+
 console.log(words);
+for (i=0; i < words.length ; i++){
+  word.push(words[i].word);
+  occur.push(words[i].occur);
+}
 
-var svg = d3.select("svg"),
-    width = +svg.attr("width");
+var ctx = document.getElementById("MostCommonWords");
 
-var format = d3.format(",d");
-
-var color = d3.scaleOrdinal(d3.schemeCategory20c);
-
-var pack = d3.pack()
-    .size([width, width])
-    .padding(1.5);
-
-d3.csv("/static/flare.csv", function(d) {
-  d.value = +d.value;
-  if (d.value) return d;
-}, function(error, classes) {
-  if (error) throw error;
-
-  var root = d3.hierarchy({children: classes})
-      .sum(function(d) { return d.value; })
-      .each(function(d) {
-        if (id = d.data.id) {
-          var id, i = id.lastIndexOf(".");
-          d.id = id;
-          d.package = id.slice(0, i);
-          d.class = id.slice(i + 1);
-        }
-      });
-
-  var node = svg.selectAll(".node")
-    .data(pack(root).leaves())
-    .enter().append("g")
-      .attr("class", "node")
-      .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
-
-  node.append("circle")
-      .attr("id", function(d) { return d.class.split(/(?=[A-Z][^A-Z]) /g); })
-      .attr("r", function(d) { return d.r; })
-      .style("fill", function(d) { return color(d.package); });
-
-  node.append("text")
-    .selectAll("tspan")
-    .data(function(d) { return d.class.split(/(?=[A-Z][^A-Z]) /g);})
-    .enter().append("tspan")
-    .style("font-size", function(d) {
-      var r = document.getElementById(d).getAttribute("r");
-      return Math.min(r/3 , (r -8)/(3*this.getComputedTextLength())) + "px";
-    })
-    .attr("text-anchor", "middle")
-    .attr("dy", ".35em")
-    .text(function(d) { return d; });
-
-  node.append("title")
-      .text(function(d) { return d.id + "\n" + format(d.value); });
+var data = {
+  labels: word,
+  datasets: [
+      {
+          label :"occurences",
+          data: occur,
+          backgroundColor: colorsForBars,
+              borderColor: colorsForBars
+      }]
+};
+var options = {
+    animation:{
+        animateScale:true
+    },
+    title: {
+        display: true,
+        text: 'Most Common Words used by {{userInfo.name}}'
+    }
+};
+var myDoughnutChart = new Chart(ctx, {
+    type: 'bar',
+    data: data,
+    options: options
 });
+
+// var svg = d3.select("svg"),
+//     width = +svg.attr("width");
+//
+// var format = d3.format(",d");
+//
+// var color = d3.scaleOrdinal(d3.schemeCategory20c);
+//
+// var pack = d3.pack()
+//     .size([width, width])
+//     .padding(1.5);
+//
+// d3.csv("/static/flare.csv", function(d) {
+//   d.value = +d.value;
+//   if (d.value) return d;
+// }, function(error, classes) {
+//   if (error) throw error;
+//
+//   var root = d3.hierarchy({children: classes})
+//       .sum(function(d) { return d.value; })
+//       .each(function(d) {
+//         if (id = d.data.id) {
+//           var id, i = id.lastIndexOf(".");
+//           d.id = id;
+//           d.package = id.slice(0, i);
+//           d.class = id.slice(i + 1);
+//         }
+//       });
+//
+//   var node = svg.selectAll(".node")
+//     .data(pack(root).leaves())
+//     .enter().append("g")
+//       .attr("class", "node")
+//       .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
+//
+//   node.append("circle")
+//       .attr("id", function(d) { return d.class.split(/(?=[A-Z][^A-Z]) /g); })
+//       .attr("r", function(d) { return d.r; })
+//       .style("fill", function(d) { return color(d.package); });
+//
+//   node.append("text")
+//     .selectAll("tspan")
+//     .data(function(d) { return d.class.split(/(?=[A-Z][^A-Z]) /g);})
+//     .enter().append("tspan")
+//     .style("font-size", function(d) {
+//       var r = document.getElementById(d).getAttribute("r");
+//       return Math.min(r/3 , (r -8)/(3*this.getComputedTextLength())) + "px";
+//     })
+//     .attr("text-anchor", "middle")
+//     .attr("dy", ".35em")
+//     .text(function(d) { return d; });
+//
+//   node.append("title")
+//       .text(function(d) { return d.id + "\n" + format(d.value); });
+// });
 
 </script>
 {% endblock %}
