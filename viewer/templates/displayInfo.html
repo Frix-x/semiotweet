@@ -42,6 +42,7 @@
 {%block script%}
 <script>
 var words = {{words|safe}};
+words.sort(function(a, b){return b.occur-a.occur});
 var word = [];
 var occur = [];
 var colorsForBars = ['rgba(54, 162, 235, 1)']*words.length;
