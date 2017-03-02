@@ -109,8 +109,8 @@ def cleanTweet(tweet):
         if tweet["source"].lower().find(s.lower()) != -1:
             tweet["source"] = s
             break
-        else:
-            tweet["source"] = "Other"
+    else:
+        tweet["source"] = "Other"
 
     return tweet
 
