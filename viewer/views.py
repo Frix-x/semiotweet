@@ -171,11 +171,13 @@ def getUser(request,screen_name):
 
         if not(userInfo): #If the user doesn't exist
             success = False
+            error = "The user doesn't exist"
             return render(request,'getUser.html',locals())
 
         # Saving the user
         success = saveUser(userInfo)
 
+    error = "Error during saving in DB"
     return render(request,'getUser.html',locals())
 
 #==============================#

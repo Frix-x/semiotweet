@@ -17,3 +17,4 @@ pycurl==7.43.0
 requests==2.11.1
 virtualenv==15.1.0
 nltk==3.2.2
+whitenoise==3.3.0
