@@ -1,0 +1,25 @@
+{% extends "template.html" %}
+{% block title %} | Getting users info {% endblock %}
+
+{% block content %}
+<section id="part" class="two">
+  <div class="container">
+    {% if success %}
+    <header>
+    <h2> Info from users
+      {% for u in usersToExtract %}
+        {{u}},
+      {% endfor %} extracted.
+
+    <h2>
+    <h2> All latest {{nbTweets}} tweets stored !<h2>
+
+    </header>
+    {% else %}
+    <header>
+    <h2> Failure during users' infos or tweets' extraction : {{error}}<h2>
+    </header>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

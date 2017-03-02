@@ -77,7 +77,10 @@ commonWordsWiki =["de", "la", "le", "et", "les", "des", "en", "un", "du", "une",
               "dont", "lui", "également", "effet", "pays", "cas"]
 
 # Others common works on Twitter, not so meaningful
-commonWordsTwitter = ["…","rt","ils","faut","https","://","http","...","ça","to","the"]
+commonWordsTwitter = ["…","rt","ils","faut","https","://","http","...","ça",
+                      "to","the","j'ai","via","ça","000","veux","être","devons"
+                      ,"doit","j'étais"]
+
 
 specifiedWords = ["colère","combat","peur","victoire","aide","argent","mensonge","société"]
 
