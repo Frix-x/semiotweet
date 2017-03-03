@@ -2,17 +2,41 @@
 {% block title %} | HomePage {% endblock %}
 
 {% block content %}
-<section id="part" class="two">
-  <div class="container">
-    <header>
-      <h2 class="center alt">Semiotweet</h2>
-      <h1 class="center alt">Tweets analysis from Politics</h1>
-    </header>
-  </div>
 
-  <div style="width:400px; height:400px; margin:auto;"> <canvas id="doughnutSources"></canvas> </div>
-  <div style="width:400px; height:400px; margin:auto;"> <canvas id="barCommonWords"></canvas> </div>
-</section>
+<div class="section no-pad-bot" id="index-banner">
+    <div class="container">
+        <br><br>
+        <h1 class="header center orange-text">Semiotweet</h1>
+        <div class="row center">
+            <h5 class="header col s12 light">Tweets analysis from Politics</h5>
+        </div>
+        <br><br>
+    </div>
+</div>
+
+
+<div class="container">
+    <div class="section">
+
+        <div class="row">
+            <div class="col s12 m4">
+                <div class="icon-block">
+                    <h5 class="center">Tweet sources</h5>
+                    <canvas id="doughnutSources"></canvas>
+                </div>
+            </div>
+
+            <div class="col s12 m8">
+                <div class="icon-block">
+                    <h5 class="center">Most common words</h5>
+                    <canvas id="barCommonWords"></canvas>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <br><br>
+</div>
 {% endblock %}
 
 
@@ -41,7 +65,7 @@ var options = {
         animateScale:true
     },
     title: {
-        display: true,
+        display: false,
         text: 'Tweet Sources'
     }
 };
@@ -61,7 +85,6 @@ var dataBar = {
   labels: words,
   datasets: [
       {
-          label: "Most Common Words",
           backgroundColor: colorsForBars,
           borderColor: colorsForBars,
           borderWidth: 1,
