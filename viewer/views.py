@@ -21,7 +21,10 @@ from semanticFields import *
 def home(request):
     """Redirect to the home page : global statistics"""
     cursor = connection.cursor()
-    cursor.execute('SELECT DISTINCT source, COUNT(source) AS nb  FROM viewer_tweet GROUP BY source ORDER BY nb DESC')
+    try:
+        cursor.execute('SELECT DISTINCT source, COUNT(source) AS nb  FROM viewer_tweet GROUP BY source ORDER BY nb DESC')
+    except BaseException:
+        return render(request,'home.html',{"error":"No data yet ; click on 'Get the data'"})
     res = cursor.fetchall()
     sources = []
     num = []

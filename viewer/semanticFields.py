@@ -5,7 +5,6 @@ import nltk.data
 
 import string
 
-from nltk.corpus import stopwords
 from nltk.tokenize import WordPunctTokenizer,TweetTokenizer
 from collections import Counter,defaultdict
 
@@ -38,7 +37,7 @@ def tokenizeText(text):
     words = tokenizer.tokenize(text)
 
     # French stopwords
-    frenchStopwords = set(stopwords.words('french')).union(set(commonWordsWiki))
+    frenchStopwords = set(stopwords).union(set(commonWordsWiki))
     frenchStopwords = frenchStopwords.union(set(commonWordsTwitter))
 
     # Filtering
@@ -63,6 +62,20 @@ def toJsonForBubbles(dict):
         output.append({"word":key,"occur":val})
 
     return output
+
+# French Stop words (see : http://www.ranks.nl/stopwords/french)
+stopwords = ["alors","au","aucuns","aussi","autre","avant","avec","avoir","bon",
+             "car","ce","cela","ces","ceux","chaque","ci","comme","comment","dans",
+             "des","du","dedans","dehors","depuis","devrait","doit","donc","dos",
+             "début","elle","elles","en","encore","essai","est","et","eu","fait",
+             "faites","fois","font","hors","ici","il","ils","je","juste","la","le",
+             "les","leur","là","ma","maintenant","mais","mes","mine","moins","mon",
+             "mot","même","ni","nommés","notre","nous","ou","où","par","parce","pas",
+             "peut","peu","plupart","pour","pourquoi","quand","que","quel","quelle",
+             "quelles","quels","qui","sa","sans","ses","seulement","si","sien","son",
+             "sont","sous","soyez","sujet","sur","ta","tandis","tellement","tels",
+             "tes","ton","tous","tout","trop","très","tu","voient","vont","votre",
+             "vous","vu","ça","étaient","état","étions","été","être"]
 
 # ~ 76 most common words in french (see : https://en.wiktionary.org/wiki/Wiktionary:French_frequency_lists/1-2000)
 commonWordsWiki =["de", "la", "le", "et", "les", "des", "en", "un", "du", "une",
