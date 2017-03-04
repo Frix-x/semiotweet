@@ -77,13 +77,12 @@ DATABASES = {
 }
 
 ```
-
 Then you have to run this in order to set up the models and the database :
 ```
 $ python manage.py makemigrations
 $ python manage.py migrate
 ```
-Finally, `$ python manage.py runserver` run the server locally.
+Finally, `$ python manage.py runserver` runs the server locally.
 
 ## Getting users data and tweets
 
