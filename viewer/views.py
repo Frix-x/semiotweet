@@ -45,19 +45,12 @@ def home(request):
 
     listTweetText = Tweet.objects.values('text')
     listTweetText = [t["text"] for t in listTweetText]
-    listTweetText = countWords(listTweetText)
 
-    words = []
-    occurences = []
-    for w,o in listTweetText.items():
-        words.append(w)
-        occurences.append(o)
-
+    # words is a JSON list of dict like : {"word":"foo", "occur":42}
+    words = json.dumps(toJsonForGraph(countWords(listTweetText)))
     colorsForBars = ['rgba(54, 162, 235, 1)']*len(words)
 
     # JSON Formating
-    words = json.dumps(words)
-    occurences = json.dumps(occurences)
     return render(request,'home.html',locals())
 
 def displayInfo(request,screen_name):
@@ -77,7 +70,7 @@ def displayInfo(request,screen_name):
     listTweetText = [t["text"] for t in listTweetText]
 
     # words is a JSON list of dict like : {"word":"foo", "occur":42}
-    words = json.dumps(toJsonForBubbles(countWords(listTweetText)))
+    words = json.dumps(toJsonForGraph(countWords(listTweetText)))
     return render(request,'displayInfo.html',locals())
 
 #==============================#
