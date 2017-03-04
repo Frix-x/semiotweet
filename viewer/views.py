@@ -14,15 +14,17 @@ import json
 
 from extraction import *
 from semanticFields import *
+
 #==============================#
 #=========== OTHERS ===========#
 #==============================#
 
 def home(request):
     """Redirect to the home page : global statistics"""
+    global requestToGetSources
     cursor = connection.cursor()
     try:
-        cursor.execute('SELECT DISTINCT source, COUNT(source) AS nb  FROM viewer_tweet GROUP BY source ORDER BY nb DESC')
+        cursor.execute(requestToGetSources)
     except BaseException:
         return render(request,'home.html',{"error":"No data yet ; click on 'Get the data'"})
     res = cursor.fetchall()
@@ -35,8 +37,8 @@ def home(request):
     # Keeping only the most commons stats
     if len(sources)>5 :
         sources = sources[0:5]
-        sources.append("Others")
-        num[6] = sum(num[6:-1])
+        sources.append(u"Others")
+        num[5] = sum(num[5:-1])
         num = num[0:6]
 
     # JSON Formating
@@ -71,6 +73,28 @@ def displayInfo(request,screen_name):
 
     # words is a JSON list of dict like : {"word":"foo", "occur":42}
     words = json.dumps(toJsonForGraph(countWords(listTweetText)))
+
+    # Sources of Tweets
+    global requestToGetSources
+    cursor = connection.cursor()
+    try:
+        cursor.execute("SELECT DISTINCT source, COUNT(source) AS nb FROM viewer_tweet WHERE user_id_id ='"+ str(idUser)+"' GROUP BY source ORDER BY nb DESC")
+    except BaseException:
+        print error
+        return render(request,'home.html',locals())
+    res = cursor.fetchall()
+    sources = []
+    num = []
+    for (s,n) in res:
+        sources.append(s)
+        num.append(n)
+
+    # Keeping only the most commons stats
+    if len(sources)>5 :
+        sources = sources[0:5]
+        sources.append(u"Others")
+        num[5] = sum(num[5:-1])
+        num = num[0:6]
     return render(request,'displayInfo.html',locals())
 
 #==============================#

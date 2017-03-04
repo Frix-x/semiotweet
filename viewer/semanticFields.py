@@ -97,6 +97,8 @@ commonWordsTwitter = ["…","rt","ils","faut","https","://","http","...","ça",
 
 specifiedWords = ["colère","combat","peur","victoire","aide","argent","mensonge","société"]
 
+requestToGetSources = 'SELECT DISTINCT source, COUNT(source) AS nb  FROM viewer_tweet GROUP BY source ORDER BY nb DESC'
+
 if __name__ == '__main__':
     # print(getSemanticField("médicament"))
     print dict(Counter(tokenizeText("J'aime les beignets à la framboise #Love @jjerphan oups oups  ")))
