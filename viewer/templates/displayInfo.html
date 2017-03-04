@@ -1,139 +1,98 @@
-{% extends "template.html" %}
-{% block title %} | @{{screen_name}} {% endblock %}
-
-{% block content %}
-<section id="part" class="two">
-  <div class="container">
-{% if success %}
-  <header>
-    <div class="row">
-      <div class="col-lg-3">
-        {% if userInfo.profile_image_url_https %}
-        <img src="{{userInfo.profile_image_url_https}}" style="width:100%;" alt="{{userInfo.screen_name}}" />
-        {% endif %}
-        <p class="center">{{userInfo.followers_count}} followers<p>
-      </div>
-
-      <div class="col-lg-9">
-        <h1 class="candidate-title">{{userInfo.name}}</h1>
-        @{{userInfo.screen_name}}{% if userInfo.verified %}<img src="/static/images/verified.png" height="25" width="25" alt="Verified" />{% endif %}
-        <p class="candidate-description">{{userInfo.description}}</p>
-      </div>
+{% extends "template.html" %} {% block title %} | @{{screen_name}} {% endblock %} {% block content %} {% if success %}
+<div class="section no-pad-bot" id="index-banner">
+    <div class="container">
+        <br><br>
+        <h1 class="header center orange-text">User information</h1>
+        <br><br>
     </div>
-    <div class="row">
-      <div class="col-lg-12">
-        <div style="width:960px; height:800px; margin:auto;"> <canvas id="MostCommonWords"></canvas> </div>
-        <svg width="960" height="880"></svg>
-      </div>
+</div>
+<div class="container">
+    <div class="section">
+        <div class="row">
+            <div class="col s12 m6">
+                <div class="icon-block">
+                    <div class="card horizontal">
+                        <div class="card-image">
+                            {% if userInfo.profile_image_url_https %}
+                            <img src="{{userInfo.profile_image_url_https}}"> {% endif %}
+                        </div>
+                        <div class="card-stacked">
+                            <div class="card-content">
+                                <h5>{{userInfo.name}}</h5>
+                                {% if userInfo.verified %}
+                                <img src="/static/images/verified.png" height="25" width="25" alt="Verified"> {% endif %}
+                                <br>
+                                <p>{{userInfo.description}}</p>
+                            </div>
+                            <div class="card-action">
+                                <p>{{userInfo.followers_count}} followers</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col s12 m6">
+                <div class="icon-block">
+                    <canvas id="MostCommonWords"></canvas>
+                </div>
+            </div>
+        </div>
     </div>
-  </header>
-
+</div>
 {% else %}
-  <header>
-    <h2> Request fail for user {{screen_name}}<h2>
-  <header>
+<div class="section no-pad-bot" id="index-banner">
+    <div class="container">
+        <br><br>
+        <h1 class="header center orange-text">Error</h1>
+        <div class="row center">
+            <h5 class="header col s12 light">Internal server error...</h5>
+        </div>
+        <br><br>
+    </div>
+</div>
 {% endif %}
-  </div>
-</section>
 {% endblock %}
-
-
 
 {%block script%}
 <script>
-var words = {{words|safe}};
-words.sort(function(a, b){return b.occur-a.occur});
-var word = [];
-var occur = [];
-var colorsForBars = ['rgba(54, 162, 235, 1)']*words.length;
+    var words = {{words|safe}};
+    words.sort(function(a, b) {
+        return b.occur - a.occur
+    });
+    var word = [];
+    var occur = [];
+    var colorsForBars = ['rgba(54, 162, 235, 1)'] * words.length;
 
-console.log(words);
-for (i=0; i < words.length ; i++){
-  word.push(words[i].word);
-  occur.push(words[i].occur);
-}
-
-var ctx = document.getElementById("MostCommonWords");
-
-var data = {
-  labels: word,
-  datasets: [
-      {
-          label :"occurences",
-          data: occur,
-          backgroundColor: colorsForBars,
-              borderColor: colorsForBars
-      }]
-};
-var options = {
-    animation:{
-        animateScale:true
-    },
-    title: {
-        display: true,
-        text: 'Most Common Words used by {{userInfo.name}}'
+    console.log(words);
+    for (i = 0; i < words.length; i++) {
+        word.push(words[i].word);
+        occur.push(words[i].occur);
     }
-};
-var myDoughnutChart = new Chart(ctx, {
-    type: 'bar',
-    data: data,
-    options: options
-});
 
-// var svg = d3.select("svg"),
-//     width = +svg.attr("width");
-//
-// var format = d3.format(",d");
-//
-// var color = d3.scaleOrdinal(d3.schemeCategory20c);
-//
-// var pack = d3.pack()
-//     .size([width, width])
-//     .padding(1.5);
-//
-// d3.csv("/static/flare.csv", function(d) {
-//   d.value = +d.value;
-//   if (d.value) return d;
-// }, function(error, classes) {
-//   if (error) throw error;
-//
-//   var root = d3.hierarchy({children: classes})
-//       .sum(function(d) { return d.value; })
-//       .each(function(d) {
-//         if (id = d.data.id) {
-//           var id, i = id.lastIndexOf(".");
-//           d.id = id;
-//           d.package = id.slice(0, i);
-//           d.class = id.slice(i + 1);
-//         }
-//       });
-//
-//   var node = svg.selectAll(".node")
-//     .data(pack(root).leaves())
-//     .enter().append("g")
-//       .attr("class", "node")
-//       .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
-//
-//   node.append("circle")
-//       .attr("id", function(d) { return d.class.split(/(?=[A-Z][^A-Z]) /g); })
-//       .attr("r", function(d) { return d.r; })
-//       .style("fill", function(d) { return color(d.package); });
-//
-//   node.append("text")
-//     .selectAll("tspan")
-//     .data(function(d) { return d.class.split(/(?=[A-Z][^A-Z]) /g);})
-//     .enter().append("tspan")
-//     .style("font-size", function(d) {
-//       var r = document.getElementById(d).getAttribute("r");
-//       return Math.min(r/3 , (r -8)/(3*this.getComputedTextLength())) + "px";
-//     })
-//     .attr("text-anchor", "middle")
-//     .attr("dy", ".35em")
-//     .text(function(d) { return d; });
-//
-//   node.append("title")
-//       .text(function(d) { return d.id + "\n" + format(d.value); });
-// });
+    var ctx = document.getElementById("MostCommonWords");
 
+    var data = {
+        labels: word,
+        datasets: [{
+            label: "Most common words",
+            data: occur,
+            backgroundColor: colorsForBars,
+            borderColor: colorsForBars
+        }]
+    };
+    var options = {
+        animation: {
+            animateScale: true
+        },
+        title: {
+            display: false,
+            text: 'Most Common Words used by {{userInfo.name}}'
+        }
+    };
+    var myDoughnutChart = new Chart(ctx, {
+        type: 'bar',
+        data: data,
+        options: options
+    });
 </script>
 {% endblock %}
