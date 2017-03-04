@@ -16,6 +16,7 @@
 </head>
 
 <body>
+<header>
     <ul id="dropdown1" class="dropdown-content">
         <li><a href="/displayInfo/MarCharlott">Charlotte Marchandise</a></li>
         <li><a href="/displayInfo/PhilippePoutou">Philippe Poutou</a></li>
@@ -40,9 +41,12 @@
             <a href="#" data-activates="nav-mobile" class="button-collapse"><i class="material-icons">menu</i></a>
         </div>
     </nav>
+</header>
 
+<main>
     {% block content %}
     {% endblock %}
+</main>
 
     <footer class="page-footer orange">
         <div class="footer-copyright">
@@ -56,7 +60,6 @@
     <!--  Scripts-->
     <script src="{% static "js/jquery-2.1.1.min.js" %}"></script>
     <script src="{% static "js/materialize.js" %}"></script>
-    <script src="{% static "js/init.js" %}"></script>
     <script src="{% static "js/d3js/d3.min.js" %}"></script>
     <script src="{% static "js/Chart.js" %}"></script>
     <script>
