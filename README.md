@@ -64,31 +64,27 @@ $ python manage.py runserver
 
 ## Getting users data and tweets
 
-Once the server is running, you have to extract the user info first, and then the tweets from them.
-
-In order to do that, you just have to click on "_Get all the users_" and "_Get all the tweets_" ; this will redirect you respectively to the
-URL : `http://127.0.0.1:8000/getUser/all/` and `http://127.0.0.1:8000/getTweets/all`.
-
-If you want to get only the info from an user (say @myUser) just go to `http://127.0.0.1:8000/getUser/myUser/` ; and if you want to get the latest tweets you do not have simply get to `http://127.0.0.1:8000/getTweets/latest` or to click "_Get the latest tweets_".
+Once the server is running, you can extact the data concerning the users and their tweets by clicking on `Get the Data` or by getting to `http://127.0.0.1:8000/getData/`
 
 ## Project Progress
 
-| Things done                                                         |    Things to do    |
-| -------------                                                       | ------------- |
-| Connection to Twitter API (100%) | Semantic fields (10%)|
-| Basic architecture (100%) | JS libraries (3.14 %) |
-| Defining models (100%) | Deployement on Heroku (0%) |
-| Defining Env' Variables (100%) | README.md (50%)|
-| Extracting user info (100%) ||
-| Extracting old tweets (100%) ||
-| Extracting latest tweets (100%) ||
-| Modular code for extraction (100%) ||
-| Getting all the users at once (100%) ||
-| Extract new tweet (80%, last 20% : effective tests to be done) || |
+| Things done                                                         | Things to do                  |
+| -------------                                                       | -------------                 |
+| Connection to Twitter API (100%)                                    | Semantic fields (10%)         |
+| Basic architecture (100%)                                           | JS libraries (3.14 %)         |
+| Defining models (100%)                                              | Deployement on Heroku (0%)    |
+| Defining Env' Variables (100%)                                      | README.md (50%)               |
+| Extracting user info (100%)                                         ||
+| Extracting old tweets (100%)                                        ||
+| Extracting latest tweets (100%)                                     ||
+| Modular code for extraction (100%)                                  ||
+| Getting all the users at once (100%)                                ||
+| Extract new tweet (100%)                                            || |
 
 
-## Ressources
+## Usefull Ressources
 
   - Logo from [graphicdesignblg](https://www.instagram.com/graphicdesignblg/ "graphicdesignblg on Instagram")
   - [Twitter API documentation](https://dev.twitter.com/ "Twitter API documentation")
+  - [Map of a Twitter Status Object](http://www.slaw.ca/wp-content/uploads/2011/11/map-of-a-tweet-copy.pdf "Map of a Twitter Status"), Raffi Krikorian
   - Marco Bonzanini, [Mining Twitter Data with Python](https://marcobonzanini.com/2015/03/02/mining-twitter-data-with-python-part-1/ "Mining Twitter Data with Python")
