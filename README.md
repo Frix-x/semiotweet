@@ -78,25 +78,25 @@ DATABASES = {
 
 ```
 
-Then you can run :
+Then you have to run this in order to set up the models and the database :
 ```
 $ python manage.py makemigrations
 $ python manage.py migrate
-$ python manage.py runserver
 ```
+Finally, `$ python manage.py runserver` run the server locally.
 
 ## Getting users data and tweets
 
-Once the server is running, you can extact the data concerning the users and their tweets by clicking on `Get the Data` or by getting to `http://127.0.0.1:8000/getData/`
+Once the server is running, you can extact the data concerning the users and their tweets by clicking on `Update Data` or by getting to `http://127.0.0.1:8000/getData/`
 
 ## Project Progress
 
 | Things done                                                         | Things to do                  |
 | -------------                                                       | -------------                 |
-| Connection to Twitter API (100%)                                    | Semantic fields (10%)         |
-| Basic architecture (100%)                                           | JS libraries (3.14 %)         |
-| Defining models (100%)                                              | Deployement on Heroku (0%)    |
-| Defining Env' Variables (100%)                                      | README.md (50%)               |
+| Connection to Twitter API (100%)                                    | Semantic fields (30%)         |
+| Basic architecture (100%)                                           | JS libraries (70 %)           |
+| Defining models (100%)                                              | Deployement on Heroku (80%)   |
+| Defining Env' Variables (100%)                                      | README.md (60%)               |
 | Extracting user info (100%)                                         ||
 | Extracting old tweets (100%)                                        ||
 | Extracting latest tweets (100%)                                     ||
