@@ -95,6 +95,11 @@ def displayInfo(request,screen_name):
         sources.append(u"Others")
         num[5] = sum(num[5:-1])
         num = num[0:6]
+
+    # JSON Formating
+    sources = json.dumps(sources)
+    num = json.dumps(num)
+
     return render(request,'displayInfo.html',locals())
 
 #==============================#
