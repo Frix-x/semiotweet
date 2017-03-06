@@ -9,7 +9,7 @@
 <div class="container">
     <div class="section">
         <div class="row">
-            <div class="col s12 m6">
+            <div class="col s12 m8">
                 <div class="icon-block">
                     <div class="card horizontal">
                         <div class="card-image">
@@ -32,10 +32,16 @@
                     </div>
                 </div>
             </div>
-            <div class="col s12 m6">
+            <div class="col s12 m4">
                 <div class="icon-block">
-                    <canvas id="MostCommonWords"></canvas>
+                    <h5 class="center">Tweet sources</h5>
+                    <canvas id="doughnutSources"></canvas>
                 </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="icon-block">
+                <canvas id="MostCommonWords"></canvas>
             </div>
         </div>
     </div>
@@ -64,7 +70,6 @@
     var occur = [];
     var colorsForBars = ['rgba(54, 162, 235, 1)'] * words.length;
 
-    console.log(words);
     for (i = 0; i < words.length; i++) {
         word.push(words[i].word);
         occur.push(words[i].occur);
@@ -95,5 +100,35 @@
         data: data,
         options: options
     });
+</script>
+<script>
+var sources = {{sources|safe}};
+var num = {{num|safe}};
+var ctx = document.getElementById("doughnutSources");
+var colors = ["#FF6384","#36A2EB","#FFCE56","#FFBA49","#20A39E",
+              "#EF5B5B","#23001E","#A4A9AD","#8CDFD6","#5A716A"];
+var data = {
+  labels: sources,
+  datasets: [
+      {
+          data: num,
+          backgroundColor: colors,
+          hoverBackgroundColor: colors
+      }]
+};
+var options = {
+    animation:{
+        animateScale:true
+    },
+    title: {
+        display: false,
+        text: 'Tweet Sources'
+    }
+};
+var myDoughnutChart = new Chart(ctx, {
+    type: 'doughnut',
+    data: data,
+    options: options
+});
 </script>
 {% endblock %}

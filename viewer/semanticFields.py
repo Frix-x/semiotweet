@@ -55,7 +55,7 @@ def countWords(listTweetText,nbWordsToExtract=30):
 
     return dict(Counter(wordOccurences).most_common(nbWordsToExtract))
 
-def toJsonForBubbles(dict):
+def toJsonForGraph(dict):
     """Return a list of dict used next for the Bubble Graph"""
     output = []
     for key,val in dict.items():
@@ -92,10 +92,12 @@ commonWordsWiki =["de", "la", "le", "et", "les", "des", "en", "un", "du", "une",
 # Others common works on Twitter, not so meaningful
 commonWordsTwitter = ["…","rt","ils","faut","https","://","http","...","ça",
                       "to","the","j'ai","via","ça","000","veux","être","devons"
-                      ,"doit","j'étais"]
+                      ,"doit","j'étais","suis"]
 
 
 specifiedWords = ["colère","combat","peur","victoire","aide","argent","mensonge","société"]
+
+requestToGetSources = 'SELECT DISTINCT source, COUNT(source) AS nb  FROM viewer_tweet GROUP BY source ORDER BY nb DESC'
 
 if __name__ == '__main__':
     # print(getSemanticField("médicament"))
