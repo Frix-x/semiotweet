@@ -2,7 +2,7 @@
 <div class="section no-pad-bot" id="index-banner">
     <div class="container">
         <br><br>
-        <h1 class="header center orange-text">User information</h1>
+        <h1 class="header center darken-1-text">User information</h1>
         <br><br>
     </div>
 </div>
@@ -19,9 +19,10 @@
                         <div class="card-stacked">
                             <div class="card-content">
                                 <h5>{{userInfo.name}}</h5>
+                                <p>@{{screen_name}}
                                 {% if userInfo.verified %}
                                 <img src="/static/images/verified.png" height="25" width="25" alt="Verified"> {% endif %}
-                                <br>
+                                <br></p>
                                 <p>{{userInfo.description}}</p>
                             </div>
                             <div class="card-action">
