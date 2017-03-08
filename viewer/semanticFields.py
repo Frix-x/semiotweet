@@ -40,6 +40,7 @@ def tokenizeText(text):
     frenchStopwords = set(stopwords).union(set(commonWordsWiki))
     frenchStopwords = frenchStopwords.union(set(commonWordsSnowball))
     frenchStopwords = frenchStopwords.union(set(commonWordsTwitter))
+    frenchStopwords = [w.decode('utf8') for w in frenchStopwords]
 
     # Filtering
     words = [w.lower() for w in words if not (len(w) < 2 or w.lower() in frenchStopwords)]
