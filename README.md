@@ -112,3 +112,7 @@ Once the server is running, you can extact the data concerning the users and the
   - [Map of a Twitter Status Object](http://www.slaw.ca/wp-content/uploads/2011/11/map-of-a-tweet-copy.pdf "Map of a Twitter Status"), Raffi Krikorian
   - Marco Bonzanini, [Mining Twitter Data with Python](https://marcobonzanini.com/2015/03/02/mining-twitter-data-with-python-part-1/ "Mining Twitter Data with Python")
   - [Migrating Your Django Project to Heroku](https://realpython.com/blog/python/migrating-your-django-project-to-heroku/ "Migrating Your Django Project to Heroku")
+  
+## License
+  This project is under [GNU General Public License (Version 3, 29 June 2007)](https://github.com/jjerphan/semiotweet/blob/master/LICENSE).
+  Feel free to contact us and to fork, to patch or this project.
