@@ -7,6 +7,8 @@ from .models import Tweet,User,Word
 import random
 import string
 import time
+import pytz
+from datetime import datetime
 from django.db.models import Max
 from django.db import connection #for direct SQL requests
 
@@ -122,7 +124,10 @@ def saveTweet(tweet,user):
     newTweet.lang = tweet['lang']
 
     # Formating the date
-    newTweet.created_at = time.strftime('%Y-%m-%d %H:%M:%S', time.strptime(newTweet.created_at,'%a %b %d %H:%M:%S +0000 %Y'))
+    current_tz = timezone.get_current_timezone()
+    newTweet.created_at = datetime.strptime(newTweet.created_at, '%a %b %d %H:%M:%S +0000 %Y')
+    newTweet.created_at= current_tz.localize(newTweet.created_at)
+    # newTweet.created_at = time.strftime('%Y-%m-%d %H:%M:%S', time.strptime(newTweet.created_at,'%a %b %d %H:%M:%S +0000 %Y'))
 
     # Saving the tweet
     try:
@@ -199,7 +204,10 @@ def saveUser(userInfo):
     newUser.verified = userInfo['verified']
 
     # Formating the date
-    newUser.created_at = time.strftime('%Y-%m-%d %H:%M:%S', time.strptime(newUser.created_at,'%a %b %d %H:%M:%S +0000 %Y'))
+    current_tz = timezone.get_current_timezone()
+    newUser.created_at = datetime.strptime(newUser.created_at, '%a %b %d %H:%M:%S +0000 %Y')
+    newUser.created_at= current_tz.localize(newUser.created_at)
+    # newUser.created_at = time.strftime('%Y-%m-%d %H:%M:%S', time.strptime(newUser.created_at,'%a %b %d %H:%M:%S +0000 %Y'))
 
     # Saving the user in the database
     try:
