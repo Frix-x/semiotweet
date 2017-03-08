@@ -39,6 +39,9 @@ Clone it. Go to the folder and :
 $ virtualenv venv
 $ source venv/bin/activate
 $ pip install -r requirements
+# If you have the error 'pg_config not found' : sudo apt install libpq_dev
+# If you have the error 'could not run curl-config' : sudo apt install libcurl4-openssl-dev
+# Then re-install the requirements
 ```
 
 You have to set some variables in yout virtual env.
