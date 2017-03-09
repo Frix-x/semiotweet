@@ -1,5 +1,6 @@
 .env
 venv/*
+venv3/*
 *pyc
 db.sqlite3
 viewer/migrations/

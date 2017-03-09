@@ -1,4 +1,5 @@
 #coding:utf-8
+from __future__ import print_function
 from lxml import html
 import requests
 import nltk.data
@@ -127,7 +128,7 @@ requestToGetSources = 'SELECT DISTINCT source, COUNT(source) AS nb  FROM viewer_
 
 if __name__ == '__main__':
     # print(getSemanticField("médicament"))
-    print dict(Counter(tokenizeText("J'aime les beignets à la framboise #Love @jjerphan oups oups  ")))
+    print(dict(Counter(tokenizeText("J'aime les beignets à la framboise #Love @jjerphan oups oups  "))))
     # listTweetText = ["J'aime les barbes à papa #swag","Mon cheval mange des carottes-cakes en Hiver ! #Yolo #QuelleIdée !","Quelle idée d'avoir des doigts :'("]
     # res = countWords(listTweetText)
     # for i in res.keys():

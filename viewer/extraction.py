@@ -1,7 +1,12 @@
 #coding:utf8
 from __future__ import print_function
+from __future__ import division
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str
+from past.utils import old_div
 import oauth2
-from StringIO import StringIO
+from io import BytesIO
 import json
 import os, sys, getenv
 
@@ -14,7 +19,7 @@ def oauthRequest(url,credentials,http_method="GET",post_body="",http_headers=Non
     consumer = oauth2.Consumer(key=credentials[0], secret=credentials[1])
     token = oauth2.Token(key=credentials[2], secret=credentials[3]) #Token of the app
     client = oauth2.Client(consumer, token) #Token of the user using the app
-    resp, content = client.request( url, method=http_method, body=post_body, headers=http_headers )
+    resp, content = client.request( url, method=http_method, body=post_body.encode('utf-8'), headers=http_headers )
     return content
 
 #==============================#
@@ -38,7 +43,7 @@ def returnTweetsBatch(screen_name,count=False,max_id=False,since_id=False):
 
     # Request
     res = oauthRequest(url,credentials)
-    res = json.load(StringIO(res)) # converting the string into good json format
+    res = json.load(BytesIO(res)) # converting the string into good json format
 
     # If there's an error or no response :
     if 'errors' in res or len(res) == 0:
@@ -65,7 +70,7 @@ def returnTweetsMultiple(screen_name,lastId=0):
     batchSize = min(nbTweet,200) # batchSize between 1 and 200
 
     if lastId == 0: # We only want to get ALL the tweets ; it supposes there are no tweets in the DB
-        maxIter = nbTweet/(batchSize+1) + 1 # number of requests to send
+        maxIter = old_div(nbTweet,(batchSize+1)) + 1 # number of requests to send
         iterNum = 0 # counter for the loop
         lastId = 0
         while lastId != currentId and iterNum < maxIter:
@@ -92,7 +97,7 @@ def cleanTweet(tweet):
     global uselessFields
     global stringFields
 
-    fieldsToDelete = [k for k in tweet.keys() if k not in usefullFields]
+    fieldsToDelete = [k for k in list(tweet.keys()) if k not in usefullFields]
     for key in fieldsToDelete:
         del tweet[key]
 
@@ -131,7 +136,7 @@ def returnUser(screen_name,toClean=True):
         return {}
 
     res = oauthRequest(baseURL+'users/show.json?screen_name='+screen_name,credentials)
-    user = json.load(StringIO(res))
+    user = json.load(BytesIO(res))
     if toClean:
         user = cleanUser(user)
     return user
@@ -141,7 +146,7 @@ def cleanUser(user):
     global usefullFieldsUser
     global stringFields
 
-    fieldsToDelete = [k for k in user.keys() if k not in usefullFieldsUser]
+    fieldsToDelete = [k for k in list(user.keys()) if k not in usefullFieldsUser]
     for key in fieldsToDelete:
         del user[key]
 
@@ -257,7 +262,7 @@ def testMultiple(screen_name,since_id=False):
 def testProfile(screen_name,toClean=True):
     user = returnUser(screen_name,credentials,toClean)
 
-    remainingFields = user.keys()
+    remainingFields = list(user.keys())
     for i in remainingFields:
         print(i,":", user[i])
 
