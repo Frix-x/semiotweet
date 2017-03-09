@@ -1,5 +1,8 @@
 #-*- coding: utf-8 -*-
 # from datetime import datetime
+from __future__ import print_function
+from __future__ import absolute_import
+from builtins import str
 from django.utils import timezone
 from django.http import HttpResponse,Http404
 from django.shortcuts import render,redirect
@@ -14,8 +17,8 @@ from django.db import connection #for direct SQL requests
 
 import json
 
-from extraction import *
-from semanticFields import *
+from .extraction import *
+from .semanticFields import *
 
 #==============================#
 #=========== OTHERS ===========#
@@ -82,7 +85,7 @@ def displayInfo(request,screen_name):
     try:
         cursor.execute("SELECT DISTINCT source, COUNT(source) AS nb FROM viewer_tweet WHERE user_id_id ='"+ str(idUser)+"' GROUP BY source ORDER BY nb DESC")
     except BaseException:
-        print error
+        print(error)
         return render(request,'home.html',locals())
     res = cursor.fetchall()
     sources = []
