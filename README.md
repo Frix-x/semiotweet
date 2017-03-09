@@ -36,9 +36,16 @@ Templates are directly put in `viewer/templates/` and not as usual in `viewer/te
 
 Clone it. Go to the folder and :
 ```
+# For Python 3.6
+$ virtualenv -p /usr/bin/python3 venv3
+$ source venv3/bin/activate
+
+# For Python 2.7
 $ virtualenv venv
 $ source venv/bin/activate
-$ pip install -r requirements
+
+# Then install the requirements
+$ pip install -r requirements.txt
 # If you have the error 'pg_config not found' : sudo apt install libpq_dev
 # If you have the error 'could not run curl-config' : sudo apt install libcurl4-openssl-dev
 # Then re-install the requirements
