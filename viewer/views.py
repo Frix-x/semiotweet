@@ -226,9 +226,10 @@ def saveUser(userInfo):
 def getWords(request):
     """ Stores common words and semantic fields of the specifiedWords """
     global specifiedWords
+    global frenchStopwords
 
     # Saving the common words
-    for word in commonWords:
+    for word in frenchStopwords:
         newWord = Word(word=word,semanticField="#")
         newWord.save()
 
