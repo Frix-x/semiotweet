@@ -36,20 +36,22 @@ Templates are directly put in `viewer/templates/` and not as usual in `viewer/te
 
 Clone it. Go to the folder and :
 ```
-# For Python 3.6
+# For Python 3.6 or Python 3.x
 $ virtualenv -p /usr/bin/python3 venv3
 $ source venv3/bin/activate
 
 # For Python 2.7
 $ virtualenv venv
 $ source venv/bin/activate
-
-# Then install the requirements
-$ pip install -r requirements.txt
-# If you have the error 'pg_config not found' : sudo apt install libpq_dev
-# If you have the error 'could not run curl-config' : sudo apt install libcurl4-openssl-dev
-# Then re-install the requirements
 ```
+Then install the requirements
+```
+$ pip install -r requirements.txt
+```
+If you have the error `pg_config not found` just install the `libpq_dev` package.
+If you have the error `could not run curl-config` install the `libcurl4-openssl-dev` package.
+Then re-install the requirements
+
 
 You have to set some variables in yout virtual env.
 First the "secret key" for the app (needed by Django).
@@ -64,6 +66,7 @@ $ export CONSUMER_SECRET='someLongStringToImagine'
 $ export KEY='someLongStringToImagine'
 $ export SECRET='someLongStringToImagine'
 ```
+
 You have to create a `local_settings.py` in the same folder as `setting.py` in order to extend this file (see the end of `setting.py`) ; this is useful for managing different
 data base between local development and deployement :
 ```
@@ -74,7 +77,7 @@ In this file are the settings set to use the local database (`DEBUG` is set to T
 
 ```
 # Local settings : used for local development.
-from settings import PROJECT_ROOT, BASE_DIR
+from .settings import PROJECT_ROOT, BASE_DIR
 import os
 
 DEBUG = True

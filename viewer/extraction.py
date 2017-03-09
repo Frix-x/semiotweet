@@ -43,7 +43,7 @@ def returnTweetsBatch(screen_name,count=False,max_id=False,since_id=False):
 
     # Request
     res = oauthRequest(url,credentials)
-    res = json.load(BytesIO(res)) # converting the string into good json format
+    res = json.loads(res.decode('utf-8'))
 
     # If there's an error or no response :
     if 'errors' in res or len(res) == 0:
@@ -135,8 +135,10 @@ def returnUser(screen_name,toClean=True):
     if not screen_name in screen_nameToExtract:
         return {}
 
+    # Request
     res = oauthRequest(baseURL+'users/show.json?screen_name='+screen_name,credentials)
-    user = json.load(BytesIO(res))
+    user = json.loads(res.decode('utf-8'))
+
     if toClean:
         user = cleanUser(user)
     return user
