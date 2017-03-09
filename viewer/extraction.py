@@ -101,11 +101,6 @@ def cleanTweet(tweet):
     for key in fieldsToDelete:
         del tweet[key]
 
-    # NOTE : To encode string : no more usefull now
-    # remainingStrFields = [k for k in tweet.keys() if k in stringFields]
-    # for key in remainingStrFields:
-    #     tweet[key] = str(tweet[key]).encode("utf-8")
-
     # Catching the foreign key : user_id
     tweet["user_id"] = tweet["user"]["id"]
     del tweet["user"]
@@ -176,19 +171,11 @@ credentials = [consumerKey,consumerSecret,key,secret]
 
 baseURL = "https://api.twitter.com/1.1/"
 
-
 ### Tweets' Fields (see : https://dev.twitter.com/overview/api/tweets):
 
 usefullFields = ["user","text","is_quote_status","in_reply_to_status_id","id",
                 "favorite_count","user_id","source","in_reply_to_user_id","retweet_count",
                 "lang","created_at"]
-
-# uselessFields = ["contributors","id_str","filter_level","geo","favorited",
-#              "geo","in_reply_to_user_id_str","in_reply_to_status_id_str",
-#              "place","possibly_sensitive","quoted_status_id_str","quoted_status",
-#              "quoted_status_id","retweeted","retweeted_status","withheld_copyright"
-#              "withheld_in_countries","withheld_scope","favorited",
-#              "truncated","coordinates","extended_entities","in_reply_to_screen_name","entities"]
 
 # Used to encode string
 stringFields = ["created_at","filter_level,id_str","in_reply_to_screen_name",
@@ -238,10 +225,6 @@ screen_nameToID = {'benoithamon': 14389177,
                   'MarCharlott': 1567664221,
                   'EmmanuelMacron': 1976143068,}
 
-
-
-
-
 #==============================#
 #=========== TESTS ============#
 #==============================#
@@ -269,8 +252,9 @@ def testProfile(screen_name,toClean=True):
         print(i,":", user[i])
 
 if __name__ == '__main__':
-    # testBatch("EmmanuelMacron",count=4,max_id=833962028842770432,since_id=832997764984401920)
-    testMultiple("JLMelenchon",since_id=834891272267653122)
-    # testBatch("JLMelenchon",since_id=834891272267653122)
+    #testBatch("EmmanuelMacron",count=4,max_id=833962028842770432,since_id=832997764984401920)
+    #testMultiple("JLMelenchon",since_id=834891272267653122)
+    #testBatch("JLMelenchon",since_id=834891272267653122)
     #testTweet("jjerphan")
     #testProfile("jjerphan",False)
+    pass
