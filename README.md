@@ -77,6 +77,7 @@ In this file are the settings set to use the local database (`DEBUG` is set to T
 
 ```
 # Local settings : used for local development.
+from __future__ import absolute_import
 from .settings import PROJECT_ROOT, BASE_DIR
 import os
 
