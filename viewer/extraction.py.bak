@@ -1,5 +1,4 @@
 #coding:utf8
-from __future__ import print_function
 import oauth2
 from StringIO import StringIO
 import json
@@ -242,16 +241,16 @@ screen_nameToID = {'benoithamon': 14389177,
 def testBatch(screen_name,count=False,max_id=False,since_id=False):
     res = returnTweetsBatch(screen_name,count,max_id,since_id)
     for t in res:
-        print(t["id"], t["text"])
+        print t["id"], t["text"]
 
-    print(len(res))
+    print len(res)
 
 def testMultiple(screen_name,since_id=False):
     res = returnTweetsMultiple(screen_name,since_id)
     for t in res:
-        print(t["id"], t["text"])
+        print t["id"], t["text"]
 
-    print(len(res))
+    print len(res)
 
 
 def testProfile(screen_name,toClean=True):
@@ -259,7 +258,7 @@ def testProfile(screen_name,toClean=True):
 
     remainingFields = user.keys()
     for i in remainingFields:
-        print(i,":", user[i])
+        print i,":", user[i]
 
 if __name__ == '__main__':
     # testBatch("EmmanuelMacron",count=4,max_id=833962028842770432,since_id=832997764984401920)

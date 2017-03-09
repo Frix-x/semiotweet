@@ -9,7 +9,6 @@ https://docs.djangoproject.com/en/1.10/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/1.10/ref/settings/
 """
-from __future__ import absolute_import
 
 import os, sys, getenv
 
@@ -155,6 +154,6 @@ SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 # Trying to load local_settings.py if it exists that is on local dev'
 try:
-  from .local_settings import *
+  from local_settings import *
 except Exception as e:
   pass
