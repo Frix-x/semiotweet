@@ -19,5 +19,5 @@ from viewer import urls
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
-    url(r'^',include('viewer.urls'))
+    url(r'^',include('viewer.urls')),
 ]

@@ -24,6 +24,13 @@ from .semanticFields import *
 #=========== OTHERS ===========#
 #==============================#
 
+def handler404(request,typed):
+    """A basic 404 error handler"""
+    response = render(request,'404.html', {"typed":typed})
+    response.status_code = 404
+    return response
+
+
 def home(request):
     """Redirect to the home page : global statistics"""
     global requestToGetSources
