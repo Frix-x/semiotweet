@@ -32,7 +32,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col s12 m4">
+            <div class="col s12 m4" id="TweetSources">
                 <div class="icon-block">
                     <h5 class="center">Tweet sources</h5>
                     <canvas id="doughnutSources"></canvas>
@@ -40,7 +40,7 @@
             </div>
         </div>
         <div class="row">
-            <div class="icon-block">
+            <div class="icon-block" id="Words">
                 <canvas id="MostCommonWords"></canvas>
             </div>
         </div>
@@ -61,74 +61,83 @@
 {% endblock %}
 
 {%block script%}
+
+
 <script>
-    var words = {{words|safe}};
-    words.sort(function(a, b) {
-        return b.occur - a.occur
-    });
-    var word = [];
-    var occur = [];
-    var colorsForBars = ['rgba(54, 162, 235, 1)'] * words.length;
+var words = {{words|safe}};
+if (words.length == 0)
+  $( "#Words").html("<div class='row center'><h3>No data yet. Click <a href='/getData/'>here</a> to update data</h3></div>");
+else{
+      words.sort(function(a, b) {
+          return b.occur - a.occur
+      });
+      var word = [];
+      var occur = [];
+      var colorsForBars = ['rgba(54, 162, 235, 1)'] * words.length;
 
-    for (i = 0; i < words.length; i++) {
-        word.push(words[i].word);
-        occur.push(words[i].occur);
-    }
+      for (i = 0; i < words.length; i++) {
+          word.push(words[i].word);
+          occur.push(words[i].occur);
+      }
 
-    var ctx = document.getElementById("MostCommonWords");
+      var ctx = document.getElementById("MostCommonWords");
 
-    var data = {
-        labels: word,
-        datasets: [{
-            label: "Most common words",
-            data: occur,
-            backgroundColor: colorsForBars,
-            borderColor: colorsForBars
-        }]
-    };
-    var options = {
-        animation: {
-            animateScale: true
-        },
-        title: {
-            display: false,
-            text: 'Most Common Words used by {{userInfo.name}}'
-        }
-    };
-    var myBarChart = new Chart(ctx, {
-        type: 'bar',
-        data: data,
-        options: options
-    });
-</script>
-<script>
+      var data = {
+          labels: word,
+          datasets: [{
+              label: "Most common words",
+              data: occur,
+              backgroundColor: colorsForBars,
+              borderColor: colorsForBars
+          }]
+      };
+      var options = {
+          animation: {
+              animateScale: true
+          },
+          title: {
+              display: false,
+              text: 'Most Common Words used by {{userInfo.name}}'
+          }
+      };
+      var myBarChart = new Chart(ctx, {
+          type: 'bar',
+          data: data,
+          options: options
+      });
+}
+
 var sources = {{sources|safe}};
 var num = {{num|safe}};
-var ctx = document.getElementById("doughnutSources");
-var colors = ["#FF6384","#36A2EB","#FFCE56","#FFBA49","#20A39E",
-              "#EF5B5B","#23001E","#A4A9AD","#8CDFD6","#5A716A"];
-var data = {
-  labels: sources,
-  datasets: [
-      {
-          data: num,
-          backgroundColor: colors,
-          hoverBackgroundColor: colors
-      }]
-};
-var options = {
-    animation:{
-        animateScale:true
-    },
-    title: {
-        display: false,
-        text: 'Tweet Sources'
-    }
-};
-var myDoughnutChart = new Chart(ctx, {
-    type: 'doughnut',
-    data: data,
-    options: options
-});
+if (sources.length == 0 && num.length == 0)
+  $( "#TweetSources").html("<div class='row center'><h3>No data yet. Click <a href='/getData/'>here</a> to update data</h3></div>");
+else{
+  var ctx = document.getElementById("doughnutSources");
+  var colors = ["#FF6384","#36A2EB","#FFCE56","#FFBA49","#20A39E",
+                "#EF5B5B","#23001E","#A4A9AD","#8CDFD6","#5A716A"];
+  var data = {
+    labels: sources,
+    datasets: [
+        {
+            data: num,
+            backgroundColor: colors,
+            hoverBackgroundColor: colors
+        }]
+  };
+  var options = {
+      animation:{
+          animateScale:true
+      },
+      title: {
+          display: false,
+          text: 'Tweet Sources'
+      }
+  };
+  var myDoughnutChart = new Chart(ctx, {
+      type: 'doughnut',
+      data: data,
+      options: options
+  });
+}
 </script>
 {% endblock %}

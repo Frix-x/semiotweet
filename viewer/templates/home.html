@@ -16,8 +16,7 @@
 
 
 <div class="container">
-    <div class="section">
-
+    <div class="section" id="Graphs">
         <div class="row">
             <div class="col s12 m4">
                 <div class="icon-block">
@@ -48,64 +47,67 @@
 <script>
 var sources = {{sources|safe}};
 var num = {{num|safe}};
-var ctx = document.getElementById("doughnutSources");
-var colors = ["#FF6384","#36A2EB","#FFCE56","#FFBA49","#20A39E",
-              "#EF5B5B","#23001E","#A4A9AD","#8CDFD6","#5A716A"];
-var data = {
-  labels: sources,
-  datasets: [
-      {
-          data: num,
-          backgroundColor: colors,
-          hoverBackgroundColor: colors
-      }]
-};
-var options = {
-    animation:{
-        animateScale:true
-    },
-    title: {
-        display: false,
-        text: 'Tweet Sources'
-    }
-};
-var myDoughnutChart = new Chart(ctx, {
-    type: 'doughnut',
-    data: data,
-    options: options
-});
-</script>
-
-<script>
-var words = {{words|safe}};
-words.sort(function(a, b) {
-    return b.occur - a.occur
-});
-var word = [];
-var occur = [];
-var colorsForBars = {{colorsForBars|safe}}
-
-for (i = 0; i < words.length; i++) {
-    word.push(words[i].word);
-    occur.push(words[i].occur);
-}
-var ctxBar = "barCommonWords";
-var dataBar = {
-  labels: word,
-  datasets: [
-      {
-          label: "Word occurences",
-          backgroundColor: colorsForBars,
-          borderColor: colorsForBars,
-          borderWidth: 1,
-          data: occur,
+if (sources.length == 0)
+  $( "#Graphs").html("<div class='row center'><h3>No data yet. Click <a href='/getData/'>here</a> to update data</h3></div>");
+else{
+  var ctx = document.getElementById("doughnutSources");
+  var colors = ["#FF6384","#36A2EB","#FFCE56","#FFBA49","#20A39E",
+                "#EF5B5B","#23001E","#A4A9AD","#8CDFD6","#5A716A"];
+  var data = {
+    labels: sources,
+    datasets: [
+        {
+            data: num,
+            backgroundColor: colors,
+            hoverBackgroundColor: colors
+        }]
+  };
+  var options = {
+      animation:{
+          animateScale:true
+      },
+      title: {
+          display: false,
+          text: 'Tweet Sources'
       }
-  ]
-};
-var myBarChart = new Chart(ctxBar, {
-  type: 'bar',
-  data: dataBar,
-  options: options
-});
+  };
+  var myDoughnutChart = new Chart(ctx, {
+      type: 'doughnut',
+      data: data,
+      options: options
+  });
+
+  var words = {{words|safe}};
+  words.sort(function(a, b) {
+      return b.occur - a.occur
+  });
+  var word = [];
+  var occur = [];
+  var colorsForBars = {{colorsForBars|safe}}
+
+  for (i = 0; i < words.length; i++) {
+      word.push(words[i].word);
+      occur.push(words[i].occur);
+  }
+  var ctxBar = "barCommonWords";
+  var dataBar = {
+    labels: word,
+    datasets: [
+        {
+            label: "Word occurences",
+            backgroundColor: colorsForBars,
+            borderColor: colorsForBars,
+            borderWidth: 1,
+            data: occur,
+        }
+    ]
+  };
+  var myBarChart = new Chart(ctxBar, {
+    type: 'bar',
+    data: dataBar,
+    options: options
+  });
+}
+
 </script>
 {% endblock %}

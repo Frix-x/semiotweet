@@ -29,10 +29,12 @@ def home(request):
     global requestToGetSources
     cursor = connection.cursor()
     try:
-        cursor.execute(requestToGetSources)
+        print(cursor.execute(requestToGetSources))
     except BaseException:
+        print("coucou")
         return render(request,'home.html',{"error":"No data yet ; click on 'Get the data'"})
     res = cursor.fetchall()
+
     sources = []
     num = []
     for (s,n) in res:
