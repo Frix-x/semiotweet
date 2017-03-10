@@ -17,6 +17,28 @@
 
 <div class="container">
     <div class="section" id="Graphs">
+          <div class="row">
+            <div class="col s12 m9">
+                <div class="icon-block">
+                  <h5 class="center">Most common words used by all politics</h5>
+                  <canvas id="barCommonWords"></canvas>
+                </div>
+            </div>
+            <div class="col s12 m3">
+                <div class="icon-block">
+                  <div class="card vertical">
+                    <div class="card-stacked">
+                      <div class="card-content" id="NbTweetsByPolitics">
+
+                      </div>
+                      <div class="card-action">
+                        <a>Number of tweets by Politic</a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+            </div>
+        </div>
         <div class="row">
             <div class="col s12 m4">
                 <div class="icon-block">
@@ -24,15 +46,7 @@
                     <canvas id="doughnutSources"></canvas>
                 </div>
             </div>
-
-            <div class="col s12 m8">
-                <div class="icon-block">
-                    <h5 class="center">Most common words</h5>
-                    <canvas id="barCommonWords"></canvas>
-                </div>
-            </div>
-        </div>
-
+          </div>
     </div>
     <br><br>
 </div>
@@ -107,7 +121,16 @@ else{
     data: dataBar,
     options: options
   });
+
+var politics = {{politics|safe}};
+var nbTweets = {{nbTweets|safe}};
+var content= '';
+
+for(var i=0 ; i < politics.length ; i++)
+  content += '<tr><td>'+ politics[i] + ':</td><td>' + nbTweets[i] + '</td></tr>';
+$( "#NbTweetsByPolitics").html("<table>"+content + "</table>");
 }
+
 
 </script>
 {% endblock %}

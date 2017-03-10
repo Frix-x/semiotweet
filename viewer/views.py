@@ -58,6 +58,21 @@ def home(request):
     sources = json.dumps(sources)
     num = json.dumps(num)
 
+    try:
+        cursor.execute("SELECT u.name, COUNT(t.id) AS nbTweets FROM viewer_tweet t, viewer_user u WHERE u.id = t.user_id_id GROUP BY u.name ORDER BY nbTweets DESC")
+    except BaseException:
+        return render(request,'home.html',{"error":"No data yet ; click on 'Get the data'"})
+    res = cursor.fetchall()
+
+    politics = []
+    nbTweets = []
+    for (p,n) in res:
+        politics.append(p)
+        nbTweets.append(n)
+    # JSON Formating
+    politics = json.dumps(politics)
+    nbTweets = json.dumps(nbTweets)
+
     listTweetText = Tweet.objects.values('text')
     listTweetText = [t["text"] for t in listTweetText]
 

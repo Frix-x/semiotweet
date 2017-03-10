@@ -23,3 +23,7 @@ body {
 main {
     flex: 1 0 auto;
 }
+
+#NbTweetsByPolitics table > th, td{
+  padding: 3px 3px;
+}
