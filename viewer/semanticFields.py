@@ -38,7 +38,9 @@ def tokenizeText(text):
 
     # French stopwords
     frenchStopwords = set(stopwords).union(set(commonWordsWiki))
+    frenchStopwords = frenchStopwords.union(set(commonWordsSnowball))
     frenchStopwords = frenchStopwords.union(set(commonWordsTwitter))
+    frenchStopwords = [w.decode('utf8') for w in frenchStopwords]
 
     # Filtering
     words = [w.lower() for w in words if not (len(w) < 2 or w.lower() in frenchStopwords)]
@@ -55,7 +57,7 @@ def countWords(listTweetText,nbWordsToExtract=30):
 
     return dict(Counter(wordOccurences).most_common(nbWordsToExtract))
 
-def toJsonForBubbles(dict):
+def toJsonForGraph(dict):
     """Return a list of dict used next for the Bubble Graph"""
     output = []
     for key,val in dict.items():
@@ -89,13 +91,39 @@ commonWordsWiki =["de", "la", "le", "et", "les", "des", "en", "un", "du", "une",
               "faire", "elle", "c'est", "peu", "vous","prix",
               "dont", "lui", "également", "effet", "pays", "cas"]
 
+# Snowball stopwords (see : http://snowball.tartarus.org/algorithms/french/stop.txt)
+commonWordsSnowball = ["au", "aux", "avec", "ce", "ces", "dans", "de", "des", "du",
+                    "elle", "en", "et", "eux", "il", "je", "la", "le", "leur", "lui",
+                    "ma", "mais", "me", "même", "mes", "moi", "mon", "ne", "nos",
+                    "notre", "nous", "on", "ou", "par", "pas", "pour", "qu",
+                    "que", "qui", "sa", "se", "ses", "son", "sur", "ta", "te",
+                    "tes", "toi", "ton", "tu", "un", "une", "vos", "votre",
+                    "vous", "c", "d", "j", "l", "à", "m", "n", "s", "t", "y",
+                    "été", "étée", "étées", "étés", "étant", "suis", "es", "est",
+                    "sommes", "êtes", "sont", "serai", "seras", "sera", "serons",
+                    "serez", "seront", "serais", "serait", "serions", "seriez",
+                    "seraient", "étais", "était", "étions", "étiez", "étaient",
+                    "fus", "fut", "fûmes", "fûtes", "furent", "sois", "soit",
+                    "soyons", "soyez", "soient", "fusse", "fusses", "fût",
+                    "fussions", "fussiez", "fussent", "ayant", "eu", "eue",
+                    "eues", "eus", "ai", "as", "avons", "avez", "ont", "aurai",
+                    "auras", "aura", "aurons", "aurez", "auront", "aurais",
+                    "aurait", "aurions", "auriez", "auraient", "avais", "avait",
+                    "avions", "aviez", "avaient", "eut", "eûmes", "eûtes",
+                    "eurent", "aie", "aies", "ait", "ayons", "ayez", "aient",
+                    "eusse", "eusses", "eût", "eussions", "eussiez", "eussent",
+                    "ceci", "cela", "celà", "cet", "cette", "ici", "ils", "les",
+                    "leurs", "quel", "quels", "quelle", "quelles", "sans", "soi"]
+
 # Others common works on Twitter, not so meaningful
 commonWordsTwitter = ["…","rt","ils","faut","https","://","http","...","ça",
                       "to","the","j'ai","via","ça","000","veux","être","devons"
-                      ,"doit","j'étais"]
+                      ,"doit","j'étais","suis"]
 
 
 specifiedWords = ["colère","combat","peur","victoire","aide","argent","mensonge","société"]
+
+requestToGetSources = 'SELECT DISTINCT source, COUNT(source) AS nb  FROM viewer_tweet GROUP BY source ORDER BY nb DESC'
 
 if __name__ == '__main__':
     # print(getSemanticField("médicament"))

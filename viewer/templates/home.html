@@ -77,19 +77,28 @@ var myDoughnutChart = new Chart(ctx, {
 </script>
 
 <script>
-var words = {{words|safe}}
-var occurences = {{occurences|safe}}
+var words = {{words|safe}};
+words.sort(function(a, b) {
+    return b.occur - a.occur
+});
+var word = [];
+var occur = [];
 var colorsForBars = {{colorsForBars|safe}}
+
+for (i = 0; i < words.length; i++) {
+    word.push(words[i].word);
+    occur.push(words[i].occur);
+}
 var ctxBar = "barCommonWords";
 var dataBar = {
-  labels: words,
+  labels: word,
   datasets: [
       {
-          labels: "Word occurences",
+          label: "Word occurences",
           backgroundColor: colorsForBars,
           borderColor: colorsForBars,
           borderWidth: 1,
-          data: occurences,
+          data: occur,
       }
   ]
 };

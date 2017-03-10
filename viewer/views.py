@@ -7,6 +7,8 @@ from .models import Tweet,User,Word
 import random
 import string
 import time
+import pytz
+from datetime import datetime
 from django.db.models import Max
 from django.db import connection #for direct SQL requests
 
@@ -14,15 +16,17 @@ import json
 
 from extraction import *
 from semanticFields import *
+
 #==============================#
 #=========== OTHERS ===========#
 #==============================#
 
 def home(request):
     """Redirect to the home page : global statistics"""
+    global requestToGetSources
     cursor = connection.cursor()
     try:
-        cursor.execute('SELECT DISTINCT source, COUNT(source) AS nb  FROM viewer_tweet GROUP BY source ORDER BY nb DESC')
+        cursor.execute(requestToGetSources)
     except BaseException:
         return render(request,'home.html',{"error":"No data yet ; click on 'Get the data'"})
     res = cursor.fetchall()
@@ -35,8 +39,8 @@ def home(request):
     # Keeping only the most commons stats
     if len(sources)>5 :
         sources = sources[0:5]
-        sources.append("Others")
-        num[6] = sum(num[6:-1])
+        sources.append(u"Others")
+        num[5] = sum(num[5:-1])
         num = num[0:6]
 
     # JSON Formating
@@ -45,19 +49,12 @@ def home(request):
 
     listTweetText = Tweet.objects.values('text')
     listTweetText = [t["text"] for t in listTweetText]
-    listTweetText = countWords(listTweetText)
 
-    words = []
-    occurences = []
-    for w,o in listTweetText.items():
-        words.append(w)
-        occurences.append(o)
-
+    # words is a JSON list of dict like : {"word":"foo", "occur":42}
+    words = json.dumps(toJsonForGraph(countWords(listTweetText)))
     colorsForBars = ['rgba(54, 162, 235, 1)']*len(words)
 
     # JSON Formating
-    words = json.dumps(words)
-    occurences = json.dumps(occurences)
     return render(request,'home.html',locals())
 
 def displayInfo(request,screen_name):
@@ -77,7 +74,34 @@ def displayInfo(request,screen_name):
     listTweetText = [t["text"] for t in listTweetText]
 
     # words is a JSON list of dict like : {"word":"foo", "occur":42}
-    words = json.dumps(toJsonForBubbles(countWords(listTweetText)))
+    words = json.dumps(toJsonForGraph(countWords(listTweetText)))
+
+    # Sources of Tweets
+    global requestToGetSources
+    cursor = connection.cursor()
+    try:
+        cursor.execute("SELECT DISTINCT source, COUNT(source) AS nb FROM viewer_tweet WHERE user_id_id ='"+ str(idUser)+"' GROUP BY source ORDER BY nb DESC")
+    except BaseException:
+        print error
+        return render(request,'home.html',locals())
+    res = cursor.fetchall()
+    sources = []
+    num = []
+    for (s,n) in res:
+        sources.append(s)
+        num.append(n)
+
+    # Keeping only the most commons stats
+    if len(sources)>5 :
+        sources = sources[0:5]
+        sources.append(u"Others")
+        num[5] = sum(num[5:-1])
+        num = num[0:6]
+
+    # JSON Formating
+    sources = json.dumps(sources)
+    num = json.dumps(num)
+
     return render(request,'displayInfo.html',locals())
 
 #==============================#
@@ -100,7 +124,10 @@ def saveTweet(tweet,user):
     newTweet.lang = tweet['lang']
 
     # Formating the date
-    newTweet.created_at = time.strftime('%Y-%m-%d %H:%M:%S', time.strptime(newTweet.created_at,'%a %b %d %H:%M:%S +0000 %Y'))
+    current_tz = timezone.get_current_timezone()
+    newTweet.created_at = datetime.strptime(newTweet.created_at, '%a %b %d %H:%M:%S +0000 %Y')
+    newTweet.created_at= current_tz.localize(newTweet.created_at)
+    # newTweet.created_at = time.strftime('%Y-%m-%d %H:%M:%S', time.strptime(newTweet.created_at,'%a %b %d %H:%M:%S +0000 %Y'))
 
     # Saving the tweet
     try:
@@ -177,7 +204,10 @@ def saveUser(userInfo):
     newUser.verified = userInfo['verified']
 
     # Formating the date
-    newUser.created_at = time.strftime('%Y-%m-%d %H:%M:%S', time.strptime(newUser.created_at,'%a %b %d %H:%M:%S +0000 %Y'))
+    current_tz = timezone.get_current_timezone()
+    newUser.created_at = datetime.strptime(newUser.created_at, '%a %b %d %H:%M:%S +0000 %Y')
+    newUser.created_at= current_tz.localize(newUser.created_at)
+    # newUser.created_at = time.strftime('%Y-%m-%d %H:%M:%S', time.strptime(newUser.created_at,'%a %b %d %H:%M:%S +0000 %Y'))
 
     # Saving the user in the database
     try:
