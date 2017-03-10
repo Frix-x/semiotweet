@@ -215,7 +215,7 @@ usefullFieldsUser = ["id","name","screen_name","created_at",
                      "contributors_enabled","verified"]
 
 screen_nameToExtract = ["EmmanuelMacron","MLP_officiel","FrancoisFillon",
-                        "benoithamon","JLMelenchon","MarCharlott","PhilippePoutou"]
+                        "benoithamon","JLMelenchon","MarCharlott","PhilippePoutou", "dupontaignan", "n_arthaud", "UPR_Asselineau"]
 
 screen_nameToID = {'benoithamon': 14389177,
                   'JLMelenchon': 80820758,
