@@ -1,4 +1,6 @@
 #coding:utf-8
+from __future__ import print_function
+from builtins import str
 from lxml import html
 import requests
 import nltk.data
@@ -18,7 +20,7 @@ def getSemanticField(word):
 
 def personnalTokenizer(text):
     """Personnal Tokenizer"""
-    text = unicode(text, "utf-8")
+    text = str(text, "utf-8")
     text = text.translate(string.maketrans("",""), "!\"$%&()*+,-./:;<=>?[\]^_`{|}~")
     words = text.lower().split()
     return words
@@ -30,17 +32,11 @@ def tokenizeText(text):
     # tokenizerLocation = 'tokenizers/punkt/french.pickle' #Python 2
     # tokenizerLocation = 'tokenizers/punkt/PY3/french.pickle' #Python 3
     # tokenizer = nltk.data.load(tokenizerLocation)
-    global commonWordsWiki
+    global frenchStopwords
 
     # tokenizer = WordPunctTokenizer()
     tokenizer = TweetTokenizer(strip_handles=True, reduce_len=True)
     words = tokenizer.tokenize(text)
-
-    # French stopwords
-    frenchStopwords = set(stopwords).union(set(commonWordsWiki))
-    frenchStopwords = frenchStopwords.union(set(commonWordsSnowball))
-    frenchStopwords = frenchStopwords.union(set(commonWordsTwitter))
-    frenchStopwords = [w.decode('utf8') for w in frenchStopwords]
 
     # Filtering
     words = [w.lower() for w in words if not (len(w) < 2 or w.lower() in frenchStopwords)]
@@ -52,7 +48,7 @@ def countWords(listTweetText,nbWordsToExtract=30):
     wordOccurences = defaultdict(lambda: 0)
     for currentTweet in listTweetText:
         currentOccurences = dict(Counter(tokenizeText(currentTweet)))
-        for k in currentOccurences.keys():
+        for k in list(currentOccurences.keys()):
             wordOccurences[k] += currentOccurences[k]
 
     return dict(Counter(wordOccurences).most_common(nbWordsToExtract))
@@ -60,7 +56,7 @@ def countWords(listTweetText,nbWordsToExtract=30):
 def toJsonForGraph(dict):
     """Return a list of dict used next for the Bubble Graph"""
     output = []
-    for key,val in dict.items():
+    for key,val in list(dict.items()):
         output.append({"word":key,"occur":val})
 
     return output
@@ -115,11 +111,16 @@ commonWordsSnowball = ["au", "aux", "avec", "ce", "ces", "dans", "de", "des", "d
                     "ceci", "cela", "celà", "cet", "cette", "ici", "ils", "les",
                     "leurs", "quel", "quels", "quelle", "quelles", "sans", "soi"]
 
+
 # Others common works on Twitter, not so meaningful
 commonWordsTwitter = ["…","rt","ils","faut","https","://","http","...","ça",
                       "to","the","j'ai","via","ça","000","veux","être","devons"
                       ,"doit","j'étais","suis"]
 
+# French stopwords
+frenchStopwords = set(stopwords).union(set(commonWordsWiki))
+frenchStopwords = frenchStopwords.union(set(commonWordsSnowball))
+frenchStopwords = frenchStopwords.union(set(commonWordsTwitter))
 
 specifiedWords = ["colère","combat","peur","victoire","aide","argent","mensonge","société"]
 
@@ -127,8 +128,8 @@ requestToGetSources = 'SELECT DISTINCT source, COUNT(source) AS nb  FROM viewer_
 
 if __name__ == '__main__':
     # print(getSemanticField("médicament"))
-    print dict(Counter(tokenizeText("J'aime les beignets à la framboise #Love @jjerphan oups oups  ")))
     # listTweetText = ["J'aime les barbes à papa #swag","Mon cheval mange des carottes-cakes en Hiver ! #Yolo #QuelleIdée !","Quelle idée d'avoir des doigts :'("]
     # res = countWords(listTweetText)
     # for i in res.keys():
     #     print i,res[i]
+    pass

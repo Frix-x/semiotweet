@@ -9,6 +9,7 @@ https://docs.djangoproject.com/en/1.10/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/1.10/ref/settings/
 """
+from __future__ import absolute_import
 
 import os, sys, getenv
 
@@ -76,8 +77,7 @@ TEMPLATES = [
 WSGI_APPLICATION = 'semiotweet.wsgi.application'
 
 
-# Database
-# https://docs.djangoproject.com/en/1.10/ref/settings/#databases
+
 
 
 # Password validation
@@ -137,15 +137,18 @@ ALLOWED_HOSTS = ['*']
 # Parse database configuration from $DATABASE_URL
 import dj_database_url
 
-# DATABASES = { 'default' : dj_database_url.config()}
+
+# Database
+# https://docs.djangoproject.com/en/1.10/ref/settings/#databases
+
 # we only need the engine name, as heroku takes care of the rest
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql_psycopg2",
     }
 }
-
 DATABASES = { 'default' : dj_database_url.config()}
+
 
 # Honor the 'X-Forwarded-Proto' header for request.is_secure()
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
@@ -154,6 +157,7 @@ SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 # Trying to load local_settings.py if it exists that is on local dev'
 try:
-  from local_settings import *
+    from .local_settings import *
 except Exception as e:
-  pass
+    print(e)
+    pass
