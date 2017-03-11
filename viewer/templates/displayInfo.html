@@ -147,14 +147,15 @@ else{
 
 var hours = {{hours|safe}};
 if (hours.length != 0){
-      var colorsForBars = ['rgba(54, 162, 235, 1)'] * hours.length;
+      var colorsForBars = ['#060709', '#0e1420', '#13182c', '#162640', '#22345c', '#2c4e8d', '#4673b6', '#68a1d8', '#98cfee', '#b7e2f5', '#a9d5f2', '#9fcaed',
+                            '93bde3', '#87aed9', '#789ccc', '#7399c6', '#7080bb' , '#5d6ab0', '#364392', '#272e64', '#272e64', '#0f1221', '#0f1221', '#0f1221' ];
 
       var ctx = document.getElementById("HoursDistribution");
 
       var data = {
           labels: [0, 1, 2, 3, 4, 5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23],
           datasets: [{
-              label: "Post count per hour",
+              label: "Number of tweets",
               data: hours,
               backgroundColor: colorsForBars,
               borderColor: colorsForBars
@@ -165,9 +166,10 @@ if (hours.length != 0){
               animateScale: true
           },
           title: {
-              display: false,
+              display: true,
+              text: 'Post count per hour'
           },
-          
+
       };
       var myBarChart = new Chart(ctx, {
           type: 'bar',
