@@ -108,7 +108,6 @@ def displayInfo(request,screen_name):
     try:
         cursor.execute("SELECT DISTINCT source, COUNT(source) AS nb FROM viewer_tweet WHERE user_id_id ='"+ str(idUser)+"' GROUP BY source ORDER BY nb DESC")
     except BaseException:
-        print(error)
         return render(request,'home.html',locals())
     res = cursor.fetchall()
     sources = []
@@ -128,6 +127,16 @@ def displayInfo(request,screen_name):
     sources = json.dumps(sources)
     num = json.dumps(num)
 
+    #Get hours distribution of all tweets
+    try:
+        cursor.execute("SELECT DISTINCT created_at AS timePosted FROM viewer_tweet WHERE user_id_id ='"+ str(idUser)+"' ORDER BY timePosted")
+    except BaseException:
+        return render(request,'home.html',locals())
+    res = cursor.fetchall()
+    hours =[0]*24
+    for (time,) in res:
+        hours[time.time().hour]+=1
+        
     return render(request,'displayInfo.html',locals())
 
 #==============================#
