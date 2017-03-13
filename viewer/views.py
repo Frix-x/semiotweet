@@ -136,7 +136,7 @@ def displayInfo(request,screen_name):
     hours =[0]*24
     for (time,) in res:
         hours[time.time().hour]+=1
-        
+
     return render(request,'displayInfo.html',locals())
 
 #==============================#
