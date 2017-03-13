@@ -34,6 +34,8 @@ def handler404(request,typed):
 def home(request):
     """Redirect to the home page : global statistics"""
     global requestToGetSources
+
+    # Getting tweets' sources
     cursor = connection.cursor()
     try:
         cursor.execute(requestToGetSources)
@@ -71,20 +73,21 @@ def home(request):
     for (p,n) in res:
         politics.append(p)
         nbTweets.append(n)
-        
+
     # JSON Formating
     politics = json.dumps(politics)
     nbTweets = json.dumps(nbTweets)
 
-    listTweetText = Tweet.objects.values('text')
-    listTweetText = [t["text"] for t in listTweetText]
+    allTokenArray = Tweet.objects.values('tokenArray')
+    words = [t["tokenArray"] for t in allTokenArray]
+    allLemmaArray = Tweet.objects.values('lemmaArray')
+    lemmes = [t["lemmaArray"] for t in allLemmaArray]
 
     # words is a JSON list of dict like : {"word":"foo", "occur":42}
-    words = json.dumps(toJsonForGraph(countWords(listTweetText)))
-    lemmes = json.dumps(toJsonForGraph(countWords(listTweetText,30,True)))
+    words = json.dumps(toJsonForGraph(countWords(words)))
+    lemmes = json.dumps(toJsonForGraph(countWords(lemmes)))
     colorsForBars = ['rgba(54, 162, 235, 1)']*len(words)
 
-    # JSON Formating
     return render(request,'home.html',locals())
 
 def displayInfo(request,screen_name):
@@ -100,11 +103,11 @@ def displayInfo(request,screen_name):
 
     # Most common words said by the user
     idUser = userInfo["id"]
-    listTweetText = Tweet.objects.filter(user_id=idUser).values('text')
-    listTweetText = [t["text"] for t in listTweetText]
+    allTokenArray = Tweet.objects.filter(user_id=idUser).values('tokenArray')
+    words = [t["tokenArray"] for t in allTokenArray]
 
     # words is a JSON list of dict like : {"word":"foo", "occur":42}
-    words = json.dumps(toJsonForGraph(countWords(listTweetText)))
+    words = json.dumps(toJsonForGraph(countWords(words)))
 
     # Sources of Tweets
     global requestToGetSources

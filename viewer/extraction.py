@@ -149,8 +149,6 @@ def saveTweet(tweet,user):
     # newTweet.created_at = time.strftime('%Y-%m-%d %H:%M:%S', time.strptime(newTweet.created_at,'%a %b %d %H:%M:%S +0000 %Y'))
 
     newTweet.tokenArray, newTweet.lemmaArray = tokenizeText(tweet['text'])
-    newTweet.tokenArray = json.dumps(newTweet.tokenArray)
-    newTweet.lemmaArray = json.dumps(newTweet.lemmaArray)
 
     # Saving the tweet
     try:

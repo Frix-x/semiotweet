@@ -32,10 +32,6 @@ def personnalTokenizer(text):
 def tokenizeText(text):
     #NOTE - TODO : to be modify to include hashtag and mentions and to remove URL
     """Tokenize & lemmatize a text : returns a list of the meaningful words and lemma"""
-    # French Tokenizer :
-    # tokenizerLocation = 'tokenizers/punkt/french.pickle' #Python 2
-    # tokenizerLocation = 'tokenizers/punkt/PY3/french.pickle' #Python 3
-    # tokenizer = nltk.data.load(tokenizerLocation)
     global frenchStopwords
 
     # tokenizer = WordPunctTokenizer()
@@ -53,16 +49,10 @@ def tokenizeText(text):
 
     return tokens, lemma
 
-def countWords(listTweetText,nbWordsToExtract=30,lemmat=False):
+def countWords(listTweetText,nbWordsToExtract=30):
     """Takes a list of text and returns the words occurences"""
-    if lemmat :
-        lemmatizer = FrenchLefffLemmatizer()
     wordOccurences = defaultdict(lambda: 0)
-    for currentTweet in listTweetText:
-        tokenizedTweet = tokenizeText(currentTweet)
-        print(tokenizedTweet)
-        if lemmat :
-            tokenizedTweet = [lemmatizer.lemmatize(word) for word in tokenizedTweet]
+    for tokenizedTweet in listTweetText:
         currentOccurences = dict(Counter(tokenizedTweet))
         for k in list(currentOccurences.keys()):
             wordOccurences[k] += currentOccurences[k]
