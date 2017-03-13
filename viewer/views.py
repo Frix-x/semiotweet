@@ -16,6 +16,7 @@ from django.db.models import Max
 from django.db import connection #for direct SQL requests
 
 import json
+import ast # convert string to list
 
 from .extraction import *
 from .semanticFields import *
@@ -78,10 +79,11 @@ def home(request):
     politics = json.dumps(politics)
     nbTweets = json.dumps(nbTweets)
 
+    # tokenArray and lemmaArray are stored as a string : we need to get the lists back
     allTokenArray = Tweet.objects.values('tokenArray')
-    words = [t["tokenArray"] for t in allTokenArray]
+    words = [ast.literal_eval(t["tokenArray"]) for t in allTokenArray]
     allLemmaArray = Tweet.objects.values('lemmaArray')
-    lemmes = [t["lemmaArray"] for t in allLemmaArray]
+    lemmes = [ast.literal_eval(t["lemmaArray"]) for t in allLemmaArray]
 
     # words is a JSON list of dict like : {"word":"foo", "occur":42}
     words = json.dumps(toJsonForGraph(countWords(words)))
@@ -104,7 +106,9 @@ def displayInfo(request,screen_name):
     # Most common words said by the user
     idUser = userInfo["id"]
     allTokenArray = Tweet.objects.filter(user_id=idUser).values('tokenArray')
-    words = [t["tokenArray"] for t in allTokenArray]
+
+    # tokenArray is stored as a string : we need to get the list back
+    words = [ast.literal_eval(t["tokenArray"]) for t in allTokenArray]
 
     # words is a JSON list of dict like : {"word":"foo", "occur":42}
     words = json.dumps(toJsonForGraph(countWords(words)))
