@@ -55,8 +55,6 @@ def countWords(listTweetText,nbWordsToExtract=30,lemmat=False):
         print(tokenizedTweet)
         if lemmat :
             tokenizedTweet = [lemmatizer.lemmatize(word) for word in tokenizedTweet]
-            print("lemmes : ")
-            print(tokenizedTweet)
         currentOccurences = dict(Counter(tokenizedTweet))
         for k in list(currentOccurences.keys()):
             wordOccurences[k] += currentOccurences[k]

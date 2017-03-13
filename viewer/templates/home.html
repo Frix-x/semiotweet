@@ -126,7 +126,7 @@ else{
     options: options
   });
 
-  var Lemmes = {{words|safe}};
+  var lemmes = {{words|safe}};
   words.sort(function(a, b) {
       return b.occur - a.occur
   });
@@ -147,7 +147,7 @@ else{
             backgroundColor: colorsForBars,
             borderColor: colorsForBars,
             borderWidth: 1,
-            data: LemmeOccur,
+            data: lemmeOccur,
         }
     ]
   };
