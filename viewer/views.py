@@ -161,6 +161,7 @@ def getData(request):
 
     # SAVING USERS
     for screen_name in screen_nameToExtract:
+        print ("Getting user info : "+screen_name)
         userInfo = returnUser(screen_name,toClean=True)
 
         if not(userInfo): #If the user doesn't exist
@@ -181,6 +182,7 @@ def getData(request):
     nbTweets = 0 # number of extracted tweets
 
     for screen_name in screen_nameToExtract:
+        print ("Getting user tweets : "+screen_name)
         try:
             idUser = User.objects.filter(screen_name=screen_name).values('id')[0]["id"]
         except SomeModel.DoesNotExist: # If the user does not exist
@@ -196,6 +198,7 @@ def getData(request):
 
         # Saving tweets in database
         userFrom = User.objects.get(screen_name=screen_name)
+        print ("Saving user tweets : "+screen_name)
         for t in tweets:
             success = saveTweet(t,userFrom) and success
 
