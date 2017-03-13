@@ -116,6 +116,34 @@ def cleanTweet(tweet):
     return tweet
 
 
+def saveTweet(tweet,user):
+    """Saves one tweet from user in database"""
+    newTweet = Tweet()
+    newTweet.id = tweet['id']
+    newTweet.user_id = user
+    newTweet.text = tweet['text']
+    newTweet.created_at = tweet['created_at']
+    newTweet.is_quote_status = tweet['is_quote_status']
+    newTweet.in_reply_to_status_id = tweet['in_reply_to_status_id']
+    newTweet.favorite_count = tweet['favorite_count']
+    newTweet.retweet_count = tweet['retweet_count']
+    newTweet.source = tweet['source']
+    newTweet.in_reply_to_user_id = tweet['in_reply_to_user_id']
+    newTweet.lang = tweet['lang']
+
+    # Formating the date
+    current_tz = timezone.get_current_timezone()
+    newTweet.created_at = datetime.strptime(newTweet.created_at, '%a %b %d %H:%M:%S +0000 %Y')
+    newTweet.created_at= current_tz.localize(newTweet.created_at)
+    # newTweet.created_at = time.strftime('%Y-%m-%d %H:%M:%S', time.strptime(newTweet.created_at,'%a %b %d %H:%M:%S +0000 %Y'))
+
+    # Saving the tweet
+    try:
+        newTweet.save()
+        return True
+    except BaseException:
+        return False
+
 #==============================#
 #=========== USERS  ===========#
 #==============================#
@@ -149,6 +177,29 @@ def cleanUser(user):
 
     return user
 
+def saveUser(userInfo):
+    """Saves one user in database"""
+    newUser = User()
+
+    newUser.id = userInfo['id']
+    newUser.name = userInfo['name']
+    newUser.screen_name = userInfo['screen_name']
+    newUser.created_at = userInfo['created_at']
+    newUser.contributors_enabled = userInfo['contributors_enabled']
+    newUser.verified = userInfo['verified']
+
+    # Formating the date
+    current_tz = timezone.get_current_timezone()
+    newUser.created_at = datetime.strptime(newUser.created_at, '%a %b %d %H:%M:%S +0000 %Y')
+    newUser.created_at= current_tz.localize(newUser.created_at)
+    # newUser.created_at = time.strftime('%Y-%m-%d %H:%M:%S', time.strptime(newUser.created_at,'%a %b %d %H:%M:%S +0000 %Y'))
+
+    # Saving the user in the database
+    try:
+        newUser.save()
+        return True
+    except BaseException:
+        return False
 
 #==============================#
 #==== SETTINGS & VARIABLES ====#

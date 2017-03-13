@@ -22,6 +22,8 @@ class Tweet(models.Model):
     source = models.URLField(max_length=300,null=True)
     in_reply_to_user_id = models.IntegerField(null=True)
     lang = models.CharField(null=True,max_length=5)
+    tokenArray = models.CharField(null=True,max_length=1000)
+    lemmaArray = models.CharField(null=True,max_length=1000)
 
     def __str__(self):
         return "Tweet of "+ str(self.user_id) +' ('+self.created_at+') : '+self.text
@@ -38,23 +40,3 @@ class User(models.Model):
 
     def __str__(self):
         return "User : "+ self.name +' (@'+self.screen_name+' ; id :'+str(self.id)+')'
-
-
-class Word(models.Model):
-    """Word class"""
-
-    word = models.CharField(primary_key=True,max_length=100)
-    semanticField = models.CharField(null=False,max_length=100)
-    occurencesNum = models.ManyToManyField(User, through='Occurences')
-
-    def __str__(self):
-        return self.word + " (semantic field : "+ self.semanticField +")"
-
-class Occurences(models.Model):
-    """Occurences class"""
-    occurencesNum = models.IntegerField(default=0)
-    user_id = models.ForeignKey(User)
-    word = models.ForeignKey(Word)
-
-    def __str__(self):
-        return "{0} was said {1} times by the user of id : {2}".format(self.word, self.occurencesNum, self.user_id)
