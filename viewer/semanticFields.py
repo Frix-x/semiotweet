@@ -12,6 +12,8 @@ from collections import Counter,defaultdict
 
 from .lda_helpers import *
 
+
+
 def getSemanticField(word):
     """Get the semantic field of the word"""
     page = requests.get('http://dict.xmatiere.com/mots_en_rapport_avec/'+word.lower())
@@ -29,7 +31,7 @@ def personnalTokenizer(text):
 
 def tokenizeText(text):
     #NOTE - TODO : to be modify to include hashtag and mentions and to remove URL
-    """Tokenize a text : returns a list of the meaningful words"""
+    """Tokenize & lemmatize a text : returns a list of the meaningful words and lemma"""
     # French Tokenizer :
     # tokenizerLocation = 'tokenizers/punkt/french.pickle' #Python 2
     # tokenizerLocation = 'tokenizers/punkt/PY3/french.pickle' #Python 3
@@ -38,12 +40,18 @@ def tokenizeText(text):
 
     # tokenizer = WordPunctTokenizer()
     tokenizer = TweetTokenizer(strip_handles=True, reduce_len=True)
+    lemmatizer = FrenchLefffLemmatizer()
+
     words = tokenizer.tokenize(text)
-
+    tokens = []
+    lemma = []
     # Filtering
-    words = [w.lower() for w in words if not (len(w) < 2 or w.lower() in frenchStopwords)]
+    for w in words:
+        if not (len(w) < 2 or w.lower() in frenchStopwords):
+            tokens.append(w.lower())
+            lemma.append(lemmatizer.lemmatize(w.lower()))
 
-    return words
+    return tokens, lemma
 
 def countWords(listTweetText,nbWordsToExtract=30,lemmat=False):
     """Takes a list of text and returns the words occurences"""
@@ -60,6 +68,7 @@ def countWords(listTweetText,nbWordsToExtract=30,lemmat=False):
             wordOccurences[k] += currentOccurences[k]
 
     return dict(Counter(wordOccurences).most_common(nbWordsToExtract))
+
 
 def toJsonForGraph(dict):
     """Return a list of dict used next for the Bubble Graph"""
