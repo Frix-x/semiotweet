@@ -1,12 +1,11 @@
 #-*- coding: utf-8 -*-
-# from datetime import datetime
 from __future__ import print_function
 from __future__ import absolute_import
 from builtins import str
 from django.utils import timezone
 from django.http import HttpResponse,Http404
 from django.shortcuts import render,redirect
-from .models import Tweet,User#,Word
+from .models import Tweet,User
 import random
 import string
 import time

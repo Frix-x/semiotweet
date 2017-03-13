@@ -12,42 +12,40 @@ from collections import Counter,defaultdict
 
 from .lda_helpers import *
 
+# def getSemanticField(word):
+#     """Get the semantic field of the word"""
+#     page = requests.get('http://dict.xmatiere.com/mots_en_rapport_avec/'+word.lower())
+#     tree = html.fromstring(page.content)
+#     aim = "/mots_en_rapport_avec/"
+#     semanticField = tree.xpath('//a[starts-with(@href,"'+aim+'")]/text()')
+#     return semanticField
+#
+# def personnalTokenizer(text):
+#     """Personnal Tokenizer"""
+#     text = str(text, "utf-8")
+#     text = text.translate(string.maketrans("",""), "!\"$%&()*+,-./:;<=>?[\]^_`{|}~")
+#     words = text.lower().split()
+#     return words
 
-
-def getSemanticField(word):
-    """Get the semantic field of the word"""
-    page = requests.get('http://dict.xmatiere.com/mots_en_rapport_avec/'+word.lower())
-    tree = html.fromstring(page.content)
-    aim = "/mots_en_rapport_avec/"
-    semanticField = tree.xpath('//a[starts-with(@href,"'+aim+'")]/text()')
-    return semanticField
-
-def personnalTokenizer(text):
-    """Personnal Tokenizer"""
-    text = str(text, "utf-8")
-    text = text.translate(string.maketrans("",""), "!\"$%&()*+,-./:;<=>?[\]^_`{|}~")
-    words = text.lower().split()
-    return words
-
-def tokenizeText(text):
-    #NOTE - TODO : to be modify to include hashtag and mentions and to remove URL
-    """Tokenize & lemmatize a text : returns a list of the meaningful words and lemma"""
-    global frenchStopwords
-
-    # tokenizer = WordPunctTokenizer()
-    tokenizer = TweetTokenizer(strip_handles=True, reduce_len=True)
-    lemmatizer = FrenchLefffLemmatizer()
-
-    words = tokenizer.tokenize(text)
-    tokens = []
-    lemma = []
-    # Filtering
-    for w in words:
-        if not (len(w) < 2 or w.lower() in frenchStopwords):
-            tokens.append(w.lower())
-            lemma.append(lemmatizer.lemmatize(w.lower()))
-
-    return tokens, lemma
+# def tokenizeText(text):
+#     #NOTE - TODO : to be modify to include hashtag and mentions and to remove URL
+#     """Tokenize & lemmatize a text : returns a list of the meaningful words and lemma"""
+#     global frenchStopwords
+#
+#     # tokenizer = WordPunctTokenizer()
+#     tokenizer = TweetTokenizer(strip_handles=True, reduce_len=True)
+#     lemmatizer = FrenchLefffLemmatizer()
+#
+#     words = tokenizer.tokenize(text)
+#     tokens = []
+#     lemma = []
+#     # Filtering
+#     for w in words:
+#         if not (len(w) < 2 or w.lower() in frenchStopwords):
+#             tokens.append(w.lower())
+#             lemma.append(lemmatizer.lemmatize(w.lower()))
+#
+#     return tokens, lemma
 
 def tokenizeAndLemmatizeTweets(listTweets):
     """Tokenize & lemmatize a list of texts"""

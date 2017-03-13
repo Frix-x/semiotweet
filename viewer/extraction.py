@@ -12,7 +12,7 @@ import os, sys, getenv
 
 
 from django.utils import timezone
-from .models import Tweet,User#,Word
+from .models import Tweet,User
 import random
 import string
 import time
