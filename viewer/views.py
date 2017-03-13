@@ -37,7 +37,8 @@ def home(request):
     cursor = connection.cursor()
     try:
         cursor.execute(requestToGetSources)
-    except BaseException:
+    except BaseException as error:
+        print("view home ; error : ", error)
         return render(request,'home.html',{"error":"No data yet ; click on 'Get the data'"})
     res = cursor.fetchall()
 
@@ -58,17 +59,19 @@ def home(request):
     sources = json.dumps(sources)
     num = json.dumps(num)
 
+    # Getting the number of tweets for each user
     try:
         cursor.execute("SELECT u.name, COUNT(t.id) AS nbTweets FROM viewer_tweet t, viewer_user u WHERE u.id = t.user_id_id GROUP BY u.name ORDER BY nbTweets DESC")
     except BaseException:
+        print("view home ; error : ",error)
         return render(request,'home.html',{"error":"No data yet ; click on 'Get the data'"})
     res = cursor.fetchall()
-
     politics = []
     nbTweets = []
     for (p,n) in res:
         politics.append(p)
         nbTweets.append(n)
+        
     # JSON Formating
     politics = json.dumps(politics)
     nbTweets = json.dumps(nbTweets)
@@ -108,7 +111,8 @@ def displayInfo(request,screen_name):
     cursor = connection.cursor()
     try:
         cursor.execute("SELECT DISTINCT source, COUNT(source) AS nb FROM viewer_tweet WHERE user_id_id ='"+ str(idUser)+"' GROUP BY source ORDER BY nb DESC")
-    except BaseException:
+    except BaseException as error:
+        print("displayInfo() ; error : ", error)
         return render(request,'home.html',locals())
     res = cursor.fetchall()
     sources = []
@@ -131,7 +135,8 @@ def displayInfo(request,screen_name):
     #Get hours distribution of all tweets
     try:
         cursor.execute("SELECT DISTINCT created_at AS timePosted FROM viewer_tweet WHERE user_id_id ='"+ str(idUser)+"' ORDER BY timePosted")
-    except BaseException:
+    except BaseException as error:
+        print("displayInfo() ; error : ", error)
         return render(request,'home.html',locals())
     res = cursor.fetchall()
     hours =[0]*24
