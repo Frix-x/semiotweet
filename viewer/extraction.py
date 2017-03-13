@@ -10,6 +10,17 @@ from io import BytesIO
 import json
 import os, sys, getenv
 
+
+from django.utils import timezone
+from .models import Tweet,User#,Word
+import random
+import string
+import time
+import pytz
+from datetime import datetime
+
+from .semanticFields import toJsonForGraph,tokenizeText
+
 #==============================#
 #========== REQUESTS ==========#
 #==============================#
@@ -137,11 +148,16 @@ def saveTweet(tweet,user):
     newTweet.created_at= current_tz.localize(newTweet.created_at)
     # newTweet.created_at = time.strftime('%Y-%m-%d %H:%M:%S', time.strptime(newTweet.created_at,'%a %b %d %H:%M:%S +0000 %Y'))
 
+    newTweet.tokenArray, newTweet.lemmaArray = tokenizeText(tweet['text'])
+    newTweet.tokenArray = json.dumps(newTweet.tokenArray)
+    newTweet.lemmaArray = json.dumps(newTweet.lemmaArray)
+
     # Saving the tweet
     try:
         newTweet.save()
         return True
-    except BaseException:
+    except BaseException as error:
+        print("saveTweet() ; error : ", error)
         return False
 
 #==============================#
@@ -198,7 +214,8 @@ def saveUser(userInfo):
     try:
         newUser.save()
         return True
-    except BaseException:
+    except BaseException as error:
+        print("saveUser() ; error : ", error)
         return False
 
 #==============================#
