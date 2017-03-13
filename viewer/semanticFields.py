@@ -49,6 +49,29 @@ def tokenizeText(text):
 
     return tokens, lemma
 
+def tokenizeAndLemmatizeTweets(listTweets):
+    """Tokenize & lemmatize a list of texts"""
+    global frenchStopwords
+
+    # Setting up the tokenizer and the lemmatizer
+    tokenizer = TweetTokenizer(strip_handles=True, reduce_len=True)
+    lemmatizer = FrenchLefffLemmatizer() # takes time to load !
+
+    for t in listTweets:
+        words = tokenizer.tokenize(t["text"])
+        tokens = []
+        lemma = []
+        # Filtering
+        for w in words:
+            if not (len(w) < 2 or w.lower() in frenchStopwords):
+                tokens.append(w.lower())
+                lemma.append(lemmatizer.lemmatize(w.lower()))
+
+        t["tokenArray"] = tokens
+        t["lemmaArray"] = lemma
+
+    return listTweets
+
 def countWords(listTweetText,nbWordsToExtract=30):
     """Takes a list of text and returns the words occurences"""
     wordOccurences = defaultdict(lambda: 0)

@@ -19,7 +19,7 @@ import time
 import pytz
 from datetime import datetime
 
-from .semanticFields import toJsonForGraph,tokenizeText
+from .semanticFields import toJsonForGraph
 
 #==============================#
 #========== REQUESTS ==========#
@@ -141,6 +141,8 @@ def saveTweet(tweet,user):
     newTweet.source = tweet['source']
     newTweet.in_reply_to_user_id = tweet['in_reply_to_user_id']
     newTweet.lang = tweet['lang']
+    newTweet.tokenArray = tweet['tokenArray']
+    newTweet.lemmaArray = tweet['lemmaArray']
 
     # Formating the date
     current_tz = timezone.get_current_timezone()
@@ -148,7 +150,6 @@ def saveTweet(tweet,user):
     newTweet.created_at= current_tz.localize(newTweet.created_at)
     # newTweet.created_at = time.strftime('%Y-%m-%d %H:%M:%S', time.strptime(newTweet.created_at,'%a %b %d %H:%M:%S +0000 %Y'))
 
-    newTweet.tokenArray, newTweet.lemmaArray = tokenizeText(tweet['text'])
 
     # Saving the tweet
     try:
