@@ -3,6 +3,7 @@ venv/*
 venv3/*
 *pyc
 db.sqlite3
-viewer/migrations/
+# viewer/migrations/
 *__pycache__
 *local_settings.py
+*migrations/
