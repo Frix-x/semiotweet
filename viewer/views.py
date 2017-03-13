@@ -78,6 +78,7 @@ def home(request):
 
     # words is a JSON list of dict like : {"word":"foo", "occur":42}
     words = json.dumps(toJsonForGraph(countWords(listTweetText)))
+    lemmes = json.dumps(toJsonForGraph(countWords(listTweetText,30,True)))
     colorsForBars = ['rgba(54, 162, 235, 1)']*len(words)
 
     # JSON Formating
@@ -136,7 +137,7 @@ def displayInfo(request,screen_name):
     hours =[0]*24
     for (time,) in res:
         hours[time.time().hour]+=1
-        
+
     return render(request,'displayInfo.html',locals())
 
 #==============================#

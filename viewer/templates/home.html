@@ -18,35 +18,39 @@
 <div class="container">
     <div class="section" id="Graphs">
           <div class="row">
-            <div class="col s12 m9">
-                <div class="icon-block">
-                  <h5 class="center">Most common words used by all politics</h5>
-                  <canvas id="barCommonWords"></canvas>
-                </div>
-            </div>
             <div class="col s12 m3">
                 <div class="icon-block">
                   <div class="card vertical">
                     <div class="card-stacked">
-                      <div class="card-content" id="NbTweetsByPolitics">
-
-                      </div>
+                      <div class="card-content" id="NbTweetsByPolitics"></div>
                       <div class="card-action">
-                        <a>Number of tweets by Politic</a>
+                        <a>Number of tweets by Politics</a>
                       </div>
                     </div>
                   </div>
                 </div>
             </div>
-        </div>
-        <div class="row">
             <div class="col s12 m4">
                 <div class="icon-block">
                     <h5 class="center">Tweet sources</h5>
                     <canvas id="doughnutSources"></canvas>
                 </div>
             </div>
+        </div>
+        <div class="row">
+          <div class="col s12 m6">
+              <div class="icon-block">
+                <h5 class="center">Most common words used by all politics</h5>
+                <canvas id="barCommonWords"></canvas>
+              </div>
           </div>
+          <div class="col s12 m6">
+              <div class="icon-block">
+                <h5 class="center">Lemmatized words used by all politics</h5>
+                <canvas id="barLemmatizedWords"></canvas>
+              </div>
+          </div>
+        </div>
     </div>
     <br><br>
 </div>
@@ -119,6 +123,37 @@ else{
   var myBarChart = new Chart(ctxBar, {
     type: 'bar',
     data: dataBar,
+    options: options
+  });
+
+  var Lemmes = {{words|safe}};
+  words.sort(function(a, b) {
+      return b.occur - a.occur
+  });
+  var lemme = [];
+  var lemmeOccur = [];
+  var colorsForBars = {{colorsForBars|safe}}
+
+  for (i = 0; i < words.length; i++) {
+      lemme.push(lemmes[i].word);
+      lemmeOccur.push(lemmes[i].occur);
+  }
+  var ctxBar2 = "barLemmatizedWords";
+  var dataBar2 = {
+    labels: lemme,
+    datasets: [
+        {
+            label: "Lemmes occurences",
+            backgroundColor: colorsForBars,
+            borderColor: colorsForBars,
+            borderWidth: 1,
+            data: LemmeOccur,
+        }
+    ]
+  };
+  var myBarChart2 = new Chart(ctxBar2, {
+    type: 'bar',
+    data: dataBar2,
     options: options
   });
 

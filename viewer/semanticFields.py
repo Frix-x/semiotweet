@@ -10,6 +10,8 @@ import string
 from nltk.tokenize import WordPunctTokenizer,TweetTokenizer
 from collections import Counter,defaultdict
 
+from .lda_helpers import *
+
 def getSemanticField(word):
     """Get the semantic field of the word"""
     page = requests.get('http://dict.xmatiere.com/mots_en_rapport_avec/'+word.lower())
@@ -43,11 +45,19 @@ def tokenizeText(text):
 
     return words
 
-def countWords(listTweetText,nbWordsToExtract=30):
+def countWords(listTweetText,nbWordsToExtract=30,lemmat=False):
     """Takes a list of text and returns the words occurences"""
+    if lemmat :
+        lemmatizer = FrenchLefffLemmatizer()
     wordOccurences = defaultdict(lambda: 0)
     for currentTweet in listTweetText:
-        currentOccurences = dict(Counter(tokenizeText(currentTweet)))
+        tokenizedTweet = tokenizeText(currentTweet)
+        print(tokenizedTweet)
+        if lemmat :
+            tokenizedTweet = [lemmatizer.lemmatize(word) for word in tokenizedTweet]
+            print("lemmes : ")
+            print(tokenizedTweet)
+        currentOccurences = dict(Counter(tokenizedTweet))
         for k in list(currentOccurences.keys()):
             wordOccurences[k] += currentOccurences[k]
 
