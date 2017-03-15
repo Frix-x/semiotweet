@@ -5,10 +5,21 @@ from lxml import html
 import requests
 import re
 import treetaggerwrapper
+from gensim import corpora,models
 
 import string
 
 from collections import Counter,defaultdict
+
+def makeLdaModel(allLemmaArray,num_topics=10):
+    """Make an LDA model using gensim of a list of lematized documents"""
+    Lda = models.ldamodel.LdaModel
+    dictionary = corpora.Dictionary(allLemmaArray)
+    corpus = [dictionary.doc2bow(document) for document in allLemmaArray]
+
+    ldamodel = Lda(corpus, num_topics, id2word=dictionary, passes=20)
+
+    return ldamodel
 
 def tokenizeAndLemmatizeTweets(listTweets):
     """Tokenize & lemmatize a list of texts"""

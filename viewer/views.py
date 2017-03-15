@@ -84,6 +84,10 @@ def home(request):
     allLemmaArray = Tweet.objects.values('lemmaArray')
     lemmes = [ast.literal_eval(t["lemmaArray"]) for t in allLemmaArray]
 
+    # LDA part
+    ldamodel = makeLdaModel(lemmes) # This take super-long time and need to be done during tweet extraction
+    print(ldamodel.print_topics(num_topics=10, num_words=5)) # To print 10 topics, each composed of 5 words
+
     # words is a JSON list of dict like : {"word":"foo", "occur":42}
     words = json.dumps(toJsonForGraph(countWords(words)))
     lemmes = json.dumps(toJsonForGraph(countWords(lemmes)))
