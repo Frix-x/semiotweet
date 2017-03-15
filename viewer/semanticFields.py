@@ -3,6 +3,7 @@ from __future__ import print_function
 from builtins import str
 from lxml import html
 import requests
+import re
 import treetaggerwrapper
 
 import string
@@ -12,27 +13,30 @@ from collections import Counter,defaultdict
 def tokenizeAndLemmatizeTweets(listTweets):
     """Tokenize & lemmatize a list of texts"""
     global frenchStopwords
+    global mentionRegex
 
     # Setting up TreeTagger
     tagger = treetaggerwrapper.TreeTagger(TAGLANG='fr')
 
     for t in listTweets:
-        tags = tagger.tag_text(t["text"])
+        text = mentionRegex.sub("", t["text"]).lower()
+        tags = tagger.tag_text(text)
         tags = treetaggerwrapper.make_tags(tags)
         tokens = []
         lemma = []
         # Filtering
         for tag in tags:
-            if hasattr(tag, 'word') :
-                if not (len(tag.lemma) < 2 or tag.lemma.lower() in frenchStopwords):
-                    tokens.append(tag.word.lower())
-                    lemma.append(tag.lemma.lower())
+            if hasattr(tag, 'word'):
+                if not (len(tag.lemma) < 2 or tag.lemma in frenchStopwords):
+                    tokens.append(tag.word)
+                    lemma.append(tag.lemma)
             else :
                 token = tag.what
-                if token.startswith("<repurl") :
+                if token.startswith("<repurl"):
                     token = token[token.find('"')+1:token.rfind('"')]
-                tokens.append(token.lower())
-                lemma.append(token.lower())
+                if not (len(token) < 2 or token in frenchStopwords):
+                    tokens.append(token)
+                    lemma.append(token)
 
         t["tokenArray"] = tokens
         t["lemmaArray"] = lemma
@@ -112,12 +116,15 @@ commonWordsSnowball = ["au", "aux", "avec", "ce", "ces", "dans", "de", "des", "d
 # Others common works on Twitter, not so meaningful
 commonWordsTwitter = ["…","rt","ils","faut","https","://","http","...","ça",
                       "to","the","j'ai","via","ça","000","veux","être","devons"
-                      ,"doit","j'étais","suis","url-remplacée"]
+                      ,"doit","j'étais","suis","url-remplacée","@card@","@ord@"]
 
 # French stopwords
 frenchStopwords = set(stopwords).union(set(commonWordsWiki))
 frenchStopwords = frenchStopwords.union(set(commonWordsSnowball))
 frenchStopwords = frenchStopwords.union(set(commonWordsTwitter))
+
+# Regex to delete user's mention in tweets
+mentionRegex = re.compile(r"@\w+")
 
 specifiedWords = ["colère","combat","peur","victoire","aide","argent","mensonge","société"]
 
