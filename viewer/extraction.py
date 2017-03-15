@@ -226,7 +226,6 @@ screen_nameToExtract = ["EmmanuelMacron",
                         "alainjuppe",
                         "jeanlassalle",
                         "ramayade",
-                        "Lesquen2017"
                         ]
 
 screen_nameToID = {'benoithamon': 14389177,
