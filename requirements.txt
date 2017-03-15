@@ -13,7 +13,6 @@ httplib2==0.10.3
 json-table-schema==0.2.1
 jsonschema==2.6.0
 lxml==3.7.3
-nltk==3.2.2
 oauth2==1.9.0.post1
 packaging==16.8
 path.py==10.1
@@ -24,5 +23,6 @@ pyparsing==2.2.0
 pytz==2016.10
 requests==2.13.0
 six==1.10.0
+treetaggerwrapper==2.2.4
 virtualenv==15.1.0
 whitenoise==3.3.0

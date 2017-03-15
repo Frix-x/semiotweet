@@ -3,67 +3,36 @@ from __future__ import print_function
 from builtins import str
 from lxml import html
 import requests
-import nltk.data
+import treetaggerwrapper
 
 import string
 
-from nltk.tokenize import WordPunctTokenizer,TweetTokenizer
 from collections import Counter,defaultdict
-
-from .lda_helpers import *
-
-# def getSemanticField(word):
-#     """Get the semantic field of the word"""
-#     page = requests.get('http://dict.xmatiere.com/mots_en_rapport_avec/'+word.lower())
-#     tree = html.fromstring(page.content)
-#     aim = "/mots_en_rapport_avec/"
-#     semanticField = tree.xpath('//a[starts-with(@href,"'+aim+'")]/text()')
-#     return semanticField
-#
-# def personnalTokenizer(text):
-#     """Personnal Tokenizer"""
-#     text = str(text, "utf-8")
-#     text = text.translate(string.maketrans("",""), "!\"$%&()*+,-./:;<=>?[\]^_`{|}~")
-#     words = text.lower().split()
-#     return words
-
-# def tokenizeText(text):
-#     #NOTE - TODO : to be modify to include hashtag and mentions and to remove URL
-#     """Tokenize & lemmatize a text : returns a list of the meaningful words and lemma"""
-#     global frenchStopwords
-#
-#     # tokenizer = WordPunctTokenizer()
-#     tokenizer = TweetTokenizer(strip_handles=True, reduce_len=True)
-#     lemmatizer = FrenchLefffLemmatizer()
-#
-#     words = tokenizer.tokenize(text)
-#     tokens = []
-#     lemma = []
-#     # Filtering
-#     for w in words:
-#         if not (len(w) < 2 or w.lower() in frenchStopwords):
-#             tokens.append(w.lower())
-#             lemma.append(lemmatizer.lemmatize(w.lower()))
-#
-#     return tokens, lemma
 
 def tokenizeAndLemmatizeTweets(listTweets):
     """Tokenize & lemmatize a list of texts"""
     global frenchStopwords
 
-    # Setting up the tokenizer and the lemmatizer
-    tokenizer = TweetTokenizer(strip_handles=True, reduce_len=True)
-    lemmatizer = FrenchLefffLemmatizer() # takes time to load !
+    # Setting up TreeTagger
+    tagger = treetaggerwrapper.TreeTagger(TAGLANG='fr')
 
     for t in listTweets:
-        words = tokenizer.tokenize(t["text"])
+        tags = tagger.tag_text(t["text"])
+        tags = treetaggerwrapper.make_tags(tags)
         tokens = []
         lemma = []
         # Filtering
-        for w in words:
-            if not (len(w) < 2 or w.lower() in frenchStopwords):
-                tokens.append(w.lower())
-                lemma.append(lemmatizer.lemmatize(w.lower()))
+        for tag in tags:
+            if hasattr(tag, 'word') :
+                if not (len(tag.lemma) < 2 or tag.lemma.lower() in frenchStopwords):
+                    tokens.append(tag.word.lower())
+                    lemma.append(tag.lemma.lower())
+            else :
+                token = tag.what
+                if token.startswith("<repurl") :
+                    token = token[token.find('"')+1:token.rfind('"')]
+                tokens.append(token.lower())
+                lemma.append(token.lower())
 
         t["tokenArray"] = tokens
         t["lemmaArray"] = lemma
@@ -143,7 +112,7 @@ commonWordsSnowball = ["au", "aux", "avec", "ce", "ces", "dans", "de", "des", "d
 # Others common works on Twitter, not so meaningful
 commonWordsTwitter = ["…","rt","ils","faut","https","://","http","...","ça",
                       "to","the","j'ai","via","ça","000","veux","être","devons"
-                      ,"doit","j'étais","suis"]
+                      ,"doit","j'étais","suis","url-remplacée"]
 
 # French stopwords
 frenchStopwords = set(stopwords).union(set(commonWordsWiki))
