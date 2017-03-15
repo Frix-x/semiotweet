@@ -89,6 +89,17 @@ def home(request):
     lemmes = json.dumps(toJsonForGraph(countWords(lemmes)))
     colorsForBars = ['rgba(54, 162, 235, 1)']*len(words)
 
+    #Get hours distribution of all tweets
+    try:
+        cursor.execute("SELECT DISTINCT created_at AS timePosted FROM viewer_tweet ORDER BY timePosted")
+    except BaseException as error:
+        print("displayInfo() ; error : ", error)
+        return render(request,'home.html',locals())
+    res = cursor.fetchall()
+    hours =[0]*24
+    for (time,) in res:
+        hours[time.time().hour]+=1
+
     return render(request,'home.html',locals())
 
 def displayInfo(request,screen_name):
@@ -138,7 +149,7 @@ def displayInfo(request,screen_name):
     sources = json.dumps(sources)
     num = json.dumps(num)
 
-    #Get hours distribution of all tweets
+    #Get hours distribution of user's tweets
     try:
         cursor.execute("SELECT DISTINCT created_at AS timePosted FROM viewer_tweet WHERE user_id_id ='"+ str(idUser)+"' ORDER BY timePosted")
     except BaseException as error:
