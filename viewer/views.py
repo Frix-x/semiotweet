@@ -220,7 +220,7 @@ def getData(request):
 
         # Saving tweets in database
         userFrom = User.objects.get(screen_name=screen_name)
-        nbTweetsSaved = 0; #counter for printing
+        nbTweetsSaved = 1; #counter for printing
         for t in tweets:
             print ("Saving {1} tweets from {0} ; {2:0.2f} %".format(screen_name,lenghtTweets,nbTweetsSaved/lenghtTweets*100))
             success = saveTweet(t,userFrom) and success
