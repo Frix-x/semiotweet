@@ -49,4 +49,4 @@ class LdaModel(models.Model):
     ldamodel = models.BinaryField(null=False)
 
     def __str__(self):
-        return "LdaModel for user "+ self.user_id
+        return "LdaModel for user "+ str(self.user_id)
