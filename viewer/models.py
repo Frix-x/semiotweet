@@ -40,3 +40,13 @@ class User(models.Model):
 
     def __str__(self):
         return "User : "+ self.name +' (@'+self.screen_name+' ; id :'+str(self.id)+')'
+
+class LdaModel(models.Model):
+    """LdaModel Class : filled with models of LDA which took time to calculate"""
+
+    id = models.IntegerField(primary_key=True)
+    user_id = models.ForeignKey('User')
+    ldamodel = models.BinaryField(null=False)
+
+    def __str__(self):
+        return "LdaModel for user "+ self.user_id
