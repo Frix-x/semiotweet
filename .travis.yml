@@ -12,9 +12,9 @@ script:
 - python manage.py migrate
 notifications:
   email: false
-addons:
-  code_climate:
-    repo_token: "$CODE_CLIMATE_REPO_TOKEN"
+#addons:
+#  code_climate:
+#    repo_token: "$CODE_CLIMATE_REPO_TOKEN"
 deploy:
   provider: heroku
   app: semiotweet
