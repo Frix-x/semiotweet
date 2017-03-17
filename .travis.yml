@@ -8,11 +8,15 @@ before_script:
 - psql -c "CREATE DATABASE travisci;" -U postgres
 script:
 - python manage.py collectstatic --noinput
-- python manage.py makemigrations viewer
-- python manage.py migrate
+#- python manage.py makemigrations viewer
+#- python manage.py migrate
 - coverage run manage.py test
 after_success:
 - codeclimate-test-reporter
+notifications:
+  slack:
+    secure: Stv7FMtB3rbHLQ0EzrhUz5KLVSDK0iE6zVdUHFCnzKcx2V9BfAljyZXjHEVIVnL4utniSJF4Enw1P4yTldMBEFfjMoYJlDjb91QxFPb9VHCYA6M4JeIMsbMrlj+/KjxMF4aCHQ/c9ZyZQG/S6RxhfoyQtM+j6w/0Kqf8XQtwGKHYoIsCkPNHxDqdkLd0gZgSCbSZzwPc7OLQZjZz/fllwK+4MFc3IHQovHNiuLbMqPqZ5+9VyPFWZSVzgbcH7VKEgDkdscT59fzltkUHPAf5GlCANcJpt6fENSqf8utT3bveildecjN1Q+yT35r4O0NE3cGNkyuVEyN4j9QDcPZAsYAELUsWpA9EIuohY925Eliveo2hqlL//H0jFarlPJAeF5g1QgoDuCQN8vHsMt0sDy7bHHzZhSQzsti07BO+Sk1Cf/QazDWrpzYGxf3hO/Zf02yveJMXgXpy1LNGuzyfkPKzS+nUritfvWPNiOVvj2zKKgNkMCWctSXYkoIc9KIY4oCFo68reKXAVdnsFa/Bt2F8WQjpCZ07gTU+9ahXIn3BuckXMgXZiVlp35/AGyHJOWzQ5fFCOq2kAKnqKFIO6uF2BDZj+qF4XVGPOZ0AvgXvuD0M05YCvh1XMDfq1ZZC32j9LwhpTz2A0QX8svhJF1xsEdcGB0m6tV3byOGgFjA=
+  email: false
 addons:
   code_climate:
     repo_token: "$CODE_CLIMATE_REPO_TOKEN"
