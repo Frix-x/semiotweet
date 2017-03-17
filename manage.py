@@ -3,6 +3,11 @@ import os
 import sys
 
 if __name__ == "__main__":
+    platforms = ["TRAVIS", "HEROKU"]
+
+    if not any(x in os.environ for x in platforms):
+        dotenv.read_dotenv()
+
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "semiotweet.settings")
     try:
         from django.core.management import execute_from_command_line
