@@ -180,6 +180,7 @@ def getData(request):
 
     # SAVING USERS
     for screen_name in screen_nameToExtract:
+        print ("GET User info : "+screen_name)
         userInfo = returnUser(screen_name,toClean=True)
 
         if not(userInfo): #If the user doesn't exist
@@ -200,6 +201,7 @@ def getData(request):
     nbTweets = 0 # number of extracted tweets
 
     for screen_name in screen_nameToExtract:
+        print ("GET user tweets : "+screen_name)
         try:
             idUser = User.objects.filter(screen_name=screen_name).values('id')[0]["id"]
         except SomeModel.DoesNotExist: # If the user does not exist
@@ -210,13 +212,18 @@ def getData(request):
         except SomeModel.DoesNotExist:
             lastId = 0 # No tweet in the data base
 
+        # The important request here : returns the new tweets from the Twitter API
         tweets = returnTweetsMultiple(screen_name,lastId)
-        nbTweets += len(tweets)
+        lenghtTweets = len(tweets)
+        nbTweets += lenghtTweets
 
         # Saving tweets in database
         userFrom = User.objects.get(screen_name=screen_name)
+        nbTweetsSaved = 1; #counter for printing
         for t in tweets:
+            print ("Saving {1} tweets from {0} ; {2:0.2f} %".format(screen_name,lenghtTweets,nbTweetsSaved/lenghtTweets*100))
             success = saveTweet(t,userFrom) and success
+            nbTweetsSaved += 1;
 
 
     return render(request,'getData.html',{"success" : success,
