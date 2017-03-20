@@ -5,21 +5,58 @@ from lxml import html
 import requests
 import re
 import treetaggerwrapper
+import pickle
 from gensim import corpora,models
+from .models import Tweet,User,LdaModel
 
 import string
 
 from collections import Counter,defaultdict
 
-def makeLdaModel(allLemmaArray,num_topics=10):
-    """Make an LDA model using gensim of a list of lematized documents"""
+def makeLdaModel(user=0):
+    """Update LDA model to avoid long processing"""
     Lda = models.ldamodel.LdaModel
-    dictionary = corpora.Dictionary(allLemmaArray)
-    corpus = [dictionary.doc2bow(document) for document in allLemmaArray]
 
-    ldamodel = Lda(corpus, num_topics, id2word=dictionary, passes=20)
+    try:
+        LdaModel = LdaModel.objects.get(user_id=user)
+    except SomeModel.DoesNotExist:
+        LdaModel = None
 
-    return ldamodel
+    if LdaModel is None: # Make an LDA model with all tweets
+        if user==0:
+            allLemmaArray_raw = Tweet.objects.all().values('lemmaArray','id')
+        else:
+            allLemmaArray_raw = Tweet.objects.all().filter(user_id=user).values('lemmaArray','id')
+        allLemmaArray = [ast.literal_eval(t["lemmaArray"]) for t in allLemmaArray_raw]
+
+        dictionary = corpora.Dictionary(allLemmaArray)
+        corpus = [dictionary.doc2bow(document) for document in allLemmaArray]
+        ldamodel = Lda(corpus, num_topics=10, id2word=dictionary, passes=20)
+    else: # Update the LDA model with the latest tweets
+        ldamodel = pickle.loads(LdaModel.ldamodel)
+        lastTweetId = LdaModel.tweet_id
+
+        if user==0:
+            allLemmaArray_raw = Tweet.objects.all().filter(id__gt=lastTweetId).values('lemmaArray','id')
+        else:
+            allLemmaArray_raw = Tweet.objects.all().filter(user_id=user,id__gt=lastTweetId).values('lemmaArray','id')
+        allLemmaArray = [ast.literal_eval(t["lemmaArray"]) for t in allLemmaArray_raw]
+
+        dictionary = corpora.Dictionary(allLemmaArray)
+        corpus = [dictionary.doc2bow(document) for document in allLemmaArray]
+        ldamodel.update(corpus)
+
+    compressedLdaModel = pickle.dumps(ldamodel,protocol=-1)
+    lastTweetId = allLemmaArray_raw[len(allLemmaArray_raw)-1].id
+    LdaModel(user_id=user,tweet_id=lastTweetId,ldamodel=compressedLdaModel)
+
+    try:
+        LdaModel.save()
+        return True
+    except BaseException as e:
+        print("makeLdaModel() ; error : ", e)
+        return False
+
 
 def tokenizeAndLemmatizeTweets(listTweets):
     """Tokenize & lemmatize a list of texts"""

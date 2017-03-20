@@ -84,10 +84,6 @@ def home(request):
     allLemmaArray = Tweet.objects.values('lemmaArray')
     lemmes = [ast.literal_eval(t["lemmaArray"]) for t in allLemmaArray]
 
-    # LDA part
-    ldamodel = makeLdaModel(lemmes) # This take super-long time and need to be done during tweet extraction
-    print(ldamodel.print_topics(num_topics=10, num_words=5)) # To print 10 topics, each composed of 5 words
-
     # words is a JSON list of dict like : {"word":"foo", "occur":42}
     words = json.dumps(toJsonForGraph(countWords(words)))
     lemmes = json.dumps(toJsonForGraph(countWords(lemmes)))
@@ -226,7 +222,18 @@ def getData(request):
             success = saveTweet(t,userFrom) and success
             nbTweetsSaved += 1;
 
+    # MAKING LDA MODELS
+    for screen_name in screen_nameToExtract:
+        print ("MAKING LDA MODEL FOR : "+screen_name)
+        try:
+            idUser = User.objects.filter(screen_name=screen_name).values('id')[0]["id"]
+        except SomeModel.DoesNotExist: # If the user does not exist
+            continue # continue with the next user
+        makeLdaModel(idUser)
+    print("MAKING GLOBAL LDA MODEL...")
+    makeLdaModel(0)
 
+    print("\nEVERYTHING DONE !")
     return render(request,'getData.html',{"success" : success,
                                           "nbTweets" : nbTweets,
                                           "screen_nameToExtract": screen_nameToExtract})
