@@ -8,6 +8,7 @@ import treetaggerwrapper
 import pickle
 from gensim import corpora,models
 from .models import Tweet,User,LdaModel
+from django.core.exceptions import ObjectDoesNotExist
 
 import string
 
@@ -18,11 +19,11 @@ def makeLdaModel(user=0):
     Lda = models.ldamodel.LdaModel
 
     try:
-        LdaModel = LdaModel.objects.get(user_id=user)
-    except SomeModel.DoesNotExist:
-        LdaModel = None
+        LdaModel_db = LdaModel.objects.get(user_id=user)
+    except ObjectDoesNotExist:
+        LdaModel_db = None
 
-    if LdaModel is None: # Make an LDA model with all tweets
+    if LdaModel_db is None: # Make an LDA model with all tweets
         if user==0:
             allLemmaArray_raw = Tweet.objects.all().values('lemmaArray','id')
         else:
@@ -33,7 +34,7 @@ def makeLdaModel(user=0):
         corpus = [dictionary.doc2bow(document) for document in allLemmaArray]
         ldamodel = Lda(corpus, num_topics=10, id2word=dictionary, passes=20)
     else: # Update the LDA model with the latest tweets
-        ldamodel = pickle.loads(LdaModel.ldamodel)
+        ldamodel = pickle.loads(LdaModel_db.ldamodel)
         lastTweetId = LdaModel.tweet_id
 
         if user==0:
