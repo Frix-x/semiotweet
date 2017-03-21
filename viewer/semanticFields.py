@@ -56,10 +56,12 @@ def makeLdaModel(user=0):
     compressedLdaModel = pickle.dumps(ldamodel,protocol=-1)
     lastTweetId = allLemmaArray_raw[len(allLemmaArray_raw)-1]['id']
     tweet_to_use = Tweet.objects.get(id=lastTweetId)
-    newLdaModel = LdaModel(user_id=user,tweet_id=tweet_to_use,ldamodel=compressedLdaModel)
+    LdaModel_db.user_id = user
+    LdaModel_db.tweet_id = tweet_to_use
+    LdaModel_db.ldamodel = compressedLdaModel
 
     try:
-        newLdaModel.save()
+        LdaModel_db.save()
         return True
     except BaseException as e:
         print("makeLdaModel() ; error : ", e)

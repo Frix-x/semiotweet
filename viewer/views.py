@@ -5,7 +5,7 @@ from builtins import str
 from django.utils import timezone
 from django.http import HttpResponse,Http404
 from django.shortcuts import render,redirect
-from .models import Tweet,User
+from .models import Tweet,User,LdaModel
 import random
 import string
 import time
@@ -99,6 +99,11 @@ def home(request):
     hours =[0]*24
     for (time,) in res:
         hours[time.time().hour]+=1
+
+    # Get LDA topics distribution for bubble Graph
+    ldamodel = pickle.loads(LdaModel.objects.get(user_id=0).ldamodel)
+    topics = ldamodel.print_topics(num_topics=10, num_words=5)
+    print(topics)
 
     return render(request,'home.html',locals())
 
