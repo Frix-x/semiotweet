@@ -36,17 +36,17 @@ def makeLdaModel(user=0):
         ldamodel = Lda(corpus, num_topics=10, id2word=dictionary, passes=20)
     else: # Update the LDA model with the latest tweets
         ldamodel = pickle.loads(LdaModel_db.ldamodel)
-        lastTweetId = LdaModel.tweet_id
+        lastTweetId = LdaModel_db.tweet_id.id
 
-        try:
-            if user==0:
-                allLemmaArray_raw = Tweet.objects.all().filter(id__gt=lastTweetId).values('lemmaArray','id')
-            else:
-                allLemmaArray_raw = Tweet.objects.all().filter(user_id=user,id__gt=lastTweetId).values('lemmaArray','id')
-        except ObjectDoesNotExist:
+        if user==0:
+            allLemmaArray_raw = Tweet.objects.all().filter(id__gt=lastTweetId).values('lemmaArray','id')
+        else:
+            allLemmaArray_raw = Tweet.objects.all().filter(user_id=user,id__gt=lastTweetId).values('lemmaArray','id')
+
+        if len(allLemmaArray_raw)==0:
             print('Already up to date...')
             return True
-            
+
         allLemmaArray = [ast.literal_eval(t["lemmaArray"]) for t in allLemmaArray_raw]
 
         dictionary = corpora.Dictionary(allLemmaArray)
