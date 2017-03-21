@@ -11,6 +11,7 @@ from .models import Tweet,User,LdaModel
 from django.core.exceptions import ObjectDoesNotExist
 
 import string
+import ast
 
 from collections import Counter,defaultdict
 
@@ -48,8 +49,9 @@ def makeLdaModel(user=0):
         ldamodel.update(corpus)
 
     compressedLdaModel = pickle.dumps(ldamodel,protocol=-1)
-    lastTweetId = allLemmaArray_raw[len(allLemmaArray_raw)-1].id
-    LdaModel(user_id=user,tweet_id=lastTweetId,ldamodel=compressedLdaModel)
+    lastTweetId = allLemmaArray_raw[len(allLemmaArray_raw)-1]['id']
+    tweet_to_use = Tweet.objects.get(id=lastTweetId)
+    LdaModel(user_id=user,tweet_id=tweet_to_use,ldamodel=compressedLdaModel)
 
     try:
         LdaModel.save()
