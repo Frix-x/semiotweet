@@ -38,10 +38,15 @@ def makeLdaModel(user=0):
         ldamodel = pickle.loads(LdaModel_db.ldamodel)
         lastTweetId = LdaModel.tweet_id
 
-        if user==0:
-            allLemmaArray_raw = Tweet.objects.all().filter(id__gt=lastTweetId).values('lemmaArray','id')
-        else:
-            allLemmaArray_raw = Tweet.objects.all().filter(user_id=user,id__gt=lastTweetId).values('lemmaArray','id')
+        try:
+            if user==0:
+                allLemmaArray_raw = Tweet.objects.all().filter(id__gt=lastTweetId).values('lemmaArray','id')
+            else:
+                allLemmaArray_raw = Tweet.objects.all().filter(user_id=user,id__gt=lastTweetId).values('lemmaArray','id')
+        except ObjectDoesNotExist:
+            print('Already up to date...')
+            return True
+            
         allLemmaArray = [ast.literal_eval(t["lemmaArray"]) for t in allLemmaArray_raw]
 
         dictionary = corpora.Dictionary(allLemmaArray)
@@ -51,10 +56,10 @@ def makeLdaModel(user=0):
     compressedLdaModel = pickle.dumps(ldamodel,protocol=-1)
     lastTweetId = allLemmaArray_raw[len(allLemmaArray_raw)-1]['id']
     tweet_to_use = Tweet.objects.get(id=lastTweetId)
-    LdaModel(user_id=user,tweet_id=tweet_to_use,ldamodel=compressedLdaModel)
+    newLdaModel = LdaModel(user_id=user,tweet_id=tweet_to_use,ldamodel=compressedLdaModel)
 
     try:
-        LdaModel.save()
+        newLdaModel.save()
         return True
     except BaseException as e:
         print("makeLdaModel() ; error : ", e)
