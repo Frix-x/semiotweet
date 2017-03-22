@@ -12,8 +12,22 @@ from django.core.exceptions import ObjectDoesNotExist
 
 import string
 import ast
+import os,sys
 
 from collections import Counter,defaultdict
+
+
+def getEnvValue(varName):
+    """Return the value of an environment variable or an error if it isn't set"""
+    if varName in os.environ:
+        return os.environ.get(varName)
+    else:
+        sys.exit(varName + " is not defined in the environment variables")
+
+try:
+    LOCALTAGDIR = getEnvValue("LOCALTAGDIR")
+except BaseException as e :
+    print(e)
 
 def makeLdaModel(user=0):
     """Update LDA model to avoid long processing"""
@@ -72,9 +86,10 @@ def tokenizeAndLemmatizeTweets(listTweets):
     """Tokenize & lemmatize a list of texts"""
     global frenchStopwords
     global mentionRegex
+    global LOCALTAGDIR
 
     # Setting up TreeTagger
-    tagger = treetaggerwrapper.TreeTagger(TAGLANG='fr')
+    tagger = treetaggerwrapper.TreeTagger(TAGLANG='fr',TAGDIR=LOCALTAGDIR)
 
     for t in listTweets:
         text = mentionRegex.sub("", t["text"]).lower()
