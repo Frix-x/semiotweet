@@ -106,7 +106,7 @@ def home(request):
     except BaseException as error:
         print("displayInfo() ; error : ", error)
         return render(request,'home.html',locals())
-    topics = ldamodel.print_topics(num_topics=10, num_words=5)
+    topics = ldamodel.show_topics(num_topics=10, num_words=5, log=False, formatted=False)
     print(topics)
 
     return render(request,'home.html',locals())
