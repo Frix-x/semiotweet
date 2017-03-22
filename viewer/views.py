@@ -101,7 +101,11 @@ def home(request):
         hours[time.time().hour]+=1
 
     # Get LDA topics distribution for bubble Graph
-    ldamodel = pickle.loads(LdaModel.objects.get(user_id=0).ldamodel)
+    try :
+        ldamodel = pickle.loads(LdaModel.objects.get(user_id=0).ldamodel)
+    except BaseException as error:
+        print("displayInfo() ; error : ", error)
+        return render(request,'home.html',locals())
     topics = ldamodel.print_topics(num_topics=10, num_words=5)
     print(topics)
 
