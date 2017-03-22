@@ -14,6 +14,7 @@ Stack is subjects to know changes.
  - Django,
  - SQLite,
  - Twitter API,
+ - TreeTagger
 
 ### Front-end ; to be chosen between :
  - D3.js
@@ -25,6 +26,8 @@ Stack is subjects to know changes.
 There's just one app called `viewer` yet. `urls.py` directly redirects to this app.
 `extraction.py` contains functions that are used in the views.
 
+## UML TO BE UPDATED !
+
 There are only two models : `Tweet` and `User` :
 ![DataBase](UML.png)
 
@@ -34,7 +37,10 @@ Templates are directly put in `viewer/templates/` and not as usual in `viewer/te
 
 ## How to install
 
+### Virtual environment
+
 Clone it. Go to the folder and :
+
 ```
 # For Python 3.6 or Python 3.x
 $ virtualenv -p /usr/bin/python3 venv3
@@ -44,8 +50,25 @@ $ source venv3/bin/activate
 $ virtualenv venv
 $ source venv/bin/activate
 ```
-Then install TreeTagger (with the french parameter file) in your home directory by refering to the official docummentation (see [here](http://www.cis.uni-muenchen.de/~schmid/tools/TreeTagger/))
 
+#### In the following, all the `export` lines can be put at the end of the file /venv3/bin/activate`. It is easier to define the env variables that way since those lines are executed when lauching the venv.
+
+You have to set some variables in yout virtual env.
+First the "secret key" for the app (needed by Django). You can use [this site](http://www.miniwebtool.com/django-secret-key-generator) to generate one.
+```
+$ export SECRET_KEY='someLongStringToImagine'
+```
+
+### TreeTagger
+
+_TreeTagger_ is one of the main library we use for the project. You have to install it with the french parameter file in your home directory by refering to the official docummentation (see [here](http://www.cis.uni-muenchen.de/~schmid/tools/TreeTagger/))
+
+You have to specify the folder in which you install _TreeTagger_ with the `LOCALTAGDIR` variable :
+```
+$ export LOCALTAGDIR='/path/to/tree-tagger/'
+```
+
+### Requirements
 Then install the requirements
 ```
 $ pip install -r requirements.txt
@@ -54,12 +77,7 @@ If you have the error `pg_config not found` just install the `libpq_dev` package
 If you have the error `could not run curl-config` install the `libcurl4-openssl-dev` package.
 Then re-install the requirements
 
-
-You have to set some variables in yout virtual env.
-First the "secret key" for the app (needed by Django).
-```
-$ export SECRET_KEY='someLongStringToImagine'
-```
+### Credentials for Twitter API
 Then the credentials (for user and consumer)for your app in order to use Twitter API.
 In order to have those string, you need to create a Twitter App (see [here](https://apps.twitter.com/app/13440041/show)) ; then you can copy-paste them to set them in your virtual env.
 ```
@@ -96,6 +114,7 @@ DATABASES = {
 Then you have to run this in order to set up the models and the database :
 ```
 $ python manage.py makemigrations
+$ python manage.py makemigrations viewer
 $ python manage.py migrate
 ```
 Finally, `$ python manage.py runserver` runs the server locally.

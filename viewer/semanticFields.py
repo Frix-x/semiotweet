@@ -39,15 +39,18 @@ def makeLdaModel(user=0):
         LdaModel_db = None
 
     if LdaModel_db is None: # Make an LDA model with all tweets
-        if user==0:
+        if user==0: # getting all the tweets for the global model
             allLemmaArray_raw = Tweet.objects.all().values('lemmaArray','id')
-        else:
+        else: # getting all the tweets from a specific user
             allLemmaArray_raw = Tweet.objects.all().filter(user_id=user).values('lemmaArray','id')
         allLemmaArray = [ast.literal_eval(t["lemmaArray"]) for t in allLemmaArray_raw]
 
+        # Creating the LDA model
         dictionary = corpora.Dictionary(allLemmaArray)
         corpus = [dictionary.doc2bow(document) for document in allLemmaArray]
-        ldamodel = Lda(corpus, num_topics=10, id2word=dictionary, passes=20)
+        ldamodel = Lda(corpus, num_topics=10, id2word=dictionary, passes=20) # Main part of the creation here
+        LdaModel_db = LdaModel() # Creating a object of the class
+
     else: # Update the LDA model with the latest tweets
         ldamodel = pickle.loads(LdaModel_db.ldamodel)
         lastTweetId = LdaModel_db.tweet_id.id
@@ -67,6 +70,7 @@ def makeLdaModel(user=0):
         corpus = [dictionary.doc2bow(document) for document in allLemmaArray]
         ldamodel.update(corpus)
 
+    # Serializing the model & filling the data
     compressedLdaModel = pickle.dumps(ldamodel,protocol=-1)
     lastTweetId = allLemmaArray_raw[len(allLemmaArray_raw)-1]['id']
     tweet_to_use = Tweet.objects.get(id=lastTweetId)
@@ -74,6 +78,7 @@ def makeLdaModel(user=0):
     LdaModel_db.tweet_id = tweet_to_use
     LdaModel_db.ldamodel = compressedLdaModel
 
+    # Saving the object in DB
     try:
         LdaModel_db.save()
         return True
