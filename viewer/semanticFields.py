@@ -3,55 +3,134 @@ from __future__ import print_function
 from builtins import str
 from lxml import html
 import requests
-import nltk.data
+import re
+import treetaggerwrapper
+import pickle
+from gensim import corpora,models
+from .models import Tweet,User,LdaModel
+from django.core.exceptions import ObjectDoesNotExist
 
 import string
+import ast
+import os,sys
 
-from nltk.tokenize import WordPunctTokenizer,TweetTokenizer
 from collections import Counter,defaultdict
 
-def getSemanticField(word):
-    """Get the semantic field of the word"""
-    page = requests.get('http://dict.xmatiere.com/mots_en_rapport_avec/'+word.lower())
-    tree = html.fromstring(page.content)
-    aim = "/mots_en_rapport_avec/"
-    semanticField = tree.xpath('//a[starts-with(@href,"'+aim+'")]/text()')
-    return semanticField
 
-def personnalTokenizer(text):
-    """Personnal Tokenizer"""
-    text = str(text, "utf-8")
-    text = text.translate(string.maketrans("",""), "!\"$%&()*+,-./:;<=>?[\]^_`{|}~")
-    words = text.lower().split()
-    return words
+def getEnvValue(varName):
+    """Return the value of an environment variable or an error if it isn't set"""
+    if varName in os.environ:
+        return os.environ.get(varName)
+    else:
+        sys.exit(varName + " is not defined in the environment variables")
 
-def tokenizeText(text):
-    #NOTE - TODO : to be modify to include hashtag and mentions and to remove URL
-    """Tokenize a text : returns a list of the meaningful words"""
-    # French Tokenizer :
-    # tokenizerLocation = 'tokenizers/punkt/french.pickle' #Python 2
-    # tokenizerLocation = 'tokenizers/punkt/PY3/french.pickle' #Python 3
-    # tokenizer = nltk.data.load(tokenizerLocation)
+try:
+    LOCALTAGDIR = getEnvValue("LOCALTAGDIR")
+except BaseException as e :
+    print(e)
+
+def makeLdaModel(user=0):
+    """Update LDA model to avoid long processing"""
+    Lda = models.ldamodel.LdaModel
+
+    try:
+        LdaModel_db = LdaModel.objects.get(user_id=user)
+    except ObjectDoesNotExist:
+        LdaModel_db = None
+
+    if LdaModel_db is None: # Make an LDA model with all tweets
+        if user==0: # getting all the tweets for the global model
+            allLemmaArray_raw = Tweet.objects.all().values('lemmaArray','id')
+        else: # getting all the tweets from a specific user
+            allLemmaArray_raw = Tweet.objects.all().filter(user_id=user).values('lemmaArray','id')
+        allLemmaArray = [ast.literal_eval(t["lemmaArray"]) for t in allLemmaArray_raw]
+
+        # Creating the LDA model
+        dictionary = corpora.Dictionary(allLemmaArray)
+        corpus = [dictionary.doc2bow(document) for document in allLemmaArray]
+        ldamodel = Lda(corpus, num_topics=10, id2word=dictionary, passes=20) # Main part of the creation here
+        LdaModel_db = LdaModel() # Creating a object of the class
+
+    else: # Update the LDA model with the latest tweets
+        ldamodel = pickle.loads(LdaModel_db.ldamodel)
+        lastTweetId = LdaModel_db.tweet_id.id
+
+        if user==0:
+            allLemmaArray_raw = Tweet.objects.all().filter(id__gt=lastTweetId).values('lemmaArray','id')
+        else:
+            allLemmaArray_raw = Tweet.objects.all().filter(user_id=user,id__gt=lastTweetId).values('lemmaArray','id')
+
+        if len(allLemmaArray_raw)==0:
+            print('Already up to date...')
+            return True
+
+        allLemmaArray = [ast.literal_eval(t["lemmaArray"]) for t in allLemmaArray_raw]
+
+        dictionary = corpora.Dictionary(allLemmaArray)
+        corpus = [dictionary.doc2bow(document) for document in allLemmaArray]
+        ldamodel.update(corpus)
+
+    # Serializing the model & filling the data
+    compressedLdaModel = pickle.dumps(ldamodel,protocol=-1)
+    lastTweetId = allLemmaArray_raw[len(allLemmaArray_raw)-1]['id']
+    tweet_to_use = Tweet.objects.get(id=lastTweetId)
+    LdaModel_db.user_id = user
+    LdaModel_db.tweet_id = tweet_to_use
+    LdaModel_db.ldamodel = compressedLdaModel
+
+    # Saving the object in DB
+    try:
+        LdaModel_db.save()
+        return True
+    except BaseException as e:
+        print("makeLdaModel() ; error : ", e)
+        return False
+
+
+def tokenizeAndLemmatizeTweets(listTweets):
+    """Tokenize & lemmatize a list of texts"""
     global frenchStopwords
+    global mentionRegex
+    global LOCALTAGDIR
 
-    # tokenizer = WordPunctTokenizer()
-    tokenizer = TweetTokenizer(strip_handles=True, reduce_len=True)
-    words = tokenizer.tokenize(text)
+    # Setting up TreeTagger
+    tagger = treetaggerwrapper.TreeTagger(TAGLANG='fr',TAGDIR=LOCALTAGDIR)
 
-    # Filtering
-    words = [w.lower() for w in words if not (len(w) < 2 or w.lower() in frenchStopwords)]
+    for t in listTweets:
+        text = mentionRegex.sub("", t["text"]).lower()
+        tags = tagger.tag_text(text)
+        tags = treetaggerwrapper.make_tags(tags)
+        tokens = []
+        lemma = []
+        # Filtering
+        for tag in tags:
+            if hasattr(tag, 'word'):
+                if not (len(tag.lemma) < 2 or tag.lemma in frenchStopwords):
+                    tokens.append(tag.word)
+                    lemma.append(tag.lemma)
+            else :
+                token = tag.what
+                if token.startswith("<repurl"):
+                    token = token[token.find('"')+1:token.rfind('"')]
+                if not (len(token) < 2 or token in frenchStopwords):
+                    tokens.append(token)
+                    lemma.append(token)
 
-    return words
+        t["tokenArray"] = tokens
+        t["lemmaArray"] = lemma
+
+    return listTweets
 
 def countWords(listTweetText,nbWordsToExtract=30):
     """Takes a list of text and returns the words occurences"""
     wordOccurences = defaultdict(lambda: 0)
-    for currentTweet in listTweetText:
-        currentOccurences = dict(Counter(tokenizeText(currentTweet)))
-        for k in currentOccurences.keys():
+    for tokenizedTweet in listTweetText:
+        currentOccurences = dict(Counter(tokenizedTweet))
+        for k in list(currentOccurences.keys()):
             wordOccurences[k] += currentOccurences[k]
 
     return dict(Counter(wordOccurences).most_common(nbWordsToExtract))
+
 
 def toJsonForGraph(dict):
     """Return a list of dict used next for the Bubble Graph"""
@@ -115,12 +194,15 @@ commonWordsSnowball = ["au", "aux", "avec", "ce", "ces", "dans", "de", "des", "d
 # Others common works on Twitter, not so meaningful
 commonWordsTwitter = ["…","rt","ils","faut","https","://","http","...","ça",
                       "to","the","j'ai","via","ça","000","veux","être","devons"
-                      ,"doit","j'étais","suis"]
+                      ,"doit","j'étais","suis","url-remplacée","@card@","@ord@"]
 
 # French stopwords
 frenchStopwords = set(stopwords).union(set(commonWordsWiki))
 frenchStopwords = frenchStopwords.union(set(commonWordsSnowball))
 frenchStopwords = frenchStopwords.union(set(commonWordsTwitter))
+
+# Regex to delete user's mention in tweets
+mentionRegex = re.compile(r"@\w+")
 
 specifiedWords = ["colère","combat","peur","victoire","aide","argent","mensonge","société"]
 

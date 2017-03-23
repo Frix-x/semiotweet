@@ -1,12 +1,11 @@
 #-*- coding: utf-8 -*-
-# from datetime import datetime
 from __future__ import print_function
 from __future__ import absolute_import
 from builtins import str
 from django.utils import timezone
 from django.http import HttpResponse,Http404
 from django.shortcuts import render,redirect
-from .models import Tweet,User,Word
+from .models import Tweet,User,LdaModel
 import random
 import string
 import time
@@ -16,6 +15,7 @@ from django.db.models import Max
 from django.db import connection #for direct SQL requests
 
 import json
+import ast # convert string to list
 
 from .extraction import *
 from .semanticFields import *
@@ -34,10 +34,13 @@ def handler404(request,typed):
 def home(request):
     """Redirect to the home page : global statistics"""
     global requestToGetSources
+
+    # Getting tweets' sources
     cursor = connection.cursor()
     try:
         cursor.execute(requestToGetSources)
-    except BaseException:
+    except BaseException as error:
+        print("view home ; error : ", error)
         return render(request,'home.html',{"error":"No data yet ; click on 'Get the data'"})
     res = cursor.fetchall()
 
@@ -58,29 +61,54 @@ def home(request):
     sources = json.dumps(sources)
     num = json.dumps(num)
 
+    # Getting the number of tweets for each user
     try:
         cursor.execute("SELECT u.name, COUNT(t.id) AS nbTweets FROM viewer_tweet t, viewer_user u WHERE u.id = t.user_id_id GROUP BY u.name ORDER BY nbTweets DESC")
     except BaseException:
+        print("view home ; error : ",error)
         return render(request,'home.html',{"error":"No data yet ; click on 'Get the data'"})
     res = cursor.fetchall()
-
     politics = []
     nbTweets = []
     for (p,n) in res:
         politics.append(p)
         nbTweets.append(n)
+
     # JSON Formating
     politics = json.dumps(politics)
     nbTweets = json.dumps(nbTweets)
 
-    listTweetText = Tweet.objects.values('text')
-    listTweetText = [t["text"] for t in listTweetText]
+    # tokenArray and lemmaArray are stored as a string : we need to get the lists back
+    allTokenArray = Tweet.objects.values('tokenArray')
+    words = [ast.literal_eval(t["tokenArray"]) for t in allTokenArray]
+    allLemmaArray = Tweet.objects.values('lemmaArray')
+    lemmes = [ast.literal_eval(t["lemmaArray"]) for t in allLemmaArray]
 
     # words is a JSON list of dict like : {"word":"foo", "occur":42}
-    words = json.dumps(toJsonForGraph(countWords(listTweetText)))
+    words = json.dumps(toJsonForGraph(countWords(words)))
+    lemmes = json.dumps(toJsonForGraph(countWords(lemmes)))
     colorsForBars = ['rgba(54, 162, 235, 1)']*len(words)
 
-    # JSON Formating
+    #Get hours distribution of all tweets
+    try:
+        cursor.execute("SELECT DISTINCT created_at AS timePosted FROM viewer_tweet ORDER BY timePosted")
+    except BaseException as error:
+        print("displayInfo() ; error : ", error)
+        return render(request,'home.html',locals())
+    res = cursor.fetchall()
+    hours =[0]*24
+    for (time,) in res:
+        hours[time.time().hour]+=1
+
+    # Get LDA topics distribution for bubble Graph
+    try :
+        ldamodel = pickle.loads(LdaModel.objects.get(user_id=0).ldamodel)
+    except BaseException as error:
+        print("displayInfo() ; error : ", error)
+        return render(request,'home.html',locals())
+    topics = ldamodel.show_topics(num_topics=10, num_words=5, log=False, formatted=False)
+    print(topics)
+
     return render(request,'home.html',locals())
 
 def displayInfo(request,screen_name):
@@ -96,18 +124,21 @@ def displayInfo(request,screen_name):
 
     # Most common words said by the user
     idUser = userInfo["id"]
-    listTweetText = Tweet.objects.filter(user_id=idUser).values('text')
-    listTweetText = [t["text"] for t in listTweetText]
+    allTokenArray = Tweet.objects.filter(user_id=idUser).values('tokenArray')
+
+    # tokenArray is stored as a string : we need to get the list back
+    words = [ast.literal_eval(t["tokenArray"]) for t in allTokenArray]
 
     # words is a JSON list of dict like : {"word":"foo", "occur":42}
-    words = json.dumps(toJsonForGraph(countWords(listTweetText)))
+    words = json.dumps(toJsonForGraph(countWords(words)))
 
     # Sources of Tweets
     global requestToGetSources
     cursor = connection.cursor()
     try:
         cursor.execute("SELECT DISTINCT source, COUNT(source) AS nb FROM viewer_tweet WHERE user_id_id ='"+ str(idUser)+"' GROUP BY source ORDER BY nb DESC")
-    except BaseException:
+    except BaseException as error:
+        print("displayInfo() ; error : ", error)
         return render(request,'home.html',locals())
     res = cursor.fetchall()
     sources = []
@@ -127,10 +158,11 @@ def displayInfo(request,screen_name):
     sources = json.dumps(sources)
     num = json.dumps(num)
 
-    #Get hours distribution of all tweets
+    #Get hours distribution of user's tweets
     try:
         cursor.execute("SELECT DISTINCT created_at AS timePosted FROM viewer_tweet WHERE user_id_id ='"+ str(idUser)+"' ORDER BY timePosted")
-    except BaseException:
+    except BaseException as error:
+        print("displayInfo() ; error : ", error)
         return render(request,'home.html',locals())
     res = cursor.fetchall()
     hours =[0]*24
@@ -140,42 +172,12 @@ def displayInfo(request,screen_name):
     return render(request,'displayInfo.html',locals())
 
 #==============================#
-#=========== TWEETS ===========#
+#===========  DATA  ===========#
 #==============================#
 
-def saveTweet(tweet,user):
-    """Saves one tweet from user in database"""
-    newTweet = Tweet()
-    newTweet.id = tweet['id']
-    newTweet.user_id = user
-    newTweet.text = tweet['text']
-    newTweet.created_at = tweet['created_at']
-    newTweet.is_quote_status = tweet['is_quote_status']
-    newTweet.in_reply_to_status_id = tweet['in_reply_to_status_id']
-    newTweet.favorite_count = tweet['favorite_count']
-    newTweet.retweet_count = tweet['retweet_count']
-    newTweet.source = tweet['source']
-    newTweet.in_reply_to_user_id = tweet['in_reply_to_user_id']
-    newTweet.lang = tweet['lang']
-
-    # Formating the date
-    current_tz = timezone.get_current_timezone()
-    newTweet.created_at = datetime.strptime(newTweet.created_at, '%a %b %d %H:%M:%S +0000 %Y')
-    newTweet.created_at= current_tz.localize(newTweet.created_at)
-    # newTweet.created_at = time.strftime('%Y-%m-%d %H:%M:%S', time.strptime(newTweet.created_at,'%a %b %d %H:%M:%S +0000 %Y'))
-
-    # Saving the tweet
-    try:
-        newTweet.save()
-        return True
-    except BaseException:
-        return False
-
 def getData(request):
-    """Save the latest tweets from all the users defined in screen_nameToExtract"""
-    """Stores info about a users in the database
-    If screen_name == "all" : store all
-    Else : only store info of one user"""
+    """Save the latest tweets from all the users defined in screen_nameToExtract
+     and stores info about a users in the database not already done"""
     global screen_nameToExtract
 
     # SAVING USERS
@@ -214,8 +216,12 @@ def getData(request):
 
         # The important request here : returns the new tweets from the Twitter API
         tweets = returnTweetsMultiple(screen_name,lastId)
+
         lenghtTweets = len(tweets)
         nbTweets += lenghtTweets
+
+        # After this operations each tweet in tweets contains 2 more fields : 'tokenArray' & 'lemmaArray'
+        tweets = tokenizeAndLemmatizeTweets(tweets)
 
         # Saving tweets in database
         userFrom = User.objects.get(screen_name=screen_name)
@@ -225,61 +231,44 @@ def getData(request):
             success = saveTweet(t,userFrom) and success
             nbTweetsSaved += 1;
 
+    # MAKING LDA MODELS
+    for screen_name in screen_nameToExtract:
+        print ("MAKING LDA MODEL FOR : "+screen_name)
+        try:
+            idUser = User.objects.filter(screen_name=screen_name).values('id')[0]["id"]
+        except SomeModel.DoesNotExist: # If the user does not exist
+            continue # continue with the next user
+        makeLdaModel(idUser)
+    print("MAKING GLOBAL LDA MODEL...")
+    makeLdaModel(0)
 
+    print("\nEVERYTHING DONE !")
     return render(request,'getData.html',{"success" : success,
                                           "nbTweets" : nbTweets,
                                           "screen_nameToExtract": screen_nameToExtract})
 
 #==============================#
-#=========== USERS  ===========#
-#==============================#
-
-def saveUser(userInfo):
-    """Saves one user in database"""
-    newUser = User()
-
-    newUser.id = userInfo['id']
-    newUser.name = userInfo['name']
-    newUser.screen_name = userInfo['screen_name']
-    newUser.created_at = userInfo['created_at']
-    newUser.contributors_enabled = userInfo['contributors_enabled']
-    newUser.verified = userInfo['verified']
-
-    # Formating the date
-    current_tz = timezone.get_current_timezone()
-    newUser.created_at = datetime.strptime(newUser.created_at, '%a %b %d %H:%M:%S +0000 %Y')
-    newUser.created_at= current_tz.localize(newUser.created_at)
-    # newUser.created_at = time.strftime('%Y-%m-%d %H:%M:%S', time.strptime(newUser.created_at,'%a %b %d %H:%M:%S +0000 %Y'))
-
-    # Saving the user in the database
-    try:
-        newUser.save()
-        return True
-    except BaseException:
-        return False
-
-#==============================#
 #=========== WORDS  ===========#
 #==============================#
 
-def getWords(request):
-    """ Stores common words and semantic fields of the specifiedWords """
-    global specifiedWords
-    global frenchStopwords
-
-    # Saving the common words
-    for word in frenchStopwords:
-        newWord = Word(word=word,semanticField="#")
-        newWord.save()
-
-    # Saving the semantic field of the specifiedWords
-    for word in specifiedWords:
-        semanticField = getSemanticField(word)
-        for relatedWord in semanticField:
-            newWord = Word(word=relatedWord,semanticField=word)
-            newWord.save()
-
-    return render(request,'getWords.html',{"success": True, "specifiedWords" : specifiedWords})
+# def getWords(request):
+#     """ Stores common words and semantic fields of the specifiedWords """
+#     global specifiedWords
+#     global frenchStopwords
+#
+#     # Saving the common words
+#     for word in frenchStopwords:
+#         newWord = Word(word=word,semanticField="#")
+#         newWord.save()
+#
+#     # Saving the semantic field of the specifiedWords
+#     for word in specifiedWords:
+#         semanticField = getSemanticField(word)
+#         for relatedWord in semanticField:
+#             newWord = Word(word=relatedWord,semanticField=word)
+#             newWord.save()
+#
+#     return render(request,'getWords.html',{"success": True, "specifiedWords" : specifiedWords})
 
 #==============================#
 #===== SEMANTIC NETWORK =======#
