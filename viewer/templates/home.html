@@ -83,95 +83,13 @@ var sources = {{sources|safe}};
 var num = {{num|safe}};
 if (sources.length == 0)
   $( "#Graphs").html("<div class='row center'><h3>No data yet. Click <a href='/getData/'>here</a> to update data</h3></div>");
-else{
-  var ctx = document.getElementById("doughnutSources");
-  var colors = ["#FF6384","#36A2EB","#FFCE56","#FFBA49","#20A39E",
-                "#EF5B5B","#23001E","#A4A9AD","#8CDFD6","#5A716A"];
-  var data = {
-    labels: sources,
-    datasets: [
-        {
-            data: num,
-            backgroundColor: colors,
-            hoverBackgroundColor: colors
-        }]
-  };
-  var options = {
-      animation:{
-          animateScale:true
-      },
-      title: {
-          display: false,
-          text: 'Tweet Sources'
-      }
-  };
-  var myDoughnutChart = new Chart(ctx, {
-      type: 'doughnut',
-      data: data,
-      options: options
-  });
+else
+  createDonut("doughnutSources", sources, num);
+let words = {{words|safe}};
+let lemmes = {{lemmes|safe}};
+createBarChart("barCommonWords",words,{{colorsForBars|safe}},"Word occurences");
+createBarChart("barLemmatizedWords",lemmes,{{colorsForBars|safe}},"Word occurences");
 
-  var words = {{words|safe}};
-  words.sort(function(a, b) {
-      return b.occur - a.occur
-  });
-  var word = [];
-  var occur = [];
-  var colorsForBars = {{colorsForBars|safe}}
-
-  for (i = 0; i < words.length; i++) {
-      word.push(words[i].word);
-      occur.push(words[i].occur);
-  }
-  var ctxBar = "barCommonWords";
-  var dataBar = {
-    labels: word,
-    datasets: [
-        {
-            label: "Word occurences",
-            backgroundColor: colorsForBars,
-            borderColor: colorsForBars,
-            borderWidth: 1,
-            data: occur,
-        }
-    ]
-  };
-  var myBarChart = new Chart(ctxBar, {
-    type: 'bar',
-    data: dataBar,
-    options: options
-  });
-
-  var lemmes = {{lemmes|safe}};
-  lemmes.sort(function(a, b) {
-      return b.occur - a.occur
-  });
-  var lemme = [];
-  var lemmeOccur = [];
-  var colorsForBars = {{colorsForBars|safe}}
-
-  for (i = 0; i < words.length; i++) {
-      lemme.push(lemmes[i].word);
-      lemmeOccur.push(lemmes[i].occur);
-  }
-  var ctxBar2 = "barLemmatizedWords";
-  var dataBar2 = {
-    labels: lemme,
-    datasets: [
-        {
-            label: "Lemmes occurences",
-            backgroundColor: colorsForBars,
-            borderColor: colorsForBars,
-            borderWidth: 1,
-            data: lemmeOccur,
-        }
-    ]
-  };
-  var myBarChart2 = new Chart(ctxBar2, {
-    type: 'bar',
-    data: dataBar2,
-    options: options
-  });
 
 var politics = {{politics|safe}};
 var nbTweets = {{nbTweets|safe}};
@@ -180,7 +98,7 @@ var content= '';
 for(var i=0 ; i < politics.length ; i++)
   content += '<tr><td>'+ politics[i] + ':</td><td>' + nbTweets[i] + '</td></tr>';
 $( "#NbTweetsByPolitics").html("<table>"+content + "</table>");
-}
+
 
 var hours = {{hours|safe}};
 if (hours.length != 0){
