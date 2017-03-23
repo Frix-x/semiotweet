@@ -133,7 +133,7 @@ else{
   });
 
   var lemmes = {{lemmes|safe}};
-  words.sort(function(a, b) {
+  lemmes.sort(function(a, b) {
       return b.occur - a.occur
   });
   var lemme = [];
