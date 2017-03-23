@@ -16,6 +16,8 @@ from django.db import connection #for direct SQL requests
 
 import json
 import ast # convert string to list
+import pprint
+import math
 
 from .extraction import *
 from .semanticFields import *
@@ -106,8 +108,14 @@ def home(request):
     except BaseException as error:
         print("displayInfo() ; error : ", error)
         return render(request,'home.html',locals())
-    topics = ldamodel.show_topics(num_topics=10, num_words=5, log=False, formatted=False)
-    print(topics)
+
+    topics = ldamodel.show_topics(num_topics=10, num_words=8, log=False, formatted=False)
+    bubblesJson = {"label":"Topics","amount":50,"children":[]}
+    for index, topic in enumerate(topics):
+        bubblesJson["children"].append({"label":topic[0],"amount":10,"children":[]})
+        for word in topic[1]:
+            bubblesJson["children"][index]["children"].append({"label":word[0],"amount":math.floor(100*word[1])})
+    bubblesJson = json.dumps(bubblesJson)
 
     return render(request,'home.html',locals())
 
