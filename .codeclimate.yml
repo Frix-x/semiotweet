@@ -1,0 +1,6 @@
+## other configuration excluded from example...
+exclude_paths:
+- "**materialize**"
+- "**Chart.js"
+- "**d3**"
+- "**/vendor/"

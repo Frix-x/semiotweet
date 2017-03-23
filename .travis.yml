@@ -13,12 +13,15 @@ script:
 - coverage run manage.py test
 after_success:
 - codeclimate-test-reporter
-addons:
-  code_climate:
-    repo_token: "$CODE_CLIMATE_REPO_TOKEN"
+notifications:
+  email: false
+#addons:
+#  code_climate:
+#    repo_token: "$CODE_CLIMATE_REPO_TOKEN"
 deploy:
   provider: heroku
   app: semiotweet
-  api_key: "$HEROKU_KEY"
+  api_key:
+    secure: "$DEPLOY_KEY"
   on:
     all_branches: true

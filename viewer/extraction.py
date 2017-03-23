@@ -1,14 +1,12 @@
 #coding:utf8
-from __future__ import print_function
-from __future__ import division
+from __future__ import print_function, division
 from future import standard_library
 standard_library.install_aliases()
 from builtins import str
-from past.utils import old_div
 import oauth2
 from io import BytesIO
 import json
-import os, sys, getenv
+import os, sys
 
 
 from django.utils import timezone
@@ -81,7 +79,7 @@ def returnTweetsMultiple(screen_name,lastId=0):
     batchSize = min(nbTweet,200) # batchSize between 1 and 200
 
     if lastId == 0: # We only want to get ALL the tweets ; it supposes there are no tweets in the DB
-        maxIter = old_div(nbTweet,(batchSize+1)) + 1 # number of requests to send
+        maxIter = nbTweet // (batchSize+1) + 1 # number of requests to send
         iterNum = 0 # counter for the loop
         lastId = 0
         while lastId != currentId and iterNum < maxIter:
@@ -108,7 +106,7 @@ def cleanTweet(tweet):
     global uselessFields
     global stringFields
 
-    fieldsToDelete = [k for k in list(tweet.keys()) if k not in usefullFields]
+    fieldsToDelete = [k for k in tweet.keys() if k not in usefullFields]
     for key in fieldsToDelete:
         del tweet[key]
 
@@ -186,7 +184,7 @@ def cleanUser(user):
     global usefullFieldsUser
     global stringFields
 
-    fieldsToDelete = [k for k in list(user.keys()) if k not in usefullFieldsUser]
+    fieldsToDelete = [k for k in user.keys() if k not in usefullFieldsUser]
     for key in fieldsToDelete:
         del user[key]
 
@@ -281,8 +279,21 @@ tweetSources =["Twitter Web Client",
 usefullFieldsUser = ["id","name","screen_name","created_at",
                      "contributors_enabled","verified"]
 
-screen_nameToExtract = ["EmmanuelMacron","MLP_officiel","FrancoisFillon",
-                        "benoithamon","JLMelenchon","MarCharlott","PhilippePoutou", "dupontaignan", "n_arthaud", "UPR_Asselineau"]
+screen_nameToExtract = ["EmmanuelMacron",
+                        "MLP_officiel",
+                        "FrancoisFillon",
+                        "benoithamon",
+                        "JLMelenchon",
+                        "MarCharlott",
+                        "PhilippePoutou",
+                        "dupontaignan",
+                        "n_arthaud",
+                        "UPR_Asselineau",
+                        "JCheminade",
+                        "alainjuppe",
+                        "jeanlassalle",
+                        "ramayade",
+                        ]
 
 screen_nameToID = {'benoithamon': 14389177,
                   'JLMelenchon': 80820758,
@@ -314,7 +325,7 @@ def testMultiple(screen_name,since_id=False):
 def testProfile(screen_name,toClean=True):
     user = returnUser(screen_name,credentials,toClean)
 
-    remainingFields = list(user.keys())
+    remainingFields = user.keys()
     for i in remainingFields:
         print(i,":", user[i])
 

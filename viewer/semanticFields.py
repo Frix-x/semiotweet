@@ -135,7 +135,7 @@ def countWords(listTweetText,nbWordsToExtract=30):
 def toJsonForGraph(dict):
     """Return a list of dict used next for the Bubble Graph"""
     output = []
-    for key,val in list(dict.items()):
+    for key,val in dict.items():
         output.append({"word":key,"occur":val})
 
     return output
