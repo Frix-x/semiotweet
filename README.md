@@ -16,10 +16,8 @@ Stack is subjects to know changes.
  - Twitter API,
  - TreeTagger
 
-### Front-end ; to be chosen between :
- - D3.js
+### Front-end  :
  - chart.js
- - vis.js
 
 ## Architecture, data structures & models
 
@@ -61,21 +59,12 @@ $ export SECRET_KEY='someLongStringToImagine'
 
 ### TreeTagger
 
-_TreeTagger_ is one of the main library we use for the project. You have to install it with the french parameter file in your home directory by refering to the official docummentation (see [here](http://www.cis.uni-muenchen.de/~schmid/tools/TreeTagger/))
+_TreeTagger_ is one of the main library used for the project. You have to install it with the french parameter file in your home directory by refering to the official docummentation (see [here](http://www.cis.uni-muenchen.de/~schmid/tools/TreeTagger/))
 
 You have to specify the folder in which you install _TreeTagger_ with the `LOCALTAGDIR` variable :
 ```
 $ export LOCALTAGDIR='/path/to/tree-tagger/'
 ```
-
-### Requirements
-Then install the requirements
-```
-$ pip install -r requirements.txt
-```
-If you have the error `pg_config not found` just install the `libpq_dev` package.
-If you have the error `could not run curl-config` install the `libcurl4-openssl-dev` package.
-Then re-install the requirements
 
 ### Credentials for Twitter API
 Then the credentials (for user and consumer)for your app in order to use Twitter API.
@@ -87,11 +76,20 @@ $ export KEY='someLongStringToImagine'
 $ export SECRET='someLongStringToImagine'
 ```
 
+### Requirements
+Then install the requirements
+```
+$ pip install -r requirements.txt
+```
+If you have the error `pg_config not found` just install the `libpq_dev` package.
+If you have the error `could not run curl-config` install the `libcurl4-openssl-dev` package.
+Then re-install the requirements
+
+
 You have to create a `local_settings.py` in the same folder as `setting.py` in order to extend this file (see the end of `setting.py`) ; this is useful for managing different
 data base between local development and deployement :
 ```
 $ touch local_settings.py
-$ pip install dj_database_url
 ```
 In this file are the settings set to use the local database (`DEBUG` is set to True for dev', false for production.) :
 
