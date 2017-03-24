@@ -31,7 +31,7 @@ class Tweet(models.Model):
             output += " of "+ str(self.user_id)
 
         if self.created_at:
-            output += '; posted at '+str(self.created_at)+
+            output += '; posted at '+str(self.created_at)
 
         if self.text:
             output += ' : " ' + self.text + ' "'
