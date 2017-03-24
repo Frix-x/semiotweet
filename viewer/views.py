@@ -18,7 +18,7 @@ import json
 import ast # convert string to list
 
 from .extraction import *
-from .semanticFields import *
+from .semanticAnalysis import *
 
 #==============================#
 #=========== OTHERS ===========#
