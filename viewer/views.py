@@ -20,7 +20,7 @@ import pprint
 import math
 
 from .extraction import *
-from .semanticFields import *
+from .semanticAnalysis import *
 
 #==============================#
 #=========== OTHERS ===========#
