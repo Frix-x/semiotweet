@@ -26,7 +26,17 @@ class Tweet(models.Model):
     lemmaArray = models.CharField(null=True,max_length=1000)
 
     def __str__(self):
-        return "Tweet of "+ str(self.user_id) +' ('+self.created_at+') : '+self.text
+        output = "Tweet"
+        if self.user_id:
+            output += " of "+ str(self.user_id)
+
+        if self.created_at:
+            output += '; posted at '+str(self.created_at)+
+
+        if self.text:
+            output += ' : " ' + self.text + ' "'
+
+        return output
 
 class User(models.Model):
     """User class"""
@@ -39,7 +49,16 @@ class User(models.Model):
     verified = models.BooleanField(default=True)
 
     def __str__(self):
-        return "User : "+ self.name +' (@'+self.screen_name+' ; id :'+str(self.id)+')'
+        output = "User : "
+        if self.name:
+            output += self.name
+
+        output += ' ('
+        if self.screen_name:
+            output += '@'+self.screen_name
+
+        output +=  '; id :'+ str(self.id) + ')'
+        return output
 
 class LdaModel(models.Model):
     """LdaModel Class : filled with models of LDA which took time to calculate"""
@@ -50,4 +69,7 @@ class LdaModel(models.Model):
     ldamodel = models.BinaryField(null=False)
 
     def __str__(self):
-        return "LdaModel for user "+ str(self.user_id)
+        if (self.user_id):
+            return "LdaModel for user "+ str(self.user_id)
+
+        return "General LdaModel"
