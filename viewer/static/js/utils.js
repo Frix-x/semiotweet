@@ -58,7 +58,7 @@ function createBarChartHours(graphName,hours, labelName ){
 }
 
 
-function createDonut(graphName, sources, num,){
+function createDonut(graphName, sources, num){
   new Chart(graphName, {
       type: 'doughnut',
       data: {
