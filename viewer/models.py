@@ -11,7 +11,7 @@ from django.db import models
 class Tweet(models.Model):
     """Tweet Class : we are only using the usefullFields (see Tweets.py)"""
 
-    id = models.IntegerField(primary_key=True)
+    id = models.BigAutoField(primary_key=True)
     user_id = models.ForeignKey('User')
     text = models.TextField(null=False)
     created_at = models.DateTimeField()
