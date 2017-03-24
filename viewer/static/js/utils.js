@@ -1,14 +1,18 @@
-function createBarChart(graphName,words, colorsForBars, labelName ){
+function createBarChart(graphName,words, labelName ){
   // sorting desc by word.occur
   words.sort(function(a, b) {
       return b.occur - a.occur
   });
-  var word = [];
-  var occur = [];
+  let word = [];
+  let occur = [];
   for (i = 0; i < words.length; i++) {
       word.push(words[i].word);
       occur.push(words[i].occur);
   }
+  let colors = [];
+  for (let i=0; i < words.length ; i++)
+    colors[i] = 'rgba(54, 162, 235, 1)';
+
   new Chart(graphName, {
     type: 'bar',
     data: {
@@ -16,8 +20,8 @@ function createBarChart(graphName,words, colorsForBars, labelName ){
               datasets: [
                             {
                               label: labelName,
-                              backgroundColor: colorsForBars,
-                              borderColor: colorsForBars,
+                              backgroundColor: colors,
+                              borderColor: colors,
                               borderWidth: 1,
                               data: occur,
                             }
@@ -54,7 +58,7 @@ function createBarChartHours(graphName,hours, labelName ){
 }
 
 
-function createDonut(graphName, sources, num,){
+function createDonut(graphName, sources, num){
   new Chart(graphName, {
       type: 'doughnut',
       data: {

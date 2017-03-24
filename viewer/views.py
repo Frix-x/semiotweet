@@ -89,7 +89,6 @@ def home(request):
     # words is a JSON list of dict like : {"word":"foo", "occur":42}
     words = json.dumps(toJsonForGraph(countWords(words)))
     lemmes = json.dumps(toJsonForGraph(countWords(lemmes)))
-    colorsForBars = ['rgba(54, 162, 235, 1)']*len(words)
 
     #Get hours distribution of all tweets
     try:
