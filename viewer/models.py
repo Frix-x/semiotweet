@@ -16,7 +16,7 @@ class Tweet(models.Model):
     text = models.TextField(null=False)
     created_at = models.DateTimeField()
     is_quote_status = models.BooleanField(default=False)
-    in_reply_to_status_id = models.IntegerField(null=True,default=-1)
+    in_reply_to_status_id = models.BigIntegerField(null=True,default=-1)
     favorite_count = models.IntegerField(default=-1)
     retweet_count = models.IntegerField(default=-1)
     source = models.URLField(max_length=300,null=True)
