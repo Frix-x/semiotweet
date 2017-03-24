@@ -121,7 +121,7 @@ def tokenizeAndLemmatizeTweets(listTweets):
 
     return listTweets
 
-def countWords(listTweetText,nbWordsToExtract=30):
+def countWords(listTweetText,nbWordsToExtract=20):
     """Takes a list of text and returns the words occurences"""
     wordOccurences = defaultdict(lambda: 0)
     for tokenizedTweet in listTweetText:
