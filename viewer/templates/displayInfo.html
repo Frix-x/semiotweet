@@ -69,21 +69,8 @@
 
 
 <script>
-var words = {{words|safe}};
-if (words.length == 0)
-  $( "#Words").html("<div class='row center'><h3>No data yet. Click <a href='/getData/'>here</a> to update data</h3></div>");
-else
-    createBarChart("MostCommonWords",words, ['rgba(54, 162, 235, 1)'] * words.length, "Most common words");
-
-var sources = {{sources|safe}};
-var num = {{num|safe}};
-if (sources.length == 0 && num.length == 0)
-  $( "#TweetSources").html("<div class='row center'><h3>No data yet. Click <a href='/getData/'>here</a> to update data</h3></div>");
-else
-  createDonut("doughnutSources", sources, num);
-
-var hours = {{hours|safe}};
-if (hours.length != 0)
-      createBarChartHours("HoursDistribution",hours,"Number of tweets",)
+createBarChart("MostCommonWords",{{words|safe}}, "Most common words");
+createDonut("doughnutSources", {{sources|safe}}, {{num|safe}});
+createBarChartHours("HoursDistribution",{{hours|safe}},"Number of tweets");
 </script>
 {% endblock %}

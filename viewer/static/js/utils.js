@@ -1,4 +1,4 @@
-function createBarChart(graphName,words, colorsForBars, labelName ){
+function createBarChart(graphName,words, labelName ){
   // sorting desc by word.occur
   words.sort(function(a, b) {
       return b.occur - a.occur
@@ -16,8 +16,8 @@ function createBarChart(graphName,words, colorsForBars, labelName ){
               datasets: [
                             {
                               label: labelName,
-                              backgroundColor: colorsForBars,
-                              borderColor: colorsForBars,
+                              backgroundColor: ['rgba(54, 162, 235, 1)']*words.length,
+                              borderColor: ['rgba(54, 162, 235, 1)']*words.length,
                               borderWidth: 1,
                               data: occur,
                             }
