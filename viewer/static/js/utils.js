@@ -3,12 +3,16 @@ function createBarChart(graphName,words, labelName ){
   words.sort(function(a, b) {
       return b.occur - a.occur
   });
-  var word = [];
-  var occur = [];
+  let word = [];
+  let occur = [];
   for (i = 0; i < words.length; i++) {
       word.push(words[i].word);
       occur.push(words[i].occur);
   }
+  let colors = [];
+  for (let i=0; i < words.length ; i++)
+    colors[i] = 'rgba(54, 162, 235, 1)';
+
   new Chart(graphName, {
     type: 'bar',
     data: {
@@ -16,8 +20,8 @@ function createBarChart(graphName,words, labelName ){
               datasets: [
                             {
                               label: labelName,
-                              backgroundColor: ['rgba(54, 162, 235, 1)']*words.length,
-                              borderColor: ['rgba(54, 162, 235, 1)']*words.length,
+                              backgroundColor: colors,
+                              borderColor: colors,
                               borderWidth: 1,
                               data: occur,
                             }
