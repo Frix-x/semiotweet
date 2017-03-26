@@ -113,7 +113,7 @@ def home(request):
     for index, topic in enumerate(topics):
         bubblesJson["children"].append({"label":topic[0],"amount":10,"children":[]})
         for word in topic[1]:
-            bubblesJson["children"][index]["children"].append({"label":word[0],"amount":math.floor(100*word[1])})
+            bubblesJson["children"][index]["children"].append({"label":word[0],"amount":math.floor(300*word[1])})
     bubblesJson = json.dumps(bubblesJson)
 
     return render(request,'home.html',locals())
