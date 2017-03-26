@@ -278,28 +278,6 @@ def getData(request):
                                           "nbTweets" : nbTweets,
                                           "screen_nameToExtract": screen_nameToExtract})
 
-#==============================#
-#=========== WORDS  ===========#
-#==============================#
-
-# def getWords(request):
-#     """ Stores common words and semantic fields of the specifiedWords """
-#     global specifiedWords
-#     global frenchStopwords
-#
-#     # Saving the common words
-#     for word in frenchStopwords:
-#         newWord = Word(word=word,semanticField="#")
-#         newWord.save()
-#
-#     # Saving the semantic field of the specifiedWords
-#     for word in specifiedWords:
-#         semanticField = getSemanticField(word)
-#         for relatedWord in semanticField:
-#             newWord = Word(word=relatedWord,semanticField=word)
-#             newWord.save()
-#
-#     return render(request,'getWords.html',{"success": True, "specifiedWords" : specifiedWords})
 
 #==============================#
 #===== SEMANTIC NETWORK =======#

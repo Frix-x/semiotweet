@@ -1,13 +1,13 @@
 {% extends "template.html" %}
 {% load static %}
-{% block title %} | Words Analysis {% endblock %}
+{% block title %} |Analyse des sujets {% endblock %}
 
 {% block content %}
 
 <div class="section no-pad-bot" id="index-banner">
     <div class="container">
         <br><br>
-        <h1 class="header center blue-grey-text text-darken-4">Words Analysis</h1>
+        <h1 class="header center blue-grey-text text-darken-4">Analyses des sujets</h1>
         <br><br>
     </div>
 </div>
@@ -22,7 +22,7 @@
                     <div class="card-stacked">
                       <div class="card-content" id="NbTweetsByPolitics"></div>
                       <div class="card-action">
-                        <a>Number of tweets by Politics</a>
+                        <a>Nombre de tweets pour chaque candidat.e</a>
                       </div>
                     </div>
                   </div>
@@ -30,7 +30,14 @@
             </div>
             <div class="col s12 m8">
                 <div class="icon-block">
-                    <h5 class="center">Hours Distribution</h5>
+                  <div class="icon-block">
+                    <h5 class="center">Overview</h5>
+                    <p>
+                      This page show data computed from an LDA (<i>Latent Dirichlet Allocation</i>) model computed from extracted tweets of all politics.<br>
+                      Les données sont mises à jour toutes les 3 heures. Dernière mise à jour:  <b>{{maj}}</b>.
+                    </p>
+                  </div>
+                    <h5 class="center">Distribution des tweets selon les heures</h5>
                     <canvas id="HoursDistribution"></canvas>
                 </div>
             </div>
@@ -38,13 +45,13 @@
         <div class="row">
           <div class="col s12 m6">
               <div class="icon-block">
-                <h5 class="center">Most common words used by all politics</h5>
+                <h5 class="center">Mots les plus employés par les candidat.e.s</h5>
                 <canvas id="barCommonWords"></canvas>
               </div>
           </div>
           <div class="col s12 m6">
               <div class="icon-block">
-                <h5 class="center">Lemmatized words used by all politics</h5>
+                <h5 class="center">Lemmes les plus employés par les candidat.e.s</h5>
                 <canvas id="barLemmatizedWords"></canvas>
               </div>
           </div>
