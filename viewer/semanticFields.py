@@ -194,7 +194,7 @@ commonWordsSnowball = ["au", "aux", "avec", "ce", "ces", "dans", "de", "des", "d
 # Others common works on Twitter, not so meaningful
 commonWordsTwitter = ["…","rt","ils","faut","https","://","http","...","ça",
                       "to","the","j'ai","via","ça","000","veux","être","devons"
-                      ,"doit","j'étais","suis","url-remplacée","@card@","@ord@"]
+                      ,"doit","j'étais","suis","url-remplacée","@card@","@ord@","gt"]
 
 # French stopwords
 frenchStopwords = set(stopwords).union(set(commonWordsWiki))
