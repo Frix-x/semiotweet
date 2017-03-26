@@ -63,7 +63,7 @@ class User(models.Model):
 class LdaModel(models.Model):
     """LdaModel Class : filled with models of LDA which took time to calculate"""
 
-    id = models.IntegerField(primary_key=True)
+    id = models.AutoField(primary_key=True)
     user_id = models.IntegerField(default=0,null=False) # not a ForeignKey for some "multiple users" computed models
     tweet_id = models.ForeignKey('Tweet')
     ldamodel = models.BinaryField(null=False)
