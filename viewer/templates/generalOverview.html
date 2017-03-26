@@ -30,13 +30,24 @@
             </div>
             <div class="col s12 m9">
                 <div class="icon-block">
-                  <h5 class="center">Most common words used by all politics</h5>
-                  <canvas id="barCommonWords"></canvas>
+                  <div class="icon-block">
+                    <h5 class="center">Overview</h5>
+                    <p>
+                      This page show data computed from an LDA (<i>Latent Dirichlet Allocation</i>) model computed from extracted tweets of all politics.<br>
+                      Datas are automaticaly updated every 3h. Last datas from <b>xxxxxxxxxxxxxxxxxxxx</b>.
+                    </p>
+                  </div>
                 </div>
             </div>
         </div>
         <div class="row">
-          <div class="col s12 m9 offset-m3">
+          <div class="col s12 m6">
+              <div class="icon-block">
+                <h5 class="center">Most common words used by all politics</h5>
+                <canvas id="barCommonWords"></canvas>
+              </div>
+          </div>
+          <div class="col s12 m6">
               <div class="icon-block">
                 <h5 class="center">Lemmatized words used by all politics</h5>
                 <canvas id="barLemmatizedWords"></canvas>
