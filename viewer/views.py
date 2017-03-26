@@ -43,7 +43,7 @@ def home(request):
         cursor.execute(requestToGetSources)
     except BaseException as error:
         print("view home ; error : ", error)
-        return render(request,'home.html',{"error":"No data yet ; click on 'Get the data'"})
+        return render(request,'home.html',{'error':'No data yet ; click on "Get the data"'})
     res = cursor.fetchall()
 
     sources = []
@@ -75,7 +75,41 @@ def home(request):
     for (p,n) in res:
         politics.append(p)
         nbTweets.append(n)
+    # JSON Formating
+    politics = json.dumps(politics)
+    nbTweets = json.dumps(nbTweets)
 
+    #Get hours distribution of all tweets
+    try:
+        cursor.execute("SELECT DISTINCT created_at AS timePosted FROM viewer_tweet ORDER BY timePosted")
+    except BaseException as error:
+        print("displayInfo() ; error : ", error)
+        return render(request,'home.html',{'sources': sources, 'num': num, 'politics': politics, 'nbTweets': nbTweets})
+    res = cursor.fetchall()
+    hours =[0]*24
+    for (time,) in res:
+        hours[time.time().hour]+=1
+
+    return render(request,'home.html',{'sources': sources, 'num': num, 'politics': politics, 'nbTweets': nbTweets, 'hours': hours})
+
+def generalOverview(request):
+    """Redirect to the words page : analysis around words used by politics"""
+    global requestToGetSources
+
+    # Getting tweets' sources
+    cursor = connection.cursor()
+    # Getting the number of tweets for each user
+    try:
+        cursor.execute("SELECT u.name, COUNT(t.id) AS nbTweets FROM viewer_tweet t, viewer_user u WHERE u.id = t.user_id_id GROUP BY u.name ORDER BY nbTweets DESC")
+    except BaseException:
+        print("view generalOverview ; error : ",error)
+        return render(request,'generalOverview.html',{'error':'No data yet ; click on "Get the data"'})
+    res = cursor.fetchall()
+    politics = []
+    nbTweets = []
+    for (p,n) in res:
+        politics.append(p)
+        nbTweets.append(n)
     # JSON Formating
     politics = json.dumps(politics)
     nbTweets = json.dumps(nbTweets)
@@ -90,33 +124,22 @@ def home(request):
     words = json.dumps(toJsonForGraph(countWords(words)))
     lemmes = json.dumps(toJsonForGraph(countWords(lemmes)))
 
-    #Get hours distribution of all tweets
-    try:
-        cursor.execute("SELECT DISTINCT created_at AS timePosted FROM viewer_tweet ORDER BY timePosted")
-    except BaseException as error:
-        print("displayInfo() ; error : ", error)
-        return render(request,'home.html',locals())
-    res = cursor.fetchall()
-    hours =[0]*24
-    for (time,) in res:
-        hours[time.time().hour]+=1
-
     # Get LDA topics distribution for bubble Graph
     try :
         ldamodel = pickle.loads(LdaModel.objects.get(user_id=0).ldamodel)
     except BaseException as error:
         print("displayInfo() ; error : ", error)
-        return render(request,'home.html',locals())
+        return render(request,'generalOverview.html',{'politics': politics, 'nbTweets': nbTweets, 'words': words, 'lemmes': lemmes, 'hours': hours})
 
     topics = ldamodel.show_topics(num_topics=10, num_words=8, log=False, formatted=False)
     bubblesJson = {"label":"Topics","amount":50,"children":[]}
     for index, topic in enumerate(topics):
         bubblesJson["children"].append({"label":topic[0],"amount":10,"children":[]})
         for word in topic[1]:
-            bubblesJson["children"][index]["children"].append({"label":word[0],"amount":math.floor(100*word[1])})
+            bubblesJson["children"][index]["children"].append({"label":word[0],"amount":math.floor(300*word[1])})
     bubblesJson = json.dumps(bubblesJson)
 
-    return render(request,'home.html',locals())
+    return render(request,'generalOverview.html',{'politics': politics, 'nbTweets': nbTweets, 'words': words, 'lemmes': lemmes, 'bubblesJson': bubblesJson})
 
 def displayInfo(request,screen_name):
     """Display all the tweets for a user
@@ -177,6 +200,8 @@ def displayInfo(request,screen_name):
         hours[time.time().hour]+=1
 
     return render(request,'displayInfo.html',locals())
+
+
 
 #==============================#
 #===========  DATA  ===========#
