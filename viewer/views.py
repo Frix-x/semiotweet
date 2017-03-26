@@ -78,18 +78,7 @@ def home(request):
     politics = json.dumps(politics)
     nbTweets = json.dumps(nbTweets)
 
-    #Get hours distribution of all tweets
-    try:
-        cursor.execute("SELECT DISTINCT created_at AS timePosted FROM viewer_tweet ORDER BY timePosted")
-    except BaseException as error:
-        print("displayInfo() ; error : ", error)
-        return render(request,'home.html',{'sources': sources, 'num': num, 'politics': politics, 'nbTweets': nbTweets})
-    res = cursor.fetchall()
-    hours =[0]*24
-    for (time,) in res:
-        hours[time.time().hour]+=1
-
-    return render(request,'home.html',{'sources': sources, 'num': num, 'politics': politics, 'nbTweets': nbTweets, 'hours': hours})
+    return render(request,'home.html',{'sources': sources, 'num': num, 'politics': politics, 'nbTweets': nbTweets})
 
 def generalOverview(request):
     """Redirect to the words page : analysis around words used by politics"""
@@ -123,12 +112,23 @@ def generalOverview(request):
     words = json.dumps(toJsonForGraph(countWords(words)))
     lemmes = json.dumps(toJsonForGraph(countWords(lemmes)))
 
+    #Get hours distribution of all tweets
+    try:
+        cursor.execute("SELECT DISTINCT created_at AS timePosted FROM viewer_tweet ORDER BY timePosted")
+    except BaseException as error:
+        print("displayInfo() ; error : ", error)
+        return render(request,'home.html',{'politics': politics, 'nbTweets': nbTweets, 'words': words, 'lemmes': lemmes})
+    res = cursor.fetchall()
+    hours =[0]*24
+    for (time,) in res:
+        hours[time.time().hour]+=1
+
     # Get LDA topics distribution for bubble Graph
     try :
         ldamodel = pickle.loads(LdaModel.objects.get(user_id=0).ldamodel)
     except BaseException as error:
         print("displayInfo() ; error : ", error)
-        return render(request,'generalOverview.html',{'politics': politics, 'nbTweets': nbTweets, 'words': words, 'lemmes': lemmes})
+        return render(request,'generalOverview.html',{'politics': politics, 'nbTweets': nbTweets, 'words': words, 'lemmes': lemmes, 'hours': hours})
 
     topics = ldamodel.show_topics(num_topics=10, num_words=8, log=False, formatted=False)
     bubblesJson = {"label":"Topics","amount":50,"children":[]}
@@ -138,7 +138,7 @@ def generalOverview(request):
             bubblesJson["children"][index]["children"].append({"label":word[0],"amount":math.floor(300*word[1])})
     bubblesJson = json.dumps(bubblesJson,default=str)
 
-    return render(request,'generalOverview.html',{'politics': politics, 'nbTweets': nbTweets, 'words': words, 'lemmes': lemmes, 'bubblesJson': bubblesJson})
+    return render(request,'generalOverview.html',{'politics': politics, 'nbTweets': nbTweets, 'words': words, 'lemmes': lemmes, 'hours': hours, 'bubblesJson': bubblesJson})
 
 def displayInfo(request,screen_name):
     """Display all the tweets for a user
