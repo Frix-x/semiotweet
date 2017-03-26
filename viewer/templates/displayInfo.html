@@ -1,8 +1,8 @@
-{% extends "template.html" %} {% block title %} | @{{screen_name}} {% endblock %} {% block content %} {% if success %}
+{% extends "template.html" %} {% load static %} {% block title %} | @{{screen_name}} {% endblock %} {% block content %} {% if success %}
 <div class="section no-pad-bot" id="index-banner">
     <div class="container">
         <br><br>
-        <!--<h1 class="header center darken-1-text">User information</h1>-->
+        <h1 class="header center darken-1-text">Infos sur l'utilisateur</h1>
         <br><br>
     </div>
 </div>
@@ -34,20 +34,34 @@
             </div>
             <div class="col s12 m4" id="TweetSources">
                 <div class="icon-block">
-                    <h5 class="center">Tweet sources</h5>
+                    <h5 class="center">Sources des tweets</h5>
                     <canvas id="doughnutSources"></canvas>
                 </div>
             </div>
         </div>
+        <br><br>
         <div class="row">
+          <div class="col s12 m6">
             <div class="icon-block" id="Words">
+                <h5 class="center">Mots les plus employés</h5>
                 <canvas id="MostCommonWords"></canvas>
             </div>
-        </div>
-        <div class="row">
+          </div>
+          <div class="col s12 m6">
             <div class="icon-block" id="Distribution">
+                <h5 class="center">Lemmes les plus employés</h5>
+                <canvas id="MostCommonLemmes"></canvas>
+            </div>
+          </div>
+        </div>
+        <br><br>
+        <div class="row">
+          <div class="col s12 m12">
+            <div class="icon-block" id="Distribution">
+                <h5 class="center">Distribution des tweets selon les heures</h5>
                 <canvas id="HoursDistribution"></canvas>
             </div>
+          </div>
         </div>
     </div>
 </div>
@@ -55,9 +69,9 @@
 <div class="section no-pad-bot" id="index-banner">
     <div class="container">
         <br><br>
-        <h1 class="header center orange-text">Error</h1>
+        <h1 class="header center orange-text">Erreur</h1>
         <div class="row center">
-            <h5 class="header col s12 light">Internal server error...</h5>
+            <h5 class="header col s12 light">Page indisponible.</h5>
         </div>
         <br><br>
     </div>
@@ -66,11 +80,14 @@
 {% endblock %}
 
 {%block script%}
-
-
+<script src="{% static "js/Chart.js" %}"></script>
+<script src="{% static "js/utils.js" %}"></script>
 <script>
-createBarChart("MostCommonWords",{{words|safe}}, "Most common words");
-createDonut("doughnutSources", {{sources|safe}}, {{num|safe}});
-createBarChartHours("HoursDistribution",{{hours|safe}},"Number of tweets");
+$(document).ready(function () {
+  createBarChart("MostCommonWords",{{words|safe}}, "Mots les plus communs");
+  createDonut("doughnutSources", {{sources|safe}}, {{num|safe}});
+  createBarChart("MostCommonLemmes",{{lemmes|safe}},"Lemmes occurences");
+  createBarChartHours("HoursDistribution",{{hours|safe}},"Nombre de tweets postés");
+});
 </script>
 {% endblock %}

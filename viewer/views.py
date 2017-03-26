@@ -16,7 +16,6 @@ from django.db import connection #for direct SQL requests
 
 import json
 import ast # convert string to list
-import pprint
 import math
 
 from .extraction import *
@@ -43,7 +42,7 @@ def home(request):
         cursor.execute(requestToGetSources)
     except BaseException as error:
         print("view home ; error : ", error)
-        return render(request,'home.html',{"error":"No data yet ; click on 'Get the data'"})
+        return render(request,'home.html',{'error':'No data yet ; click on "Get the data"'})
     res = cursor.fetchall()
 
     sources = []
@@ -75,7 +74,30 @@ def home(request):
     for (p,n) in res:
         politics.append(p)
         nbTweets.append(n)
+    # JSON Formating
+    politics = json.dumps(politics)
+    nbTweets = json.dumps(nbTweets)
 
+    return render(request,'home.html',{'sources': sources, 'num': num, 'politics': politics, 'nbTweets': nbTweets})
+
+def generalOverview(request):
+    """Redirect to the words page : analysis around words used by politics"""
+    global requestToGetSources
+
+    # Getting tweets' sources
+    cursor = connection.cursor()
+    # Getting the number of tweets for each user
+    try:
+        cursor.execute("SELECT u.name, COUNT(t.id) AS nbTweets FROM viewer_tweet t, viewer_user u WHERE u.id = t.user_id_id GROUP BY u.name ORDER BY nbTweets DESC")
+    except BaseException:
+        print("view generalOverview ; error : ",error)
+        return render(request,'generalOverview.html',{'error':'No data yet ; click on "Get the data"'})
+    res = cursor.fetchall()
+    politics = []
+    nbTweets = []
+    for (p,n) in res:
+        politics.append(p)
+        nbTweets.append(n)
     # JSON Formating
     politics = json.dumps(politics)
     nbTweets = json.dumps(nbTweets)
@@ -95,7 +117,7 @@ def home(request):
         cursor.execute("SELECT DISTINCT created_at AS timePosted FROM viewer_tweet ORDER BY timePosted")
     except BaseException as error:
         print("displayInfo() ; error : ", error)
-        return render(request,'home.html',locals())
+        return render(request,'home.html',{'politics': politics, 'nbTweets': nbTweets, 'words': words, 'lemmes': lemmes})
     res = cursor.fetchall()
     hours =[0]*24
     for (time,) in res:
@@ -106,17 +128,17 @@ def home(request):
         ldamodel = pickle.loads(LdaModel.objects.get(user_id=0).ldamodel)
     except BaseException as error:
         print("displayInfo() ; error : ", error)
-        return render(request,'home.html',locals())
+        return render(request,'generalOverview.html',{'politics': politics, 'nbTweets': nbTweets, 'words': words, 'lemmes': lemmes, 'hours': hours})
 
     topics = ldamodel.show_topics(num_topics=10, num_words=8, log=False, formatted=False)
     bubblesJson = {"label":"Topics","amount":50,"children":[]}
     for index, topic in enumerate(topics):
         bubblesJson["children"].append({"label":topic[0],"amount":10,"children":[]})
         for word in topic[1]:
-            bubblesJson["children"][index]["children"].append({"label":word[0],"amount":math.floor(100*word[1])})
-    bubblesJson = json.dumps(bubblesJson)
+            bubblesJson["children"][index]["children"].append({"label":word[0],"amount":math.floor(300*word[1])})
+    bubblesJson = json.dumps(bubblesJson,default=str)
 
-    return render(request,'home.html',locals())
+    return render(request,'generalOverview.html',{'politics': politics, 'nbTweets': nbTweets, 'words': words, 'lemmes': lemmes, 'hours': hours, 'bubblesJson': bubblesJson})
 
 def displayInfo(request,screen_name):
     """Display all the tweets for a user
@@ -132,12 +154,15 @@ def displayInfo(request,screen_name):
     # Most common words said by the user
     idUser = userInfo["id"]
     allTokenArray = Tweet.objects.filter(user_id=idUser).values('tokenArray')
+    allLemmaArray = Tweet.objects.filter(user_id=idUser).values('lemmaArray')
 
     # tokenArray is stored as a string : we need to get the list back
     words = [ast.literal_eval(t["tokenArray"]) for t in allTokenArray]
+    lemmes = [ast.literal_eval(t["lemmaArray"]) for t in allLemmaArray]
 
     # words is a JSON list of dict like : {"word":"foo", "occur":42}
     words = json.dumps(toJsonForGraph(countWords(words)))
+    lemmes = json.dumps(toJsonForGraph(countWords(lemmes)))
 
     # Sources of Tweets
     global requestToGetSources
@@ -177,6 +202,8 @@ def displayInfo(request,screen_name):
         hours[time.time().hour]+=1
 
     return render(request,'displayInfo.html',locals())
+
+
 
 #==============================#
 #===========  DATA  ===========#
