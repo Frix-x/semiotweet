@@ -39,6 +39,7 @@ def makeLdaModel(user=0):
         LdaModel_db = None
 
     if LdaModel_db is None: # Make an LDA model with all tweets
+        LdaModel_db = LdaModel() # Creating an object of the class
         if user==0: # getting all the tweets for the global model
             allLemmaArray_raw = Tweet.objects.all().values('lemmaArray','id')
         else: # getting all the tweets from a specific user
@@ -48,8 +49,10 @@ def makeLdaModel(user=0):
         # Creating the LDA model
         dictionary = corpora.Dictionary(allLemmaArray)
         corpus = [dictionary.doc2bow(document) for document in allLemmaArray]
-        ldamodel = Lda(corpus, num_topics=10, id2word=dictionary, passes=20) # Main part of the creation here
-        LdaModel_db = LdaModel() # Creating a object of the class
+        if (user == 0): # Main part of the creation here
+            ldamodel = Lda(corpus, num_topics=20, id2word=dictionary, passes=20)
+        else:
+            ldamodel = Lda(corpus, num_topics=10, id2word=dictionary, passes=20)
 
     else: # Update the LDA model with the latest tweets
         ldamodel = pickle.loads(LdaModel_db.ldamodel)
@@ -110,11 +113,12 @@ def tokenizeAndLemmatizeTweets(listTweets):
                     lemma.append(tag.lemma)
             else :
                 token = tag.what
-                if token.startswith("<repurl"):
-                    token = token[token.find('"')+1:token.rfind('"')]
                 if not (len(token) < 2 or token in frenchStopwords):
+                    if token.startswith("<repurl") or token.startswith("<repdns"):
+                        token = token[token.find('"')+1:token.rfind('"')]
+                    else:
+                        lemma.append(token)
                     tokens.append(token)
-                    lemma.append(token)
 
         t["tokenArray"] = tokens
         t["lemmaArray"] = lemma
@@ -193,8 +197,9 @@ commonWordsSnowball = ["au", "aux", "avec", "ce", "ces", "dans", "de", "des", "d
 
 # Others common works on Twitter, not so meaningful
 commonWordsTwitter = ["…","rt","ils","faut","https","://","http","...","ça",
-                      "to","the","j'ai","via","ça","000","veux","être","devons"
-                      ,"doit","j'étais","suis","url-remplacée","@card@","@ord@","gt"]
+                      "to","the","j'ai","via","ça","000","veux","être","devons",
+                      "doit","j'étais","suis","url-remplacée","dns-remplacé",
+                      "@card@","@ord@","gt"]
 
 # French stopwords
 frenchStopwords = set(stopwords).union(set(commonWordsWiki))
