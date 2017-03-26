@@ -154,12 +154,15 @@ def displayInfo(request,screen_name):
     # Most common words said by the user
     idUser = userInfo["id"]
     allTokenArray = Tweet.objects.filter(user_id=idUser).values('tokenArray')
+    allLemmaArray = Tweet.objects.filter(user_id=idUser).values('lemmaArray')
 
     # tokenArray is stored as a string : we need to get the list back
     words = [ast.literal_eval(t["tokenArray"]) for t in allTokenArray]
+    lemmes = [ast.literal_eval(t["lemmaArray"]) for t in allLemmaArray]
 
     # words is a JSON list of dict like : {"word":"foo", "occur":42}
     words = json.dumps(toJsonForGraph(countWords(words)))
+    lemmes = json.dumps(toJsonForGraph(countWords(lemmes)))
 
     # Sources of Tweets
     global requestToGetSources
