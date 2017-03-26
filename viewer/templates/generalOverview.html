@@ -1,13 +1,13 @@
 {% extends "template.html" %}
 {% load static %}
-{% block title %} |Analyse des sujets {% endblock %}
+{% block title %} | Analyse des sujets {% endblock %}
 
 {% block content %}
 
 <div class="section no-pad-bot" id="index-banner">
     <div class="container">
         <br><br>
-        <h1 class="header center blue-grey-text text-darken-4">Analyse générale</h1>
+        <h1 class="header center blue-grey-text text-darken-4">Analyses des sujets</h1>
         <br><br>
     </div>
 </div>
@@ -22,7 +22,7 @@
                     <div class="card-stacked">
                       <div class="card-content" id="NbTweetsByPolitics"></div>
                       <div class="card-action">
-                        <a>Nombre de tweets pour chaque candidats</a>
+                        <a>Nombre de tweets pour chaque candidat</a>
                       </div>
                     </div>
                   </div>
@@ -35,7 +35,6 @@
                 </div>
             </div>
         </div>
-        <br><br>
         <div class="row">
           <div class="col s12 m6">
               <div class="icon-block">
@@ -50,11 +49,10 @@
               </div>
           </div>
         </div>
-        <br><br>
         <div class="row">
           <div class="col s12 m7">
               <div class="icon-block">
-                <h5 class="center">Graphe de présentation des sujets abordés</h5>
+                <h5 class="center">Bubble chart des sujets populaires</h5>
                 <div class="bubbletree-wrapper">
 		               <div class="bubbletree"></div>
 	              </div>
@@ -62,7 +60,7 @@
           </div>
           <div class="col s12 m5">
               <div class="icon-block">
-                <h5 class="center">Carte de chaleur des sujets abordés (à venir)</h5>
+                <h5 class="center">Heatmap des sujets</h5>
               </div>
           </div>
         </div>
@@ -80,8 +78,8 @@
 <script>
 $(document).ready(function () {
   createBarChartHours("HoursDistribution",{{hours|safe}},"Number of tweets");
-  createBarChart("barCommonWords",{{words|safe}},"Word occurences");
-  createBarChart("barLemmatizedWords",{{lemmes|safe}},"Lemmes occurences");
+  createBarChart("barCommonWords",{{words|safe}},"Occurence des mots");
+  createBarChart("barLemmatizedWords",{{lemmes|safe}},"Occurence des lemmes");
 
   var politics = {{politics|safe}};
   var nbTweets = {{nbTweets|safe}};

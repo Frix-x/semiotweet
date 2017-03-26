@@ -78,7 +78,16 @@ def home(request):
     politics = json.dumps(politics)
     nbTweets = json.dumps(nbTweets)
 
-    return render(request,'home.html',{'sources': sources, 'num': num, 'politics': politics, 'nbTweets': nbTweets})
+    # Getting the date of the last tweet
+    lastTweet = Tweet.objects.aggregate(Max('id'))
+    lastId = lastTweet["id__max"]
+    maj = Tweet.objects.get(id=lastId).created_at
+
+    return render(request,'home.html',{'sources': sources,
+                                       'num': num,
+                                       'politics': politics,
+                                       'nbTweets': nbTweets,
+                                       'maj' : maj})
 
 def generalOverview(request):
     """Redirect to the words page : analysis around words used by politics"""
@@ -244,7 +253,9 @@ def getData(request):
             continue # continue with the next user
 
         try: # We try to get the id of the user's last tweet
-            lastId = Tweet.objects.filter(user_id=idUser).aggregate(Max('id'))["id__max"]
+            lastTweet = Tweet.objects.filter(user_id=idUser).aggregate(Max('id'))
+            lastId = lastTweet["id__max"]
+            maj = Tweet.objects.get(id=lastId).created_at
         except SomeModel.DoesNotExist:
             lastId = 0 # No tweet in the data base
 
@@ -279,7 +290,8 @@ def getData(request):
     print("\nEVERYTHING DONE !")
     return render(request,'getData.html',{"success" : success,
                                           "nbTweets" : nbTweets,
-                                          "screen_nameToExtract": screen_nameToExtract})
+                                          "screen_nameToExtract": screen_nameToExtract,
+                                          "maj" : maj})
 
 
 #==============================#
