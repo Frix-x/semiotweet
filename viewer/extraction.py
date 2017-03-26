@@ -17,7 +17,7 @@ import time
 import pytz
 from datetime import datetime
 
-from .semanticFields import toJsonForGraph
+from .semanticAnalysis import toJsonForGraph
 
 #==============================#
 #========== REQUESTS ==========#
@@ -291,14 +291,6 @@ screen_nameToExtract = ["EmmanuelMacron",
                         "JCheminade",
                         "jeanlassalle",
                         ]
-
-screen_nameToID = {'benoithamon': 14389177,
-                  'JLMelenchon': 80820758,
-                  'MLP_officiel': 217749896,
-                  'PhilippePoutou': 374392774,
-                  'FrancoisFillon': 551669623,
-                  'MarCharlott': 1567664221,
-                  'EmmanuelMacron': 1976143068,}
 
 #==============================#
 #=========== TESTS ============#
