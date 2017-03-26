@@ -57,6 +57,16 @@
               </div>
           </div>
         </div>
+        <div class="row">
+          <div class="col s12 m12">
+              <div class="icon-block">
+                <h5 class="center">Bubble chart of common topics</h5>
+                <div class="bubbletree-wrapper">
+		               <div class="bubbletree"></div>
+	              </div>
+              </div>
+          </div>
+        </div>
     </div>
     <br><br>
 </div>
@@ -69,141 +79,34 @@
 
 
 <script>
-var sources = {{sources|safe}};
-var num = {{num|safe}};
-if (sources.length == 0)
-  $( "#Graphs").html("<div class='row center'><h3>No data yet. Click <a href='/getData/'>here</a> to update data</h3></div>");
-else{
-  var ctx = document.getElementById("doughnutSources");
-  var colors = ["#FF6384","#36A2EB","#FFCE56","#FFBA49","#20A39E",
-                "#EF5B5B","#23001E","#A4A9AD","#8CDFD6","#5A716A"];
-  var data = {
-    labels: sources,
-    datasets: [
-        {
-            data: num,
-            backgroundColor: colors,
-            hoverBackgroundColor: colors
-        }]
-  };
-  var options = {
-      animation:{
-          animateScale:true
-      },
-      title: {
-          display: false,
-          text: 'Tweet Sources'
-      }
-  };
-  var myDoughnutChart = new Chart(ctx, {
-      type: 'doughnut',
-      data: data,
-      options: options
-  });
-
-  var words = {{words|safe}};
-  words.sort(function(a, b) {
-      return b.occur - a.occur
-  });
-  var word = [];
-  var occur = [];
-  var colorsForBars = {{colorsForBars|safe}}
-
-  for (i = 0; i < words.length; i++) {
-      word.push(words[i].word);
-      occur.push(words[i].occur);
-  }
-  var ctxBar = "barCommonWords";
-  var dataBar = {
-    labels: word,
-    datasets: [
-        {
-            label: "Word occurences",
-            backgroundColor: colorsForBars,
-            borderColor: colorsForBars,
-            borderWidth: 1,
-            data: occur,
-        }
-    ]
-  };
-  var myBarChart = new Chart(ctxBar, {
-    type: 'bar',
-    data: dataBar,
-    options: options
-  });
-
-  var lemmes = {{lemmes|safe}};
-  lemmes.sort(function(a, b) {
-      return b.occur - a.occur
-  });
-  var lemme = [];
-  var lemmeOccur = [];
-  var colorsForBars = {{colorsForBars|safe}}
-
-  for (i = 0; i < words.length; i++) {
-      lemme.push(lemmes[i].word);
-      lemmeOccur.push(lemmes[i].occur);
-  }
-  var ctxBar2 = "barLemmatizedWords";
-  var dataBar2 = {
-    labels: lemme,
-    datasets: [
-        {
-            label: "Lemmes occurences",
-            backgroundColor: colorsForBars,
-            borderColor: colorsForBars,
-            borderWidth: 1,
-            data: lemmeOccur,
-        }
-    ]
-  };
-  var myBarChart2 = new Chart(ctxBar2, {
-    type: 'bar',
-    data: dataBar2,
-    options: options
-  });
+createDonut("doughnutSources", {{sources|safe}}, {{num|safe}});
+createBarChart("barCommonWords",{{words|safe}},"Word occurences");
+createBarChart("barLemmatizedWords",{{lemmes|safe}},"Word occurences");
+createBarChartHours("HoursDistribution",{{hours|safe}},"Number of tweets");
 
 var politics = {{politics|safe}};
 var nbTweets = {{nbTweets|safe}};
 var content= '';
-
 for(var i=0 ; i < politics.length ; i++)
   content += '<tr><td>'+ politics[i] + ':</td><td>' + nbTweets[i] + '</td></tr>';
 $( "#NbTweetsByPolitics").html("<table>"+content + "</table>");
-}
 
-var hours = {{hours|safe}};
-if (hours.length != 0){
-      var colorsForBars = ['#060709', '#0e1420', '#13182c', '#162640', '#22345c', '#2c4e8d', '#4673b6', '#68a1d8', '#98cfee', '#b7e2f5', '#a9d5f2', '#9fcaed',
-                            '93bde3', '#87aed9', '#789ccc', '#7399c6', '#7080bb' , '#5d6ab0', '#364392', '#272e64', '#272e64', '#0f1221', '#0f1221', '#0f1221' ];
 
-      var ctx3 = document.getElementById("HoursDistribution");
-
-      var data3 = {
-          labels: [0, 1, 2, 3, 4, 5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23],
-          datasets: [{
-              label: "Number of tweets",
-              data: hours,
-              backgroundColor: colorsForBars,
-              borderColor: colorsForBars
-          }]
-      };
-      var options3 = {
-          animation: {
-              animateScale: true
-          },
-          title: {
-              display: false,
-              text: 'Post count per hour'
-          },
-
-      };
-      var myBarChart3 = new Chart(ctx3, {
-          type: 'bar',
-          data: data3,
-          options: options3
-      });
-}
+var databubbles = {{bubblesJson|safe}};
+// var databubbles = {
+// 				label: 'Topics',
+// 				amount: 50,
+// 				color: '#0066bb',  // color for root node, will be inherited by children
+// 				children: [
+// 					{ label: 'First child', amount: 15 },
+// 					{ label: 'Second child', amount: 20 },
+// 					{ label: 'Third child', amount: 15, color: '#ff3300' }
+// 				]
+// 			};
+new BubbleTree({
+		data: databubbles,
+		container: '.bubbletree'
+});
 
 </script>
 {% endblock %}
