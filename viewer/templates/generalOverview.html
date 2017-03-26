@@ -16,7 +16,7 @@
 <div class="container">
     <div class="section" id="Graphs">
           <div class="row">
-            <div class="col s12 m3">
+            <div class="col s12 m4">
                 <div class="icon-block">
                   <div class="card vertical">
                     <div class="card-stacked">
@@ -28,7 +28,7 @@
                   </div>
                 </div>
             </div>
-            <div class="col s12 m9">
+            <div class="col s12 m8">
                 <div class="icon-block">
                   <div class="icon-block">
                     <h5 class="center">Overview</h5>
@@ -37,6 +37,8 @@
                       Les données sont mises à jour toutes les 3 heures. Dernière mise à jour:  <b>{{maj}}</b>.
                     </p>
                   </div>
+                    <h5 class="center">Distribution des tweets selon les heures</h5>
+                    <canvas id="HoursDistribution"></canvas>
                 </div>
             </div>
         </div>
@@ -82,6 +84,7 @@
 <script src="{% static "js/utils.js" %}"></script>
 <script>
 $(document).ready(function () {
+  createBarChartHours("HoursDistribution",{{hours|safe}},"Number of tweets");
   createBarChart("barCommonWords",{{words|safe}},"Word occurences");
   createBarChart("barLemmatizedWords",{{lemmes|safe}},"Word occurences");
 
@@ -94,16 +97,6 @@ $(document).ready(function () {
 
 
   var databubbles = {{bubblesJson|safe}};
-  // var databubbles = {
-  // 				label: 'Topics',
-  // 				amount: 50,
-  // 				color: '#0066bb',  // color for root node, will be inherited by children
-  // 				children: [
-  // 					{ label: 'First child', amount: 15 },
-  // 					{ label: 'Second child', amount: 20 },
-  // 					{ label: 'Third child', amount: 15, color: '#ff3300' }
-  // 				]
-  // 			};
   new BubbleTree({
   		data: databubbles,
   		container: '.bubbletree'

@@ -18,6 +18,23 @@
 <div class="container">
     <div class="section" id="Graphs">
           <div class="row">
+            <div class="col s12 m6">
+                <div class="icon-block">
+                  <div class="icon-block">
+                    <h5 class="center">Overview</h5>
+                    <p>
+                      DESCRIPTION OKLM.<br>
+                      Datas are automaticaly updated every 3h. Last datas from <b>xxxxxxxxxxxxxxxxxxxx</b>.
+                    </p>
+                  </div>
+                </div>
+            </div>
+            <div class="col s12 m3">
+                <div class="icon-block">
+                    <h5 class="center">Sources des tweets</h5>
+                    <canvas id="doughnutSources"></canvas>
+                </div>
+            </div>
             <div class="col s12 m3">
                 <div class="icon-block">
                   <div class="card vertical">
@@ -28,18 +45,6 @@
                       </div>
                     </div>
                   </div>
-                </div>
-            </div>
-            <div class="col s12 m3">
-                <div class="icon-block">
-                    <h5 class="center">Sources des tweets</h5>
-                    <canvas id="doughnutSources"></canvas>
-                </div>
-            </div>
-            <div class="col s12 m6">
-                <div class="icon-block">
-                    <h5 class="center">Distribution des tweets selon les heures</h5>
-                    <canvas id="HoursDistribution"></canvas>
                 </div>
             </div>
         </div>
@@ -57,7 +62,6 @@
 <script>
 $(document).ready(function () {
   createDonut("doughnutSources", {{sources|safe}}, {{num|safe}});
-  createBarChartHours("HoursDistribution",{{hours|safe}},"Number of tweets");
 
   var politics = {{politics|safe}};
   var nbTweets = {{nbTweets|safe}};
