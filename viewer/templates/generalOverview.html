@@ -15,17 +15,17 @@
 
 <div class="container">
     <div class="section" id="Graphs">
-          <div class="row">
+        <div class="row">
             <div class="col s12 m4">
                 <div class="icon-block">
-                  <div class="card vertical">
-                    <div class="card-stacked">
-                      <div class="card-content" id="NbTweetsByPolitics"></div>
-                      <div class="card-action">
-                        <a>Nombre de tweets de chaque candidat</a>
-                      </div>
+                    <div class="card vertical">
+                        <div class="card-stacked">
+                            <div class="card-content" id="NbTweetsByPolitics"></div>
+                            <div class="card-action">
+                                <a>Nombre de tweets de chaque candidat</a>
+                            </div>
+                        </div>
                     </div>
-                  </div>
                 </div>
             </div>
             <div class="col s12 m8">
@@ -37,34 +37,52 @@
         </div>
         <br><br>
         <div class="row">
-          <div class="col s12 m6">
-              <div class="icon-block">
-                <h5 class="center">Mots les plus employés par les candidats</h5>
-                <canvas id="barCommonWords"></canvas>
-              </div>
-          </div>
-          <div class="col s12 m6">
-              <div class="icon-block">
-                <h5 class="center">Lemmes les plus employés par les candidats</h5>
-                <canvas id="barLemmatizedWords"></canvas>
-              </div>
-          </div>
+            <div class="col s12 m6">
+                <div class="icon-block">
+                    <h5 class="center">Mots les plus employés par les candidats</h5>
+                    <canvas id="barCommonWords"></canvas>
+                </div>
+            </div>
+            <div class="col s12 m6">
+                <div class="icon-block">
+                    <h5 class="center">Lemmes les plus employés par les candidats</h5>
+                    <canvas id="barLemmatizedWords"></canvas>
+                </div>
+            </div>
         </div>
         <br><br>
         <div class="row">
-          <div class="col s12 m7">
-              <div class="icon-block">
-                <h5 class="center">Bubble chart des sujets populaires</h5>
-                <div class="bubbletree-wrapper">
-		               <div class="bubbletree"></div>
-	              </div>
-              </div>
-          </div>
-          <div class="col s12 m5">
-              <div class="icon-block">
-                <h5 class="center">Heatmap des sujets</h5>
-              </div>
-          </div>
+            <div class="col s12 m12">
+                <div class="icon-block">
+                    <h5 class="center">Sujets abordés par les politiques et mots clés correspondants</h5>
+                    <table class="responsive-table centered" id="LDAtopics">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Item Name</th>
+                                <th>Item Price</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Alvin</td>
+                                <td>Eclair</td>
+                                <td>$0.87</td>
+                            </tr>
+                            <tr>
+                                <td>Alan</td>
+                                <td>Jellybean</td>
+                                <td>$3.76</td>
+                            </tr>
+                            <tr>
+                                <td>Jonathan</td>
+                                <td>Lollipop</td>
+                                <td>$7.00</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
     </div>
     <br><br>
@@ -72,9 +90,6 @@
 {% endblock %}
 
 {% block script %}
-<script src="{% static "js/raphael.js" %}"></script>
-<script src="{% static "js/tween.js" %}"></script>
-<script src="{% static "js/bubbletree.js" %}"></script>
 <script src="{% static "js/Chart.js" %}"></script>
 <script src="{% static "js/utils.js" %}"></script>
 <script>
@@ -87,15 +102,43 @@ $(document).ready(function () {
   var nbTweets = {{nbTweets|safe}};
   var content= '';
   for(var i=0 ; i < politics.length ; i++)
-    content += '<tr><td>'+ politics[i] + ':</td><td>' + nbTweets[i] + '</td></tr>';
-  $( "#NbTweetsByPolitics").html("<table>"+content + "</table>");
+    content += '<tr><td>' + politics[i] + ' :</td><td>' + nbTweets[i] + '</td></tr>';
+  $( "#NbTweetsByPolitics").html("<table>" + content + "</table>");
 
-
-  var databubbles = {{bubblesJson|safe}};
-  new BubbleTree({
-  		data: databubbles,
-  		container: '.bubbletree'
+  var topics = {{bubblesJson|safe}};
+  var tableHead = "";
+  var tableBody = "";
+  (topics.children).forEach(function(topic, index) {
+    tableHead = tableHead + "<th>Sujet " + (index+1) + "</th>";
+    tableBody = tableBody + "<tr>";
+    (topic.children).forEach(function(word) {
+      tableBody = tableBody + "<td>" + word.label + "</td>";
+    });
+    tableBody = tableBody + "</tr>";
   });
+  var tableTopics = $("#LDAtopics");
+  tableTopics.html("<thead><tr>" + tableHead + "</tr></thead><tbody>" + tableBody + "</tbody>");
+
+  var t = $('#LDAtopics tbody').eq(0);
+    var r = t.find('tr');
+    var cols= r.length;
+    var rows= r.eq(0).find('td').length;
+    var cell, next, tem, i = 0;
+    var tb= $('<tbody></tbody>');
+
+    while(i<rows){
+        cell= 0;
+        tem= $('<tr></tr>');
+        while(cell<cols){
+            next= r.eq(cell++).find('td').eq(0);
+            tem.append(next);
+        }
+        tb.append(tem);
+        ++i;
+    }
+    tableTopics.append(tb);
+    tableTopics.show();
+
 });
 </script>
 {% endblock %}
