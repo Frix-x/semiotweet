@@ -10,19 +10,19 @@ It shows what are the most commons words in those tweets, and what are the diffe
 ## How it works
 Stack is subjects to know changes.
 
-### Back-end :
- - Django,
- - SQLite,
- - Twitter API,
- - TreeTagger
-
-### Front-end  :
- - chart.js
+### Stack :
+ - Django as framework,
+ - PostGreSQL for the database,
+ - Twitter API as data provider,
+ - TreeTagger for tweets' analysis,
+ - chart.js for visualization
 
 ## Architecture, data structures & models
 
 There's just one app called `viewer` yet. `urls.py` directly redirects to this app.
-`extraction.py` contains functions that are used in the views.
+`extraction.py` and `semanticAnalysis.py` contains functions that are used in the views.
+
+The one from `extraction.py` catch the tweets, those in `semanticAnalysis.py` process the analysis.
 
 ## UML TO BE UPDATED !
 
@@ -125,9 +125,9 @@ Once the server is running, you can extact the data concerning the users and the
 
 | Things done                                                         | Things to do                  |
 | -------------                                                       | -------------                 |
-| Connection to Twitter API (100%)                                    | Semantic fields (30%)         |
-| Basic architecture (100%)                                           | JS libraries (70 %)           |
-| Defining models (100%)                                              | Deployement on Heroku (80%)   |
+| Connection to Twitter API (100%)                                    |  Semantic fields (80%)        |
+| Basic architecture (100%)                                           | JS libraries (90 %)           |
+| Defining models (100%)                                              |                               |
 | Defining Env' Variables (100%)                                      | README.md (60%)               |
 | Extracting user info (100%)                                         ||
 | Extracting old tweets (100%)                                        ||
@@ -135,6 +135,7 @@ Once the server is running, you can extact the data concerning the users and the
 | Modular code for extraction (100%)                                  ||
 | Getting all the users at once (100%)                                ||
 | Extract new tweet (100%)                                            || |
+| Deployement on Heroku (100%)                                        || |
 
 
 ## Usefull Ressources
@@ -148,4 +149,4 @@ Once the server is running, you can extact the data concerning the users and the
 
 ## License
   This project is under [GNU General Public License (Version 3, 29 June 2007)](https://github.com/jjerphan/semiotweet/blob/master/LICENSE).
-  Feel free to contact us and to fork, to patch or this project.
+  Feel free to contact us and to fork or to patch this project.
