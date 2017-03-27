@@ -1,27 +1,49 @@
 language: python
+
+cache:
+- pip
+
 python:
 - 3.5
+
 services: postgresql
+
+before_install:
+- virtualenv venv
+
 install:
+- pip install --upgrade pip
 - pip install -r requirements.txt
+
 before_script:
 - psql -c "CREATE DATABASE travisci;" -U postgres
+
 script:
 - python manage.py collectstatic --noinput
 - python manage.py makemigrations viewer
 - python manage.py migrate
 - coverage run manage.py test
+
 after_success:
 - codeclimate-test-reporter
+
 notifications:
   email: false
 #addons:
 #  code_climate:
 #    repo_token: "$CODE_CLIMATE_REPO_TOKEN"
+
 deploy:
-  provider: heroku
-  app: semiotweet
-  api_key:
-    secure: "$DEPLOY_KEY"
+  provider: cloudfoundry
+  api: https://api.eu-gb.bluemix.net
+  username: jonathan.dekhtiar@utc.fr
+  password:
+    secure: YxCxUPk0EqQ6I3woZm5Uc9gSFYtyYPV39/K5ZgLK8egWT+HMzHEDBBN6WF5i29JO7LuqkKaXx9LvcV6FVjadE7KR44aZPE1TfEhQH12Nf38LbCs5+hBwE+YQWETBloP5BIo2vB/c5j7QDgCoLPPxN+3ykLyPR+rLdFOOs/3emZXU9MZTmHYseUDE4Eu7x3p+zKPNCyjNJYoAFQnhxR8D+Vd9ZOa7oGmHwMeUkJI2ZmOWhx/jiwj6LQG+4ps2xqTJX87V2OLDA9oXazbGARs+6xyCTuIU+L4AQqUdKWcqXRZMUjheX1axKPez2B0YtuNPl67lxf8kG9bHyyWb+2Dbh7975I7mVseQQjKNHpnn1bQztWpJW8LtBpO4hXhyu7Nn954i8beqxwHYZPme4zuJsfkIlhv6zdz/O+ZG0LZ2jHbSe4WQcPTVnOoHItzrzmW8ltBSbD6Be1HzBnYXpFRTlqqE5gZUAiwxNXRhoFkXxwiYpZwxHINACfbkk2ifV1Ev9onmlxSUEoNyKHrqGQ9VjyYYgbf+hrkfiFTmZ5GCYj/AHFGCb3HsxDnN/xP5fBwJObbz/hrtfom6AHROFJgCb34nQcbPWI+kvaIDhLoWM6vNd80T9nXBIFXxGxYyD5AyMbiqY/2fLk8HP/UUlLShw0SbmW/eo1J2All5b4XwsOg=
+  organization: Semiotweet
+  space: prod
+  manifest: manifest.yml       # (optional)  Defaults to manifest.yml.
+  region: eu-gb                # (optional)  [ng, eu-gb , au-syd] Defaults to US South region (ng).
   on:
-    all_branches: true
+    branch: master
+    python: '3.6'
+    repo: DEKHTIARJonathan/test-bluemix
