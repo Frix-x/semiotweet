@@ -81,7 +81,11 @@ def home(request):
     # Getting the date of the last tweet
     lastTweet = Tweet.objects.aggregate(Max('id'))
     lastId = lastTweet["id__max"]
-    maj = Tweet.objects.get(id=lastId).created_at
+    try:
+        maj = Tweet.objects.get(id=lastId).created_at
+    except BaseException as e:
+        print(e)
+        pass
 
     return render(request,'home.html',{'sources': sources,
                                        'num': num,
@@ -255,7 +259,7 @@ def getData(request):
         try: # We try to get the id of the user's last tweet
             lastTweet = Tweet.objects.filter(user_id=idUser).aggregate(Max('id'))
             lastId = lastTweet["id__max"]
-            maj = Tweet.objects.get(id=lastId).created_at
+            # maj = Tweet.objects.get(id=lastId).created_at
         except SomeModel.DoesNotExist:
             lastId = 0 # No tweet in the data base
 
