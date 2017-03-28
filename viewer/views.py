@@ -219,8 +219,7 @@ def comparison(request):
                                                         "lemmesList": lemmesList,
                                                         "sourcesList": sourcesList,
                                                         "numList": numList,
-                                                        "hoursList": hoursList,
-                                                        "indices" : [0,1]})
+                                                        "hoursList": hoursList})
         else:
             return render(request,'comparison.html', {'users':users})
 
