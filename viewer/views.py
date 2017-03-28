@@ -236,7 +236,7 @@ def displayInfo(request,screen_name):
     success = True
     if not(userInfo): # If the user doesn't exist
         success = False
-        return render(request,'displayInfo.html',locals())
+        return render(request,'displayInfo.html',{"success" : success})
 
     userInfo["profile_image_url_https"] = userInfo["profile_image_url_https"].replace('_normal.jpg','.jpg')
 
@@ -260,7 +260,7 @@ def displayInfo(request,screen_name):
         cursor.execute("SELECT DISTINCT source, COUNT(source) AS nb FROM viewer_tweet WHERE user_id_id ='"+ str(idUser)+"' GROUP BY source ORDER BY nb DESC")
     except BaseException as error:
         print("displayInfo() ; error : ", error)
-        return render(request,'home.html',locals())
+        return render(request,'home.html',{"success": success})
     res = cursor.fetchall()
     sources = []
     num = []
@@ -284,13 +284,20 @@ def displayInfo(request,screen_name):
         cursor.execute("SELECT DISTINCT created_at AS timePosted FROM viewer_tweet WHERE user_id_id ='"+ str(idUser)+"' ORDER BY timePosted")
     except BaseException as error:
         print("displayInfo() ; error : ", error)
-        return render(request,'home.html',locals())
+        return render(request,'home.html',{"success":success})
     res = cursor.fetchall()
     hours =[0]*24
     for (time,) in res:
         hours[time.time().hour]+=1
 
-    return render(request,'displayInfo.html',locals())
+    return render(request,'displayInfo.html',{"userInfo" : userInfo,
+                                              "words" : words,
+                                              "lemmes" : lemmes,
+                                              "hours" : hours,
+                                              "sources" : sources,
+                                              "screen_name" : screen_name,
+                                              "num" : num,
+                                              "success" : success})
 
 
 
