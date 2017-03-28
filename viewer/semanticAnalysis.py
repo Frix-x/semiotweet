@@ -217,7 +217,10 @@ frenchStopwords = frenchStopwords.union(set(commonWordsTwitter))
 # Regex to delete user's mention in tweets
 mentionRegex = re.compile(r"@\w+")
 
+requestToGetSources = 'SELECT DISTINCT source, COUNT(source) AS nb  FROM viewer_tweet GROUP BY source ORDER BY nb DESC'
+
 if __name__ == '__main__':
+    # print(getSemanticField("médicament"))
     # listTweetText = ["J'aime les barbes à papa #swag","Mon cheval mange des carottes-cakes en Hiver ! #Yolo #QuelleIdée !","Quelle idée d'avoir des doigts :'("]
     # res = countWords(listTweetText)
     # for i in res.keys():
