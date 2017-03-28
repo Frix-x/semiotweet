@@ -55,7 +55,7 @@
             <div class="col s12 m12">
                 <div class="icon-block">
                     <h5 class="center">Sujets abordés par les politiques et mots clés correspondants</h5>
-                    <table class="responsive-table centered" id="LDAtopics">
+                    <table class="centered bordered" id="LDAtopics">
                       <!-- To be filled with topics from LDA -->
                     </table>
                 </div>
@@ -90,7 +90,7 @@ $(document).ready(function () {
     tableHead = tableHead + '<th>Sujet ' + (index+1) + '</th>';
     tableBody = tableBody + '<tr>';
     (topic.children).forEach(function(word) {
-      tableBody = tableBody + '<td style="font-size:' + (word.amount*10) + '%;">' + word.label + '</td>';
+      tableBody = tableBody + '<td style="font-size:' + (word.amount*8) + '%;">' + word.label + '</td>';
     });
     tableBody = tableBody + '</tr>';
   });
