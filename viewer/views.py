@@ -371,8 +371,7 @@ def getData(request):
     print("\nEVERYTHING DONE !")
     return render(request,'getData.html',{"success" : success,
                                           "nbTweets" : nbTweets,
-                                          "screen_nameToExtract": screen_nameToExtract,
-                                          "maj" : maj})
+                                          "screen_nameToExtract": screen_nameToExtract})
 
 
 #==============================#
