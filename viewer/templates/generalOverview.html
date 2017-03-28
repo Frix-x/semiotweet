@@ -56,30 +56,7 @@
                 <div class="icon-block">
                     <h5 class="center">Sujets abordés par les politiques et mots clés correspondants</h5>
                     <table class="responsive-table centered" id="LDAtopics">
-                        <thead>
-                            <tr>
-                                <th>Name</th>
-                                <th>Item Name</th>
-                                <th>Item Price</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>Alvin</td>
-                                <td>Eclair</td>
-                                <td>$0.87</td>
-                            </tr>
-                            <tr>
-                                <td>Alan</td>
-                                <td>Jellybean</td>
-                                <td>$3.76</td>
-                            </tr>
-                            <tr>
-                                <td>Jonathan</td>
-                                <td>Lollipop</td>
-                                <td>$7.00</td>
-                            </tr>
-                        </tbody>
+                      <!-- To be filled with topics from LDA -->
                     </table>
                 </div>
             </div>
@@ -106,18 +83,19 @@ $(document).ready(function () {
   $( "#NbTweetsByPolitics").html("<table>" + content + "</table>");
 
   var topics = {{bubblesJson|safe}};
-  var tableHead = "";
-  var tableBody = "";
+  var tableHead = '';
+  var tableBody = '';
   (topics.children).forEach(function(topic, index) {
-    tableHead = tableHead + "<th>Sujet " + (index+1) + "</th>";
-    tableBody = tableBody + "<tr>";
+    console.log(topic);
+    tableHead = tableHead + '<th>Sujet ' + (index+1) + '</th>';
+    tableBody = tableBody + '<tr>';
     (topic.children).forEach(function(word) {
-      tableBody = tableBody + "<td>" + word.label + "</td>";
+      tableBody = tableBody + '<td style="font-size:' + (word.amount*10) + '%;">' + word.label + '</td>';
     });
-    tableBody = tableBody + "</tr>";
+    tableBody = tableBody + '</tr>';
   });
-  var tableTopics = $("#LDAtopics");
-  tableTopics.html("<thead><tr>" + tableHead + "</tr></thead><tbody>" + tableBody + "</tbody>");
+  var tableTopics = $('#LDAtopics');
+  tableTopics.html('<thead><tr>' + tableHead + '</tr></thead><tbody>' + tableBody + '</tbody>');
 
   var t = $('#LDAtopics tbody').eq(0);
     var r = t.find('tr');
