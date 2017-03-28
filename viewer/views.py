@@ -168,7 +168,7 @@ def comparison(request):
         candidats.append(request.GET['candidat1'])
         candidats.append(request.GET['candidat2'])
 
-        if candidats[0] in screen_nameToExtract and candidats[1] in screen_nameToExtract:
+        if candidats[0] in screen_nameToExtract and candidats[1] in screen_nameToExtract and candidats[0] != candidats[1]:
             for candidat in candidats:
                 idUser = users[candidat]["id"]
                 allTokenArray = Tweet.objects.filter(user_id=idUser).values('tokenArray')
@@ -212,7 +212,14 @@ def comparison(request):
                 for (time,) in res:
                     hours[time.time().hour]+=1
                 hoursList.append(hours)
-            return render(request,'comparison.html', {'users':users, "candidats":candidats, "wordsList": wordsList,"lemmesList": lemmesList,"sourcesList": sourcesList,"numList": numList,"hoursList": hoursList})
+            return render(request,'comparison.html', {  "users":users,
+                                                        "candidats":candidats,
+                                                        "wordsList": wordsList,
+                                                        "lemmesList": lemmesList,
+                                                        "sourcesList": sourcesList,
+                                                        "numList": numList,
+                                                        "hoursList": hoursList,
+                                                        "indices" : [0,1]})
         else:
             return render(request,'comparison.html', {'users':users})
 

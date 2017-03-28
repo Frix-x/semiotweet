@@ -86,13 +86,15 @@
       $('select').material_select();
 
       {% if candidats %}
-        {% for candidat in candidats %}
-          console.log({{forloop.counter0}})
-          createBarChart("MostCommonWords{{candidat}}",{{wordsList.0|safe}}, "Mots les plus communs");
-          createDonut("doughnutSources{{candidat}}", {{sourcesList.0|safe}}, {{numList.0|safe}});
-          createBarChart("MostCommonLemmes{{candidat}}",{{lemmesList.0|safe}},"Lemmes occurences");
-          createBarChartHours("HoursDistribution{{candidat}}",{{hoursList.0|safe}},"Nombre de tweets postés");
-        {% endfor %}
+          createBarChart("MostCommonWords{{candidats.0}}",{{wordsList.0|safe}}, "Mots les plus communs");
+          createDonut("doughnutSources{{candidats.0}}", {{sourcesList.0|safe}}, {{numList.0|safe}});
+          createBarChart("MostCommonLemmes{{candidats.0}}",{{lemmesList.0|safe}},"Lemmes occurences");
+          createBarChartHours("HoursDistribution{{candidats.0}}",{{hoursList.0|safe}},"Nombre de tweets postés");
+
+          createBarChart("MostCommonWords{{candidats.1}}",{{wordsList.1|safe}}, "Mots les plus communs");
+          createDonut("doughnutSources{{candidats.1}}", {{sourcesList.1|safe}}, {{numList.1|safe}});
+          createBarChart("MostCommonLemmes{{candidats.1}}",{{lemmesList.1|safe}},"Lemmes occurences");
+          createBarChartHours("HoursDistribution{{candidats.1}}",{{hoursList.1|safe}},"Nombre de tweets postés");
       {% endif %}
   });
 </script>
