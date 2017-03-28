@@ -18,7 +18,11 @@
 <div class="container">
     <div class="section" id="Graphs">
           <div class="row">
+            {% if maj %}
             <div class="col s12 m6">
+            {% else %}
+            <div class="col s12 m12">
+            {% endif %}
                 <div class="icon-block">
                   <div class="icon-block">
                     <h5 class="center">Aperçu</h5>
@@ -30,11 +34,12 @@
                       <br>
                       Ceci est une première version qui est amenée à être améliorée et étoffée au fur et à mesure avec d'autres indicateurs.
                       <br>N'hésitez pas à y jeter un coup d'oeil et à partager vos retours !<br><br>
-                      Dernière mise à jour le : <b>{{maj}}</b>.
+                      {% if maj %}Dernière mise à jour le : <b>{{maj}}</b>.{% endif %}
                     </p>
                   </div>
                 </div>
             </div>
+            {% if maj %}
             <div class="col s12 m3">
                 <div class="icon-block">
                     <h5 class="center">Sources des tweets</h5>
@@ -53,6 +58,7 @@
                   </div>
                 </div>
             </div>
+            {% endif %}
         </div>
     </div>
     <br><br>

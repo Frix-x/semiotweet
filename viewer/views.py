@@ -84,6 +84,7 @@ def home(request):
     try:
         maj = Tweet.objects.get(id=lastId).created_at
     except BaseException as e:
+        maj = False
         print(e)
         pass
 
