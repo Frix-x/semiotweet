@@ -5,13 +5,8 @@ from __future__ import unicode_literals
 
 import os
 import sys
-import dotenv
 
 if __name__ == "__main__":
-    # platforms = ["TRAVIS", "HEROKU"]
-    #
-    # if not any(x in os.environ for x in platforms):
-    #     dotenv.read_dotenv()
 
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "semiotweet.settings")
     try:
