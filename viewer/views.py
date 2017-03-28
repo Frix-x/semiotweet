@@ -41,13 +41,16 @@ def home(request):
     """Redirect to the home page : global statistics"""
     global requestToGetSources
 
+    # Error message if no data
+    noData = "Fonctionnalité indisponible pour le moment."
+
     # Getting tweets' sources
     cursor = connection.cursor()
     try:
         cursor.execute(requestToGetSources)
-    except BaseException as error:
+    except BaseException as error: # No data in DB
         print("view home ; error : ", error)
-        return render(request,'home.html',{'error':'No data yet ; click on "Get the data"'})
+        return render(request,'home.html',{"error": noData})
     res = cursor.fetchall()
 
     sources = []
@@ -72,7 +75,7 @@ def home(request):
         cursor.execute("SELECT u.name, COUNT(t.id) AS nbTweets FROM viewer_tweet t, viewer_user u WHERE u.id = t.user_id_id GROUP BY u.name ORDER BY nbTweets DESC")
     except BaseException: # No data in DB
         print("view home ; error : ",error)
-        return render(request,'home.html',{"error":"Fonctionnalité indisponible pour le moment."})
+        return render(request,'home.html',{"error": noData})
     res = cursor.fetchall()
     politics = []
     nbTweets = []
