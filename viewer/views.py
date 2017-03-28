@@ -95,8 +95,6 @@ def home(request):
 
 def generalOverview(request):
     """Redirect to the words page : analysis around words used by politics"""
-    global requestToGetSources
-
     # Getting tweets' sources
     cursor = connection.cursor()
     # Getting the number of tweets for each user
@@ -152,6 +150,16 @@ def generalOverview(request):
     bubblesJson = json.dumps(bubblesJson,default=str)
 
     return render(request,'generalOverview.html',{'politics': politics, 'nbTweets': nbTweets, 'words': words, 'lemmes': lemmes, 'hours': hours, 'bubblesJson': bubblesJson})
+
+def comparison(request,candidat1="",candidat2=""):
+    """Redirect to the comparison page : compare two politics"""
+    global screen_nameToExtract
+    print("candidat1=" + candidat1)
+    users = {}
+    for screen_name in screen_nameToExtract:
+        users[screen_name] = returnUser(screen_name, toClean=False)
+
+    return render(request,'comparison.html', {'users':users})
 
 def displayInfo(request,screen_name):
     """Display all the tweets for a user
