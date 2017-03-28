@@ -1,23 +1,26 @@
 #coding:utf8
+# For Py2 retrocompatibility
 from __future__ import print_function, division
+from builtins import str
 from future import standard_library
 standard_library.install_aliases()
-from builtins import str
-import oauth2
-from io import BytesIO
-import json
-import os, sys
 
-
-from django.utils import timezone
-from .models import Tweet,User
+# For time and date processing
 import random
-import string
 import time
 import pytz
 from datetime import datetime
+from django.utils import timezone
 
+# For data processing
+from .models import Tweet,User
 from .semanticAnalysis import toJsonForGraph
+import json
+import string
+from io import BytesIO
+import os, sys
+import oauth2
+
 
 #==============================#
 #========== REQUESTS ==========#

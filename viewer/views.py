@@ -1,25 +1,30 @@
 #-*- coding: utf-8 -*-
-from __future__ import print_function
-from __future__ import absolute_import
+from __future__ import print_function, absolute_import # For Py2 retrocompatibility
 from builtins import str
-from django.utils import timezone
 from django.http import HttpResponse,Http404
 from django.shortcuts import render,redirect
+
+# Forthe database
 from .models import Tweet,User,LdaModel
+from django.db import connection #for direct SQL requests
+from django.db.models import Max
+
+# For time and date processing
 import random
-import string
+from django.utils import timezone
 import time
 import pytz
 from datetime import datetime
-from django.db.models import Max
-from django.db import connection #for direct SQL requests
 
+
+# Data Processing
+from .extraction import *
+from .semanticAnalysis import *
+import string
 import json
 import ast # convert string to list
 import math
 
-from .extraction import *
-from .semanticAnalysis import *
 
 #==============================#
 #=========== OTHERS ===========#
