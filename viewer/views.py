@@ -70,9 +70,9 @@ def home(request):
     # Getting the number of tweets for each user
     try:
         cursor.execute("SELECT u.name, COUNT(t.id) AS nbTweets FROM viewer_tweet t, viewer_user u WHERE u.id = t.user_id_id GROUP BY u.name ORDER BY nbTweets DESC")
-    except BaseException:
+    except BaseException: # No data in DB
         print("view home ; error : ",error)
-        return render(request,'home.html',{"error":"No data yet ; click on 'Get the data'"})
+        return render(request,'home.html',{"error":"Fonctionnalité indisponible pour le moment."})
     res = cursor.fetchall()
     politics = []
     nbTweets = []
