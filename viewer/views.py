@@ -95,8 +95,6 @@ def home(request):
 
 def generalOverview(request):
     """Redirect to the words page : analysis around words used by politics"""
-    global requestToGetSources
-
     # Getting tweets' sources
     cursor = connection.cursor()
     # Getting the number of tweets for each user
@@ -152,6 +150,77 @@ def generalOverview(request):
     bubblesJson = json.dumps(bubblesJson,default=str)
 
     return render(request,'generalOverview.html',{'politics': politics, 'nbTweets': nbTweets, 'words': words, 'lemmes': lemmes, 'hours': hours, 'bubblesJson': bubblesJson})
+
+def comparison(request):
+    """Redirect to the comparison form page : compare two politics"""
+    global screen_nameToExtract
+    users = {}
+    candidats = []
+    wordsList = []
+    lemmesList = []
+    sourcesList = []
+    numList = []
+    hoursList = []
+    for screen_name in screen_nameToExtract:
+        users[screen_name] = returnUser(screen_name, toClean=False)
+
+    if request.method == 'GET' and 'candidat1' in request.GET and 'candidat2' in request.GET:
+        candidats.append(request.GET['candidat1'])
+        candidats.append(request.GET['candidat2'])
+
+        if candidats[0] in screen_nameToExtract and candidats[1] in screen_nameToExtract:
+            for candidat in candidats:
+                idUser = users[candidat]["id"]
+                allTokenArray = Tweet.objects.filter(user_id=idUser).values('tokenArray')
+                allLemmaArray = Tweet.objects.filter(user_id=idUser).values('lemmaArray')
+                # tokenArray is stored as a string : we need to get the list back
+                words = [ast.literal_eval(t["tokenArray"]) for t in allTokenArray]
+                lemmes = [ast.literal_eval(t["lemmaArray"]) for t in allLemmaArray]
+                # words is a JSON list of dict like : {"word":"foo", "occur":42}
+                wordsList.append(json.dumps(toJsonForGraph(countWords(words))))
+                lemmesList.append(json.dumps(toJsonForGraph(countWords(lemmes))))
+                # Sources of Tweets
+                global requestToGetSources
+                cursor = connection.cursor()
+                try:
+                    cursor.execute("SELECT DISTINCT source, COUNT(source) AS nb FROM viewer_tweet WHERE user_id_id ='"+ str(idUser)+"' GROUP BY source ORDER BY nb DESC")
+                except BaseException as error:
+                    return render(request,'comparison.html', {'users':users})
+                res = cursor.fetchall()
+                sources = []
+                num = []
+                for (s,n) in res:
+                    sources.append(s)
+                    num.append(n)
+                # Keeping only the most commons stats
+                if len(sources)>5 :
+                    sources = sources[0:5]
+                    sources.append(u"Others")
+                    num[5] = sum(num[5:-1])
+                    num = num[0:6]
+                # JSON Formating
+                sourcesList.append(json.dumps(sources))
+                numList.append(json.dumps(num))
+
+                #Get hours distribution of user's tweets
+                try:
+                    cursor.execute("SELECT DISTINCT created_at AS timePosted FROM viewer_tweet WHERE user_id_id ='"+ str(idUser)+"' ORDER BY timePosted")
+                except BaseException as error:
+                    return render(request,'comparison.html', {'users':users})
+                res = cursor.fetchall()
+                hours =[0]*24
+                for (time,) in res:
+                    hours[time.time().hour]+=1
+                hoursList.append(hours)
+            return render(request,'comparison.html', {'users':users, "candidats":candidats, "wordsList": wordsList,"lemmesList": lemmesList,"sourcesList": sourcesList,"numList": numList,"hoursList": hoursList})
+        else:
+            return render(request,'comparison.html', {'users':users})
+
+
+    else:
+        return render(request,'comparison.html', {'users':users})
+    return render(request,'comparison.html', {'users':users})
+
 
 def displayInfo(request,screen_name):
     """Display all the tweets for a user

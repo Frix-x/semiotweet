@@ -279,17 +279,17 @@ tweetSources =["Twitter Web Client",
 usefullFieldsUser = ["id","name","screen_name","created_at",
                      "contributors_enabled","verified"]
 
-screen_nameToExtract = ["EmmanuelMacron",
-                        "MLP_officiel",
-                        "FrancoisFillon",
-                        "benoithamon",
-                        "JLMelenchon",
-                        "PhilippePoutou",
-                        "dupontaignan",
-                        "n_arthaud",
+screen_nameToExtract = ["n_arthaud",
                         "UPR_Asselineau",
                         "JCheminade",
+                        "dupontaignan",
+                        "FrancoisFillon",
+                        "benoithamon",
                         "jeanlassalle",
+                        "MLP_officiel",
+                        "EmmanuelMacron",
+                        "JLMelenchon",
+                        "PhilippePoutou",
                         ]
 
 #==============================#
