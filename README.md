@@ -1,20 +1,24 @@
 # <img src="viewer/static/images/semiotweet.jpg" width="60" height="60" alt = "Logo"/> Semiotweet
 Tweets analysis from politics.
 
+The project is online [here]("https://semiotweet.eu-gb.mybluemix.net/") !
+<img src="http://www.numerama.com/content/uploads/2017/03/fillon.png" alt = "François Fillon"/>
+
 ## What's the goal
 
 _Semiotweet_ aims to better understand the tweets posted by politics.
 It shows what are the most commons words in those tweets, and what are the different semantic fields related to them.
 
 
-## How it works
-Stack is subjects to know changes.
 
+## How it works
+
+Stack is subjects to know changes.
 ### Stack :
  - Django as framework,
  - PostGreSQL for the database,
  - Twitter API as data provider,
- - TreeTagger for tweets' analysis,
+ - TreeTagger & gensim for tweets' analysis,
  - chart.js for visualization
 
 ## Architecture, data structures & models
@@ -23,6 +27,8 @@ There's just one app called `viewer` yet. `urls.py` directly redirects to this a
 `extraction.py` and `semanticAnalysis.py` contains functions that are used in the views.
 
 The one from `extraction.py` catch the tweets, those in `semanticAnalysis.py` process the analysis.
+The analysis is based on *LDA (Latent Dirichlet allocation)*.
+
 
 ## UML TO BE UPDATED !
 
