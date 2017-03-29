@@ -3537,11 +3537,15 @@ if (jQuery) {
         }
       });
 
-      $newSelect.on('blur', function() {
-        if (!multiple) {
-          $(this).trigger('close');
-        }
-        options.find('li.selected').removeClass('selected');
+      //$newSelect.on('blur', function() {
+      //  if (!multiple) {
+      //    $(this).trigger('close');
+      //  }
+      //  options.find('li.selected').removeClass('selected');
+      //});
+
+      $('.select-dropdown').find('span').on('click',function(){
+        $newSelect.trigger('close');
       });
 
       options.hover(function() {
