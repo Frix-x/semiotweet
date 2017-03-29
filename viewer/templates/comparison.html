@@ -17,7 +17,7 @@
       <form method="get" action="">
           <div class="row">
             <div class="input-field col s12 m6">
-              <select name="candidat1">
+              <select name="candidat1" id="candidat1">
                   <option value="" disabled selected>Selectionner un candidat...</option>
                 {% for screen_name, value in users.items %}
                   <option value="{{screen_name}}" data-icon="{{value.profile_image_url_https}}" class="left circle">{{value.name}}</option>
@@ -26,7 +26,7 @@
               <label>Candidat 1</label>
             </div>
             <div class="input-field col s12 m6">
-              <select name="candidat2">
+              <select name="candidat2" id="candidat2">
                 <option value="" disabled selected>... puis un deuxième, évidemment !</option>
                 {% for screen_name, value in users.items %}
                   <option value="{{screen_name}}" data-icon="{{value.profile_image_url_https}}" class="left circle">{{value.name}}</option>
@@ -95,6 +95,10 @@
           createDonut("doughnutSources{{candidats.1}}", {{sourcesList.1|safe}}, {{numList.1|safe}});
           createBarChart("MostCommonLemmes{{candidats.1}}",{{lemmesList.1|safe}},"Lemmes occurences");
           createBarChartHours("HoursDistribution{{candidats.1}}",{{hoursList.1|safe}},"Nombre de tweets postés");
+
+          document.getElementById('candidat1').value="{{candidats.0}}";
+          document.getElementById('candidat2').value="{{candidats.1}}";
+          $('select').material_select();
       {% endif %}
   });
 </script>
