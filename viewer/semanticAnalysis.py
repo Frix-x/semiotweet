@@ -1,20 +1,28 @@
 #coding:utf-8
+# For Py2 retrocompatibility
 from __future__ import print_function
 from builtins import str
-from lxml import html
-import requests
-import re
-import treetaggerwrapper
-import pickle
-from gensim import corpora,models
+
+# Forthe database
 from .models import Tweet,User,LdaModel
 from django.core.exceptions import ObjectDoesNotExist
 
+# For requests
+from lxml import html
+import requests
+
+# For data processing
 import string
 import ast
+import pickle
 import os,sys
-
 from collections import Counter,defaultdict
+
+# For LDA models
+from gensim import corpora,models
+import re
+import treetaggerwrapper
+
 
 
 def getEnvValue(varName):
@@ -208,8 +216,6 @@ frenchStopwords = frenchStopwords.union(set(commonWordsTwitter))
 
 # Regex to delete user's mention in tweets
 mentionRegex = re.compile(r"@\w+")
-
-specifiedWords = ["colère","combat","peur","victoire","aide","argent","mensonge","société"]
 
 requestToGetSources = 'SELECT DISTINCT source, COUNT(source) AS nb  FROM viewer_tweet GROUP BY source ORDER BY nb DESC'
 

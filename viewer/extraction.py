@@ -1,23 +1,26 @@
 #coding:utf8
+# For Py2 retrocompatibility
 from __future__ import print_function, division
+from builtins import str
 from future import standard_library
 standard_library.install_aliases()
-from builtins import str
-import oauth2
-from io import BytesIO
-import json
-import os, sys
 
-
-from django.utils import timezone
-from .models import Tweet,User
+# For time and date processing
 import random
-import string
 import time
 import pytz
 from datetime import datetime
+from django.utils import timezone
 
+# For data processing
+from .models import Tweet,User
 from .semanticAnalysis import toJsonForGraph
+import json
+import string
+from io import BytesIO
+import os, sys
+import oauth2
+
 
 #==============================#
 #========== REQUESTS ==========#
@@ -279,17 +282,17 @@ tweetSources =["Twitter Web Client",
 usefullFieldsUser = ["id","name","screen_name","created_at",
                      "contributors_enabled","verified"]
 
-screen_nameToExtract = ["EmmanuelMacron",
-                        "MLP_officiel",
-                        "FrancoisFillon",
-                        "benoithamon",
-                        "JLMelenchon",
-                        "PhilippePoutou",
-                        "dupontaignan",
-                        "n_arthaud",
+screen_nameToExtract = ["n_arthaud",
                         "UPR_Asselineau",
                         "JCheminade",
+                        "dupontaignan",
+                        "FrancoisFillon",
+                        "benoithamon",
                         "jeanlassalle",
+                        "MLP_officiel",
+                        "EmmanuelMacron",
+                        "JLMelenchon",
+                        "PhilippePoutou",
                         ]
 
 #==============================#
