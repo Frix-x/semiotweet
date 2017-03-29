@@ -92,6 +92,9 @@
     <script>
       $( document ).ready(function() {
         $(".button-collapse").sideNav();
+        $('.dropdown-button + .dropdown-content').on('click', function(event) {
+          event.stopPropagation();
+        });
         $(".dropdown-button").dropdown();
       });
     </script>
