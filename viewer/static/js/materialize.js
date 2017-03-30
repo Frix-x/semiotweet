@@ -754,7 +754,7 @@ if (jQuery) {
 
         // Add click close handler to document
         $(document).bind('click.'+ activates.attr('id') + ' touchstart.' + activates.attr('id'), function (e) {
-          if (!activates.is(e.target) && !origin.is(e.target) && (!origin.find(e.target).length) ) {
+          if (!activates.is(e.target) && !origin.is(e.target) && (!activates.find(e.target).length) ) {
             hideDropdown();
             $(document).unbind('click.'+ activates.attr('id') + ' touchstart.' + activates.attr('id'));
           }

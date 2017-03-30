@@ -1,105 +1,58 @@
-{% extends "template.html" %}
-{% block title %} | KeywordsNetwork {% endblock %}
+{% extends "template.html" %} {% block title %} | Keywords network {% endblock %} {% load static %} {% block content %}
 
-{% block content %}
-<section id="part" class="two">
-  <div class="container">
-{% if success %}
-  <header>
-    <div class="row">
-      <div class="col-lg-12">
-        <h1>Network</h1>
-        <svg width="960" height="880"></svg>
-      </div>
+<div class="section no-pad-bot" id="index-banner">
+    <div class="container">
+        <br><br>
+        <h1 class="header center orange-text">Network</h1>
+        <br><br>
     </div>
-  </header>
-{% else %}
-  <header>
-    <h2> Request fail <h2>
-  <header>
-{% endif %}
-  </div>
-</section>
+</div>
+
+<div class="container">
+    <div class="section">
+        <div class="row">
+          <div class="col s12 m12">
+            <div class="icon-block">
+              <div id="keywordsNetwork"></div>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
 
+{% block script %}
+<script src="{% static "js/utils.js" %}"></script>
+<script type="text/javascript">
+  $(document).ready(function() {
+    // create an array with nodes
+    var nodes = new vis.DataSet([
+        {id: 1, label: 'Node 1'},
+        {id: 2, label: 'Node 2'},
+        {id: 3, label: 'Node 3'},
+        {id: 4, label: 'Node 4'},
+        {id: 5, label: 'Node 5'}
+    ]);
 
+    // create an array with edges
+    var edges = new vis.DataSet([
+        {from: 1, to: 3},
+        {from: 1, to: 2},
+        {from: 2, to: 4},
+        {from: 2, to: 5}
+    ]);
 
-{%block script%}
-<script>
-var svg = d3.select("svg"),
-    width = +svg.attr("width"),
-    height = +svg.attr("height");
+    // create a network
+    var container = document.getElementById('keywordsNetwork');
 
-var color = d3.scaleOrdinal(d3.schemeCategory20);
+    // provide the data in the vis format
+    var data = {
+        nodes: nodes,
+        edges: edges
+    };
+    var options = {};
 
-var simulation = d3.forceSimulation()
-    .force("link", d3.forceLink().id(function(d) { return d.id; }))
-    .force("charge", d3.forceManyBody())
-    .force("center", d3.forceCenter(width / 2, height / 2));
-
-d3.json("/static/network.json", function(error, graph) {
-  if (error) throw error;
-
-  var link = svg.append("g")
-      .attr("class", "links")
-    .selectAll("line")
-    .data(graph.links)
-    .enter().append("line")
-      .attr("stroke-width", function(d) { return Math.sqrt(d.value); })
-      .attr("stroke","#999")
-      .attr("stroke-opacity","0.6");
-
-  var node = svg.append("g")
-      .attr("class", "nodes")
-    .selectAll("circle")
-    .data(graph.nodes)
-    .enter().append("circle")
-      .attr("r", 5)
-      .attr("fill", function(d) { return color(d.group); })
-      .call(d3.drag()
-          .on("start", dragstarted)
-          .on("drag", dragged)
-          .on("end", dragended));
-
-  node.append("title")
-      .text(function(d) { return d.id; });
-
-  simulation
-      .nodes(graph.nodes)
-      .on("tick", ticked);
-
-  simulation.force("link")
-      .links(graph.links);
-
-  function ticked() {
-    link
-        .attr("x1", function(d) { return d.source.x; })
-        .attr("y1", function(d) { return d.source.y; })
-        .attr("x2", function(d) { return d.target.x; })
-        .attr("y2", function(d) { return d.target.y; });
-
-    node
-        .attr("cx", function(d) { return d.x; })
-        .attr("cy", function(d) { return d.y; });
-  }
-});
-
-function dragstarted(d) {
-  if (!d3.event.active) simulation.alphaTarget(0.3).restart();
-  d.fx = d.x;
-  d.fy = d.y;
-}
-
-function dragged(d) {
-  d.fx = d3.event.x;
-  d.fy = d3.event.y;
-}
-
-function dragended(d) {
-  if (!d3.event.active) simulation.alphaTarget(0);
-  d.fx = null;
-  d.fy = null;
-}
-
+    // initialize your network!
+    var network = new vis.Network(container, data, options);
+  });
 </script>
 {% endblock %}
