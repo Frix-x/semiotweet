@@ -4,6 +4,7 @@ from . import views
 urlpatterns = [
     url(r'^$',views.home,name='home'),
     url(r'^displayInfo/(?P<screen_name>.+)$',views.displayInfo,name='displayInfo'),
+    url(r'^methodology/?$',views.methodology,name='methodology'),
 #    url(r'^getData/$',views.getData,name='getData'),
     url(r'^generalOverview/?$',views.generalOverview,name='generalOverview'),
     url(r'^comparison/?$',views.comparison,name='comparison'),

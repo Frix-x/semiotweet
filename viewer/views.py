@@ -26,9 +26,6 @@ import ast # convert string to list
 import math
 
 
-#==============================#
-#=========== OTHERS ===========#
-#==============================#
 
 def handler404(request,typed):
     """A basic 404 error handler"""
@@ -36,9 +33,13 @@ def handler404(request,typed):
     response.status_code = 404
     return response
 
+def methodology(request):
+    """Redirects to the methodology page"""
+    return render(request,'methodology.html',{})
+
 
 def home(request):
-    """Redirect to the home page : global statistics"""
+    """Redirects to the home page : global statistics"""
     global requestToGetSources
 
     # Error message if no data
@@ -103,7 +104,7 @@ def home(request):
                                        'maj' : maj})
 
 def generalOverview(request):
-    """Redirect to the words page : analysis around words used by politics"""
+    """Redirects to the words page : analysis around words used by politics"""
     # Getting tweets' sources
     cursor = connection.cursor()
     # Getting the number of tweets for each user
@@ -161,7 +162,7 @@ def generalOverview(request):
     return render(request,'generalOverview.html',{'politics': politics, 'nbTweets': nbTweets, 'words': words, 'lemmes': lemmes, 'hours': hours, 'bubblesJson': bubblesJson})
 
 def comparison(request):
-    """Redirect to the comparison form page : compare two politics"""
+    """Redirects to the comparison form page : compare two politics"""
     global screen_nameToExtract
     users = {}
     candidats = []
@@ -238,7 +239,7 @@ def comparison(request):
 
 
 def displayInfo(request,screen_name):
-    """Display all the tweets for a user
+    """Displays all the tweets for a user
     Requests the Twitter API directly and search for the most common words"""
     userInfo = returnUser(screen_name,toClean=False)
     success = True
@@ -314,7 +315,7 @@ def displayInfo(request,screen_name):
 #==============================#
 
 def getData(request):
-    """Save the latest tweets from all the users defined in screen_nameToExtract
+    """Saves the latest tweets from all the users defined in screen_nameToExtract
      and stores info about a users in the database not already done"""
     global screen_nameToExtract
 
@@ -393,6 +394,6 @@ def getData(request):
 #==============================#
 
 def displayNetwork(request):
-    """Display a force network with users linked to their matching keywords"""
+    """Displays a force network with users linked to their matching keywords"""
 
     return render(request,'displayNetwork.html',{"success": True})
