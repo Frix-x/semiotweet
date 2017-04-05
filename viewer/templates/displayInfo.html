@@ -1,8 +1,8 @@
-{% extends "template.html" %} {% load static %} {% block title %} | @{{screen_name}} {% endblock %} {% block content %} {% if success %}
+{% extends "template.html" %} {% load static %} {% block title %} {% endblock %} {% block content %}
 <div class="section no-pad-bot" id="index-banner">
     <div class="container">
         <br><br>
-        <h1 class="header center orange-text">Informations sur {{userInfo.name}}</h1>
+        <h1 class="header center orange-text">Informations sur <span id="title"></span></h1>
         <br><br>
     </div>
 </div>
@@ -10,23 +10,19 @@
     <div class="section">
         <div class="row">
             <div class="col s12 m8">
-                <div class="icon-block">
+                <div class="icon-block loader" id="PeopleCard">
                     <div class="card horizontal">
-                        <div class="card-image">
-                            {% if userInfo.profile_image_url_https %}
-                            <img src="{{userInfo.profile_image_url_https}}"> {% endif %}
-                        </div>
+                        <div class="card-image"></div>
                         <div class="card-stacked">
                             <div class="card-content">
-                                <h5>{{userInfo.name}}</h5>
-                                <p>@{{screen_name}}
-                                {% if userInfo.verified %}
-                                <img src="/static/images/verified.png" height="25" width="25" alt="Verified"> {% endif %}
+                                <h5 id="name"></h5>
+                                <p>@<span id="screen_name"></span>
+                                <span id="verified"></span>
                                 <br></p>
-                                <p>{{userInfo.description}}</p>
+                                <p id="description"></p>
                             </div>
                             <div class="card-action">
-                                <p>{{userInfo.followers_count}} followers</p>
+                                <p><span id="followers"></span> followers</p>
                             </div>
                         </div>
                     </div>
@@ -35,7 +31,7 @@
             <div class="col s12 m4" id="TweetSources">
                 <div class="icon-block">
                     <h5 class="center">Sources des tweets</h5>
-                    <canvas id="doughnutSources"></canvas>
+                    <div class="loader"><canvas id="doughnutSources"></canvas></div>
                 </div>
             </div>
         </div>
@@ -44,13 +40,13 @@
           <div class="col s12 m6">
             <div class="icon-block" id="Words">
                 <h5 class="center">Mots les plus employés</h5>
-                <canvas id="MostCommonWords"></canvas>
+                <div class="loader"><canvas id="MostCommonWords"></canvas></div>
             </div>
           </div>
           <div class="col s12 m6">
             <div class="icon-block" id="Distribution">
                 <h5 class="center">Lemmes les plus employés</h5>
-                <canvas id="MostCommonLemmes"></canvas>
+                <div class="loader"><canvas id="MostCommonLemmes"></canvas></div>
             </div>
           </div>
         </div>
@@ -59,24 +55,12 @@
           <div class="col s12 m12">
             <div class="icon-block" id="Distribution">
                 <h5 class="center">Distribution des tweets selon les heures</h5>
-                <canvas id="HoursDistribution"></canvas>
+                <div class="loader"><canvas id="HoursDistribution"></canvas></div>
             </div>
           </div>
         </div>
     </div>
 </div>
-{% else %}
-<div class="section no-pad-bot" id="index-banner">
-    <div class="container">
-        <br><br>
-        <h1 class="header center orange-text">Erreur</h1>
-        <div class="row center">
-            <h5 class="header col s12 light">Page indisponible.</h5>
-        </div>
-        <br><br>
-    </div>
-</div>
-{% endif %}
 {% endblock %}
 
 {%block script%}
@@ -84,10 +68,45 @@
 <script src="{% static "js/utils.js" %}"></script>
 <script>
 $(document).ready(function () {
-  createBarChart("MostCommonWords",{{words|safe}}, "Mots les plus communs");
-  createDonut("doughnutSources", {{sources|safe}}, {{num|safe}});
-  createBarChart("MostCommonLemmes",{{lemmes|safe}},"Lemmes occurences");
-  createBarChartHours("HoursDistribution",{{hours|safe}},"Nombre de tweets postés");
+  $.get('/api/v1/user', {"id":{{userId}}}, function(res, status) {
+    if (status === 'success') {
+      $("#title").html(res.users[0].name);
+      $("#name").html(res.users[0].name);
+      $("#screen_name").html(res.users[0].screen_name);
+      $("#titlePage").html(res.users[0].screen_name);
+      $("#description").html(res.users[0].description);
+      $("#followers").html(res.users[0].followers_count);
+      $(".card-image").html("<img src='"+ res.users[0].profile_image_url+"'>");
+      if (res.users[0].verified) {
+        $("#verified").html("<img src='/static/images/verified.png' height='25' width='25' alt='Verified'>");
+      }
+      $('#PeopleCard').removeClass('loader');
+    }
+  });
+  $.get('/api/v1/user/sources', {"id":{{userId}}}, function(res, status) {
+    if (status === 'success') {
+      createDonut("doughnutSources", res.sources, res.num);
+      $('#doughnutSources').parent().removeClass('loader');
+    }
+  });
+  $.get('/api/v1/user/hours', {"id":{{userId}}}, function(res, status) {
+    if (status === 'success') {
+      createBarChartHours("HoursDistribution", res.hours, "Nombre de tweets");
+      $('#HoursDistribution').parent().removeClass('loader');
+    }
+  });
+  $.get('/api/v1/user/wordcount', {"id":{{userId}}}, function(res, status) {
+    if (status === 'success') {
+      createBarChart("MostCommonWords", res.words, "Mots les plus communs");
+      $('#MostCommonWords').parent().removeClass('loader');
+    }
+  });
+  $.get('/api/v1/user/lemmecount', {"id":{{userId}}}, function(res, status) {
+    if (status === 'success') {
+      createBarChart("MostCommonLemmes", res.lemmes, "Lemmes occurences");
+      $('#MostCommonLemmes').parent().removeClass('loader');
+    }
+  });
 });
 </script>
 {% endblock %}

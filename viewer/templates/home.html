@@ -18,37 +18,33 @@
 <div class="container">
     <div class="section" id="Graphs">
           <div class="row">
-            {% if maj %}
             <div class="col s12 m6">
-            {% else %}
-            <div class="col s12 m12">
-            {% endif %}
                 <div class="icon-block">
                   <div class="icon-block">
                     <h5 class="center">Aperçu</h5>
                     <br>
-                    <p>
+                    <p id="apercu">
                       Semiotweet permet d'analyser les tweets des 11 candidats
                       à l'élection présidentielle française de 2017 et d'en ressortir des informations telles
                       que les mots, les champs sémantiques et les sujets les plus abordés par chaque candidat.
                       <br>
                       Ceci est une première version qui est amenée à être améliorée et étoffée au fur et à mesure avec d'autres indicateurs.
                       <br>N'hésitez pas à y jeter un coup d'oeil et à partager vos retours !<br><br>
-                      {% if maj %}Dernière mise à jour le : <b>{{maj}}</b>{% endif %}
+                      Dernière mise à jour le : <b><span id="MAJ"></span></b>
                     </p>
                   </div>
                 </div>
             </div>
-            {% if maj %}
             <div class="col s12 m3">
                 <div class="icon-block">
                     <h5 class="center">Sources des tweets</h5>
-                    <canvas id="doughnutSources"></canvas>
+                    <div class="loader"><canvas id="doughnutSources"></canvas></div>
                 </div>
             </div>
             <div class="col s12 m3">
-                <div class="icon-block">
-                  <div class="card vertical">
+              <div class="icon-block">
+                <div class="card vertical">
+                  <div id="nbTweetsLoader" class="loader">
                     <div class="card-stacked">
                       <div class="card-content" id="NbTweetsByPolitics"></div>
                       <div class="card-action">
@@ -57,8 +53,8 @@
                     </div>
                   </div>
                 </div>
+              </div>
             </div>
-            {% endif %}
         </div>
     </div>
     <br><br>
@@ -73,14 +69,75 @@
 <script src="{% static "js/utils.js" %}"></script>
 <script>
 $(document).ready(function () {
-  createDonut("doughnutSources", {{sources|safe}}, {{num|safe}});
+  $.get('/api/v1/tweet/last', function(res, status) {
+    if (status === 'success') {
+      var maj = new Date(res).toLocaleString();
+      $("#MAJ").html(maj);
+    }
+  });
+  $.get('/api/v1/user/sources', function(res, status) {
+    if (status === 'success') {
+      createDonut("doughnutSources", res.sources, res.num);
+      $('#doughnutSources').parent().removeClass('loader');
+    }
+  });
+  $.get('/api/v1/user/nbtweets', function(res, status) {
+    if (status === 'success') {
+      var content = '';
+      for(var i=0 ; i < res.politics.length ; i++)
+        content += '<tr><td>' + res.politics[i] + ':</td><td>' + res.nbTweets[i] + '</td></tr>';
+      $( "#NbTweetsByPolitics").html("<table>" + content + "</table>");
+      $('#nbTweetsLoader').removeClass('loader');
+    }
+  });
 
-  var politics = {{politics|safe}};
-  var nbTweets = {{nbTweets|safe}};
-  var content= '';
-  for(var i=0 ; i < politics.length ; i++)
-    content += '<tr><td>'+ politics[i] + ':</td><td>' + nbTweets[i] + '</td></tr>';
-  $( "#NbTweetsByPolitics").html("<table>"+content + "</table>");
+
+
+      // createBarChartHours("HoursDistribution",{{hours|safe}},"Number of tweets");
+      // createBarChart("barCommonWords",{{words|safe}},"Occurence des mots");
+      // createBarChart("barLemmatizedWords",{{lemmes|safe}},"Occurence des lemmes");
+      //
+      // var politics = {{politics|safe}};
+      // var nbTweets = {{nbTweets|safe}};
+      // var content= '';
+      // for(var i=0 ; i < politics.length ; i++)
+      //   content += '<tr><td>' + politics[i] + ' :</td><td>' + nbTweets[i] + '</td></tr>';
+      // $( "#NbTweetsByPolitics").html("<table>" + content + "</table>");
+      //
+      // var topics = {{bubblesJson|safe}};
+      // var tableHead = '';
+      // var tableBody = '';
+      // (topics.children).forEach(function(topic, index) {
+      //   console.log(topic);
+      //   tableHead = tableHead + '<th>Sujet ' + (index+1) + '</th>';
+      //   tableBody = tableBody + '<tr>';
+      //   (topic.children).forEach(function(word) {
+      //     tableBody = tableBody + '<td style="font-size:' + (word.amount*8) + '%;">' + word.label + '</td>';
+      //   });
+      //   tableBody = tableBody + '</tr>';
+      // });
+      // var tableTopics = $('#LDAtopics');
+      // tableTopics.html('<thead><tr>' + tableHead + '</tr></thead><tbody>' + tableBody + '</tbody>');
+      //
+      // var t = $('#LDAtopics tbody').eq(0);
+      //   var r = t.find('tr');
+      //   var cols= r.length;
+      //   var rows= r.eq(0).find('td').length;
+      //   var cell, next, tem, i = 0;
+      //   var tb= $('<tbody></tbody>');
+      //
+      //   while(i<rows){
+      //       cell= 0;
+      //       tem= $('<tr></tr>');
+      //       while(cell<cols){
+      //           next= r.eq(cell++).find('td').eq(0);
+      //           tem.append(next);
+      //       }
+      //       tb.append(tem);
+      //       ++i;
+      //   }
+      //   tableTopics.append(tb);
+      //   tableTopics.show();
 });
 </script>
 {% endblock %}

@@ -1,7 +1,7 @@
 # <img src="viewer/static/images/semiotweet.jpg" width="60" height="60" alt = "Logo"/> Semiotweet
 Tweets analysis from politics.
 
-The project is online [here](https://semiotweet.eu-gb.mybluemix.net) !
+The project is online [here](http://www.semiotweet.com) !
 <img src="http://www.numerama.com/content/uploads/2017/03/fillon.png" alt = "François Fillon"/>
 
 ## What's the goal

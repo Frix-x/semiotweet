@@ -1,0 +1,323 @@
+#-*- coding: utf-8 -*-
+from __future__ import print_function, absolute_import # For Py2 retrocompatibility
+from builtins import str
+from django.http import HttpResponse,Http404,JsonResponse
+from django.shortcuts import render,redirect
+
+# For the API
+from django.views.decorators.csrf import csrf_exempt
+from rest_framework.renderers import JSONRenderer
+from rest_framework.parsers import JSONParser
+
+
+# Forthe database
+from .models import Tweet,User,LdaModel
+from django.db import connection #for direct SQL requests
+from django.db.models import Max
+
+# For time and date processing
+import random
+from django.utils import timezone
+import time
+import pytz
+from datetime import datetime
+
+
+# Data Processing
+from .extraction import *
+from .semanticAnalysis import *
+import string
+import json
+import ast # convert string to list
+import math
+
+
+# return JsonResponse(serializer.errors, status=400)
+
+#==============================#
+#=========== OTHERS ===========#
+#==============================#
+
+def handler404(request,typed):
+    """A basic 404 error handler"""
+    return JsonResponse({"error":"Page "+typed+" not found"}, status=404)
+
+
+def sources(request):
+    """GET Tweets'sources for all or individual candidate"""
+    # Getting tweets' sources
+    global requestToGetSources
+
+    # GET user and check if he exist
+    userId = request.GET.get("id", "")
+    try:
+        if userId != "":
+            User.objects.get(id=userId)
+    except BaseException as e:
+        return JsonResponse({"sources":-1,"num":-1,"error":str(e)}, status=400)
+
+    cursor = connection.cursor()
+    try:
+        if userId == "":
+            cursor.execute(requestToGetSources)
+        else:
+            cursor.execute("SELECT DISTINCT source, COUNT(source) AS nb FROM api_tweet WHERE user_id_id ='"+ str(userId)+"' GROUP BY source ORDER BY nb DESC")
+    except BaseException as e: # No data in DB
+        print("API - sources()\nError : ", e)
+        return JsonResponse({"sources":-1,"num":-1,"error":str(e)}, status=400)
+    res = cursor.fetchall()
+
+    sources = []
+    num = []
+    for (s,n) in res:
+        sources.append(s)
+        num.append(n)
+
+    # Keeping only the most commons stats
+    if len(sources)>5 :
+        sources = sources[0:5]
+        sources.append("Others")
+        num[5] = sum(num[5:-1])
+        num = num[0:6]
+
+    return JsonResponse({"sources":sources,"num":num}, status=200)
+
+
+def userExist(request):
+    # GET user and check if he exist
+    userId = request.GET.get("id", "")
+    if userId == "":
+        return JsonResponse({"id":userId,"exist":False}, status=200)
+    else:
+        try:
+            User.objects.get(id=userId)
+        except BaseException as e:
+            return JsonResponse({"id":userId,"exist":False}, status=200)
+        return JsonResponse({"id":userId,"exist":True}, status=200)
+
+
+def user(request):
+    """GET candidate's informations such as followers_count, profile picture, profile description and screen name"""
+    # GET user and check if he exist
+    userId = request.GET.get("id", "")
+    try:
+        if userId != "":
+            User.objects.get(id=userId)
+    except BaseException as e:
+        return JsonResponse({"users":-1,"error":str(e)}, status=400)
+
+    cursor = connection.cursor()
+    try:
+        if userId == "":
+            cursor.execute("SELECT id, screen_name, name, description, followers_count, verified, profile_image_url FROM api_user")
+        else:
+            cursor.execute("SELECT id, screen_name, name, description, followers_count, verified, profile_image_url FROM api_user WHERE id ='"+ str(userId)+ "'")
+    except BaseException as e: # No data in DB
+        print("API - userInfo()\nError : ", e)
+        return JsonResponse({"users":-1,"error":str(e)}, status=400)
+    res = cursor.fetchall()
+    users = []
+    for user in res:
+        users.append({"id":user[0], "screen_name":user[1], "name": user[2], "description": user[3], "followers_count": user[4], "verified" : user[5], "profile_image_url": user[6].replace('_normal.jpg','.jpg')})
+
+    return JsonResponse({"users":users}, status=200)
+
+
+def nbTweets(request):
+    """GET number of tweets for each candidates"""
+    # Getting the number of tweets for each user
+    cursor = connection.cursor()
+    try:
+        cursor.execute("SELECT u.name, COUNT(t.id) AS nbTweets FROM api_tweet t, api_user u WHERE u.id = t.user_id_id GROUP BY u.name ORDER BY nbTweets DESC")
+    except BaseException as e: # No data in DB
+        print("API - nbTweets()\nError : ", e)
+        return JsonResponse({"politics":-1,"nbTweets":-1,"error":str(e)}, status=400)
+    res = cursor.fetchall()
+
+    politics = []
+    nbTweets = []
+    for (p,n) in res:
+        politics.append(p)
+        nbTweets.append(n)
+    # JSON Formating
+    return JsonResponse({"politics":politics,"nbTweets":nbTweets}, status=200)
+
+
+def lastTweet(request):
+    """GET date of the last tweet saved in DB"""
+    # Getting the date of the last tweet
+    try:
+        lastTweetReq = Tweet.objects.aggregate(Max('id'))
+        lastId = lastTweetReq["id__max"]
+        lastTweet = Tweet.objects.get(id=lastId).created_at
+    except BaseException as e:
+        print("API - lestTweet()\nError : ", e)
+        return JsonResponse({"lasttweet":-1,"error":str(e)}, status=400)
+
+    return HttpResponse(lastTweet, status=200)
+
+
+def hours(request):
+    """GET tweets hours distribution for one or all candidates"""
+    # GET user and check if he exist
+    userId = request.GET.get("id", "")
+    try:
+        if userId != "":
+            User.objects.get(id=userId)
+    except BaseException as e:
+        return JsonResponse({"hours":-1,"error":str(e)}, status=400)
+
+    cursor = connection.cursor()
+    try:
+        if userId == "":
+            cursor.execute("SELECT DISTINCT created_at AS timePosted FROM api_tweet ORDER BY timePosted")
+        else:
+            cursor.execute("SELECT DISTINCT created_at AS timePosted FROM api_tweet WHERE user_id_id ='"+ str(userId)+"'ORDER BY timePosted")
+    except BaseException as e: # No data in DB
+        print("API - hours()\nError : ", e)
+        return JsonResponse({"hours":-1,"error":str(e)}, status=400)
+    res = cursor.fetchall()
+
+    hours =[0]*24
+    for (time,) in res:
+        hours[time.time().hour]+=1
+
+    # JSON Formating
+    return JsonResponse({"hours":hours}, status=200)
+
+
+def wordCount(request):
+    userId = request.GET.get("id", "")
+
+    # tokenArray is stored as a string : we need to get the list back
+    try:
+        if userId == "":
+            allTokenArray = Tweet.objects.values('tokenArray')
+        else:
+            allTokenArray = Tweet.objects.filter(user_id=userId).values('tokenArray')
+    except BaseException as e:
+        print("API - wordCount()\nError : ", e)
+        return JsonResponse({"words":-1,"error":str(e)}, status=400)
+
+    words = [ast.literal_eval(t["tokenArray"]) for t in allTokenArray]
+    words = toJsonForGraph(countWords(words))
+
+    # words is a JSON list of dict like : {"word":"foo", "occur":42}
+    return JsonResponse({"words":words}, status=200)
+
+
+def lemmeCount(request):
+    userId = request.GET.get("id", "")
+
+    # lemmaArray is stored as a string : we need to get the list back
+    try:
+        if userId == "":
+            allLemmaArray = Tweet.objects.values('lemmaArray')
+        else:
+            allLemmaArray = Tweet.objects.filter(user_id=userId).values('lemmaArray')
+    except BaseException as e:
+        print("API - lemmeCount()\nError : ", e)
+        return JsonResponse({"lemmes":-1,"error":str(e)}, status=400)
+
+    lemmes = [ast.literal_eval(t["lemmaArray"]) for t in allLemmaArray]
+    lemmes = toJsonForGraph(countWords(lemmes))
+
+    # lemmes is a JSON list of dict like : {"word":"foo", "occur":42}
+    return JsonResponse({"lemmes":lemmes}, status=200)
+
+
+def ldaTopics(request):
+    # GET user and check if he exist
+    userId = request.GET.get("id", 0)
+
+    # Get LDA topics distribution for table
+    try :
+        ldamodel = pickle.loads(LdaModel.objects.get(user_id=userId).ldamodel)
+    except BaseException as e:
+        print("API - ldaTopics()\nError : ", e)
+        return JsonResponse({"ldaTopics":-1,"error":str(e)}, status=400)
+
+    topics = ldamodel.show_topics(num_topics=10, num_words=5, log=False, formatted=False)
+    tableJson = {"label":"ldaTopics","topics":[]}
+    for index, topic in enumerate(topics):
+        tableJson["topics"].append({"label":topic[0],"words":[]})
+        for word in topic[1]:
+            tableJson["topics"][index]["words"].append({"label":word[0],"weight":math.floor(300*word[1])})
+    tableJson = json.dumps(tableJson,default=str)
+
+    return HttpResponse(tableJson, status=200)
+
+
+#==============================#
+#===========  DATA  ===========#
+#==============================#
+
+def getData(request):
+    """Save the latest tweets from all the users defined in screen_nameToExtract
+     and stores info about a users in the database not already done"""
+    global screen_nameToExtract
+
+    # SAVING USERS
+    for screen_name in screen_nameToExtract:
+        print ("GET User info : "+screen_name)
+        userInfo = returnUser(screen_name,toClean=True)
+
+        if not(userInfo): #If the user doesn't exist
+            success = False
+            error = "The user doesn't exist"
+            return JsonResponse({"res":{"success":success,"error":error}}, status=400)
+
+        # Saving the user
+        success = saveUser(userInfo)
+        if not(success):
+            error = "Error during saving in DB"
+            return JsonResponse({"res":{"success":success,"error":error}}, status=400)
+
+    # SAVING TWEETS
+    lastId = 0
+    nbTweets = 0 # number of extracted tweets
+
+    for screen_name in screen_nameToExtract:
+        print ("GET user tweets : "+screen_name)
+        try:
+            idUser = User.objects.filter(screen_name=screen_name).values('id')[0]["id"]
+        except SomeModel.DoesNotExist: # If the user does not exist
+            continue # continue with the next user
+
+        try: # We try to get the id of the user's last tweet
+            lastTweet = Tweet.objects.filter(user_id=idUser).aggregate(Max('id'))
+            lastId = lastTweet["id__max"]
+            # maj = Tweet.objects.get(id=lastId).created_at
+        except SomeModel.DoesNotExist:
+            lastId = 0 # No tweet in the data base
+
+        # The important request here : returns the new tweets from the Twitter API
+        tweets = returnTweetsMultiple(screen_name,lastId)
+
+        lenghtTweets = len(tweets)
+        nbTweets += lenghtTweets
+
+        # After this operations each tweet in tweets contains 2 more fields : 'tokenArray' & 'lemmaArray'
+        tweets = tokenizeAndLemmatizeTweets(tweets)
+
+        # Saving tweets in database
+        userFrom = User.objects.get(screen_name=screen_name)
+        nbTweetsSaved = 1; #counter for printing
+        for t in tweets:
+            print ("Saving {1} tweets from {0} ; {2:0.2f} %".format(screen_name,lenghtTweets,nbTweetsSaved/lenghtTweets*100))
+            success = saveTweet(t,userFrom) and success
+            nbTweetsSaved += 1;
+
+    # MAKING LDA MODELS
+    for screen_name in screen_nameToExtract:
+        print ("MAKING LDA MODEL FOR : "+screen_name)
+        try:
+            idUser = User.objects.filter(screen_name=screen_name).values('id')[0]["id"]
+        except SomeModel.DoesNotExist: # If the user does not exist
+            continue # continue with the next user
+        makeLdaModel(idUser)
+    print("MAKING GLOBAL LDA MODEL...")
+    makeLdaModel(0)
+
+    print("\nEVERYTHING DONE !")
+    return JsonResponse({"res":{"success":success,"error":0}}, status=200)

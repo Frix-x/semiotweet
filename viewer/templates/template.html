@@ -12,6 +12,7 @@
     <link href="{% static "css/materialize.css" %}" type="text/css" rel="stylesheet" media="screen,projection" />
     <link href="{% static "css/vis.css" %}" type="text/css" rel="stylesheet" media="screen,projection" />
     <link href="{% static "css/style.css" %}" type="text/css" rel="stylesheet" media="screen,projection" />
+    <link href="{% static "css/loading.css" %}" type="text/css" rel="stylesheet" media="screen,projection" />
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="{% static "favicon.png" %}"/>
     <script type="text/javascript">
@@ -27,21 +28,21 @@
             <a href="#" data-activates="nav-mobile" class="button-collapse"><i class="material-icons">menu</i></a>
             <ul class="left hide-on-med-and-down">
                 <li><a href="/">Accueil</a></li>
-                <li><a href="/generalOverview/">Analyse générale</a></li>
+                <li><a href="/general/">Analyse générale</a></li>
                 <li><a href="/comparison/">Comparer</a></li>
                 <li><a class="dropdown-button" href="#" data-activates="dropdown1" data-beloworigin="true" data-constrainwidth="false">Candidats<i class="material-icons right">arrow_drop_down</i></a>
                   <ul id="dropdown1" class="dropdown-content" style="width:250px;position:absolute;top: 64px;left: 619.875px; opacity: 1; display: none;" >
-                      <li><a class="grey-text darken-4"href="/displayInfo/n_arthaud">Nathalie Arthaud</a></li>
-                      <li><a class="grey-text darken-4"href="/displayInfo/UPR_Asselineau">François Asselineau</a></li>
-                      <li><a class="grey-text darken-4"href="/displayInfo/JCheminade">Jacques Cheminade</a></li>
-                      <li><a class="grey-text darken-4"href="/displayInfo/dupontaignan">Nicolas Dupont-Aignan</a></li>
-                      <li><a class="grey-text darken-4"href="/displayInfo/FrancoisFillon">François Fillon</a></li>
-                      <li><a class="grey-text darken-4"href="/displayInfo/benoithamon">Benoît Hamon</a></li>
-                      <li><a class="grey-text darken-4"href="/displayInfo/jeanlassalle">Jean Lassalle</a></li>
-                      <li><a class="grey-text darken-4"href="/displayInfo/MLP_officiel">Marine Le Pen</a></li>
-                      <li><a class="grey-text darken-4"href="/displayInfo/EmmanuelMacron">Emmanuel Macron</a></li>
-                      <li><a class="grey-text darken-4"href="/displayInfo/JLMelenchon">Jean-Luc Mélenchon</a></li>
-                      <li><a class="grey-text darken-4"href="/displayInfo/PhilippePoutou">Philippe Poutou</a></li>
+                      <li><a class="grey-text darken-4"href="/user?id=1003575248">Nathalie Arthaud</a></li>
+                      <li><a class="grey-text darken-4"href="/user?id=200659061">François Asselineau</a></li>
+                      <li><a class="grey-text darken-4"href="/user?id=150201042">Jacques Cheminade</a></li>
+                      <li><a class="grey-text darken-4"href="/user?id=38170599">Nicolas Dupont-Aignan</a></li>
+                      <li><a class="grey-text darken-4"href="/user?id=551669623">François Fillon</a></li>
+                      <li><a class="grey-text darken-4"href="/user?id=14389177">Benoît Hamon</a></li>
+                      <li><a class="grey-text darken-4"href="/user?id=102722347">Jean Lassalle</a></li>
+                      <li><a class="grey-text darken-4"href="/user?id=217749896">Marine Le Pen</a></li>
+                      <li><a class="grey-text darken-4"href="/user?id=1976143068">Emmanuel Macron</a></li>
+                      <li><a class="grey-text darken-4"href="/user?id=80820758">Jean-Luc Mélenchon</a></li>
+                      <li><a class="grey-text darken-4"href="/user?id=374392774">Philippe Poutou</a></li>
                   </ul>
                 </li>
                 <!--<li><a href="/getData/">Mise à jour</a></li>-->
@@ -51,21 +52,21 @@
   </div>
   <ul id="nav-mobile" class="side-nav">
       <li><a href="/">Accueil</a></li>
-      <li><a href="/generalOverview/">Analyse générale</a></li>
+      <li><a href="/general/">Analyse générale</a></li>
       <li><a href="/comparison/">Comparer</a></li>
       <li><a class="dropdown-button" href="#!" data-activates="dropdown2" data-beloworigin="true" data-stoppropagation="true">Candidats<i class="material-icons right">arrow_drop_down</i></a>
         <ul id="dropdown2" class="dropdown-content">
-            <li><a class="grey-text darken-4"href="/displayInfo/n_arthaud">Nathalie Arthaud</a></li>
-            <li><a class="grey-text darken-4"href="/displayInfo/UPR_Asselineau">François Asselineau</a></li>
-            <li><a class="grey-text darken-4"href="/displayInfo/JCheminade">Jacques Cheminade</a></li>
-            <li><a class="grey-text darken-4"href="/displayInfo/dupontaignan">Nicolas Dupont-Aignan</a></li>
-            <li><a class="grey-text darken-4"href="/displayInfo/FrancoisFillon">François Fillon</a></li>
-            <li><a class="grey-text darken-4"href="/displayInfo/benoithamon">Benoît Hamon</a></li>
-            <li><a class="grey-text darken-4"href="/displayInfo/jeanlassalle">Jean Lassalle</a></li>
-            <li><a class="grey-text darken-4"href="/displayInfo/MLP_officiel">Marine Le Pen</a></li>
-            <li><a class="grey-text darken-4"href="/displayInfo/EmmanuelMacron">Emmanuel Macron</a></li>
-            <li><a class="grey-text darken-4"href="/displayInfo/JLMelenchon">Jean-Luc Mélenchon</a></li>
-            <li><a class="grey-text darken-4"href="/displayInfo/PhilippePoutou">Philippe Poutou</a></li>
+          <li><a class="grey-text darken-4"href="/user?id=1003575248">Nathalie Arthaud</a></li>
+          <li><a class="grey-text darken-4"href="/user?id=200659061">François Asselineau</a></li>
+          <li><a class="grey-text darken-4"href="/user?id=150201042">Jacques Cheminade</a></li>
+          <li><a class="grey-text darken-4"href="/user?id=38170599">Nicolas Dupont-Aignan</a></li>
+          <li><a class="grey-text darken-4"href="/user?id=551669623">François Fillon</a></li>
+          <li><a class="grey-text darken-4"href="/user?id=14389177">Benoît Hamon</a></li>
+          <li><a class="grey-text darken-4"href="/user?id=102722347">Jean Lassalle</a></li>
+          <li><a class="grey-text darken-4"href="/user?id=217749896">Marine Le Pen</a></li>
+          <li><a class="grey-text darken-4"href="/user?id=1976143068">Emmanuel Macron</a></li>
+          <li><a class="grey-text darken-4"href="/user?id=80820758">Jean-Luc Mélenchon</a></li>
+          <li><a class="grey-text darken-4"href="/user?id=374392774">Philippe Poutou</a></li>
         </ul>
       </li>
       <!--<li><a href="/getData/">Mise à jour</a></li>-->

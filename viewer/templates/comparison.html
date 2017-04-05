@@ -14,27 +14,19 @@
 
 <div class="container">
     <div class="section">
-      <form method="get" action="">
+      <form>
           <div class="row">
             <div class="input-field col s12 m6">
               <select name="candidat1" id="candidat1">
                   <option value="" disabled selected>Selectionner un candidat...</option>
-                {% for screen_name, value in users.items %}
-                  <option value="{{screen_name}}" data-icon="{{value.profile_image_url_https}}" class="left circle">{{value.name}}</option>
-                {% endfor %}
               </select>
               <label>Candidat 1</label>
             </div>
             <div class="input-field col s12 m6">
               <select name="candidat2" id="candidat2">
                 <option value="" disabled selected>... puis un deuxième, évidemment !</option>
-                {% for screen_name, value in users.items %}
-                  <option value="{{screen_name}}" data-icon="{{value.profile_image_url_https}}" class="left circle">{{value.name}}</option>
-                {% endfor %}
               </select>
               <label>Candidat 2</label>
-            <label>
-            </label>
             </div>
         </div>
         <div class="row">
@@ -54,21 +46,19 @@
               <div class="col s6 m6">
                   <div class="icon-block">
                       <h5 class="center">Mots les plus employés</h5>
-                      <canvas id="MostCommonWords{{candidat}}"></canvas>
+                      <div class="loader"><canvas id="MostCommonWords{{candidat}}"></canvas></div>
                   </div>
                   <div class="icon-block">
                       <h5 class="center">Lemmes les plus employés</h5>
-                      <canvas id="MostCommonLemmes{{candidat}}"></canvas>
+                      <div class="loader"><canvas id="MostCommonLemmes{{candidat}}"></canvas></div>
                   </div>
                   <div class="icon-block">
                       <h5 class="center">Distribution des tweets selon les heures</h5>
-                      <canvas id="HoursDistribution{{candidat}}"></canvas>
+                      <div class="loader"><canvas id="HoursDistribution{{candidat}}"></canvas></div>
                   </div>
                   <div class="icon-block">
                       <h5 class="center">Sources des tweets</h5>
-                      <div class="col s10 m10">
-                        <canvas id="doughnutSources{{candidat}}"></canvas>
-                      </div>
+                      <div class="loader"><canvas id="doughnutSources{{candidat}}"></canvas></div>
                   </div>
               </div>
             {% endfor %}
@@ -84,22 +74,40 @@
 <script>
   $(document).ready(function() {
       $('select').material_select();
-
-      {% if candidats %}
-          createBarChart("MostCommonWords{{candidats.0}}",{{wordsList.0|safe}}, "Mots les plus communs");
-          createDonut("doughnutSources{{candidats.0}}", {{sourcesList.0|safe}}, {{numList.0|safe}});
-          createBarChart("MostCommonLemmes{{candidats.0}}",{{lemmesList.0|safe}},"Lemmes occurences");
-          createBarChartHours("HoursDistribution{{candidats.0}}",{{hoursList.0|safe}},"Nombre de tweets postés");
-
-          createBarChart("MostCommonWords{{candidats.1}}",{{wordsList.1|safe}}, "Mots les plus communs");
-          createDonut("doughnutSources{{candidats.1}}", {{sourcesList.1|safe}}, {{numList.1|safe}});
-          createBarChart("MostCommonLemmes{{candidats.1}}",{{lemmesList.1|safe}},"Lemmes occurences");
-          createBarChartHours("HoursDistribution{{candidats.1}}",{{hoursList.1|safe}},"Nombre de tweets postés");
-
-          document.getElementById('candidat1').value="{{candidats.0}}";
-          document.getElementById('candidat2').value="{{candidats.1}}";
+      $.get('/api/v1/user', function(res, status) {
+        if (status === 'success') {
+          for (let i=0 ; i < res.users.length ; i++) {
+            $( "select" ).append( "<option value='"+res.users[i].id+"' data-icon='"+ res.users[i].profile_image_url +"' class='left circle'>"+res.users[i].name +"</option>" );
+          }
           $('select').material_select();
-      {% endif %}
+        }
+      });
+      {% if candidats %} {% for candidat in candidats %}
+      $.get('/api/v1/user/sources', {"id":{{candidat}}}, function(res, status) {
+        if (status === 'success') {
+          createDonut("doughnutSources{{candidat}}", res.sources, res.num);
+          $('#doughnutSources{{candidat}}').parent().removeClass('loader');
+        }
+      });
+      $.get('/api/v1/user/hours', {"id":{{candidat}}}, function(res, status) {
+        if (status === 'success') {
+          createBarChartHours("HoursDistribution{{candidat}}", res.hours, "Nombre de tweets");
+          $('#HoursDistribution{{candidat}}').parent().removeClass('loader');
+        }
+      });
+      $.get('/api/v1/user/wordcount', {"id":{{candidat}}}, function(res, status) {
+        if (status === 'success') {
+          createBarChart("MostCommonWords{{candidat}}", res.words, "Mots les plus communs");
+          $('#MostCommonWords{{candidat}}').parent().removeClass('loader');
+        }
+      });
+      $.get('/api/v1/user/lemmecount', {"id":{{candidat}}}, function(res, status) {
+        if (status === 'success') {
+          createBarChart("MostCommonLemmes{{candidat}}", res.lemmes, "Lemmes occurences");
+          $('#MostCommonLemmes{{candidat}}').parent().removeClass('loader');
+        }
+      });
+      {% endfor %} {% endif %}
   });
 </script>
 {% endblock %}

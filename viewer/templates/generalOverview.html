@@ -18,20 +18,22 @@
         <div class="row">
             <div class="col s12 m4">
                 <div class="icon-block">
-                    <div class="card vertical">
-                        <div class="card-stacked">
-                            <div class="card-content" id="NbTweetsByPolitics"></div>
-                            <div class="card-action">
-                                <a>Nombre de tweets de chaque candidat</a>
-                            </div>
+                  <div class="card vertical">
+                    <div id="nbTweetsLoader" class="loader">
+                      <div class="card-stacked">
+                        <div class="card-content" id="NbTweetsByPolitics"></div>
+                        <div class="card-action">
+                          <a>Nombre de tweets de chaque candidat</a>
                         </div>
+                      </div>
                     </div>
+                  </div>
                 </div>
             </div>
             <div class="col s12 m8">
                 <div class="icon-block">
                     <h5 class="center">Distribution des tweets selon les heures</h5>
-                    <canvas id="HoursDistribution"></canvas>
+                    <div class="loader"><canvas id="HoursDistribution"></canvas></div>
                 </div>
             </div>
         </div>
@@ -40,13 +42,13 @@
             <div class="col s12 m6">
                 <div class="icon-block">
                     <h5 class="center">Mots les plus employés par les candidats</h5>
-                    <canvas id="barCommonWords"></canvas>
+                    <div class="loader"><canvas id="barCommonWords"></canvas></div>
                 </div>
             </div>
             <div class="col s12 m6">
                 <div class="icon-block">
                     <h5 class="center">Lemmes les plus employés par les candidats</h5>
-                    <canvas id="barLemmatizedWords"></canvas>
+                    <div class="loader"><canvas id="barLemmatizedWords"></canvas></div>
                 </div>
             </div>
         </div>
@@ -55,7 +57,7 @@
             <div class="col s12 m12">
                 <div class="icon-block">
                     <h5 class="center">Sujets abordés par les politiques et mots clés correspondants</h5>
-                    <table class="centered bordered" id="LDAtopics">
+                    <table class="centered bordered loader" id="LDAtopics">
                       <!-- To be filled with topics from LDA -->
                     </table>
                 </div>
@@ -71,52 +73,69 @@
 <script src="{% static "js/utils.js" %}"></script>
 <script>
 $(document).ready(function () {
-  createBarChartHours("HoursDistribution",{{hours|safe}},"Number of tweets");
-  createBarChart("barCommonWords",{{words|safe}},"Occurence des mots");
-  createBarChart("barLemmatizedWords",{{lemmes|safe}},"Occurence des lemmes");
-
-  var politics = {{politics|safe}};
-  var nbTweets = {{nbTweets|safe}};
-  var content= '';
-  for(var i=0 ; i < politics.length ; i++)
-    content += '<tr><td>' + politics[i] + ' :</td><td>' + nbTweets[i] + '</td></tr>';
-  $( "#NbTweetsByPolitics").html("<table>" + content + "</table>");
-
-  var topics = {{bubblesJson|safe}};
-  var tableHead = '';
-  var tableBody = '';
-  (topics.children).forEach(function(topic, index) {
-    console.log(topic);
-    tableHead = tableHead + '<th>Sujet ' + (index+1) + '</th>';
-    tableBody = tableBody + '<tr>';
-    (topic.children).forEach(function(word) {
-      tableBody = tableBody + '<td style="font-size:' + (word.amount*8) + '%;">' + word.label + '</td>';
-    });
-    tableBody = tableBody + '</tr>';
-  });
-  var tableTopics = $('#LDAtopics');
-  tableTopics.html('<thead><tr>' + tableHead + '</tr></thead><tbody>' + tableBody + '</tbody>');
-
-  var t = $('#LDAtopics tbody').eq(0);
-    var r = t.find('tr');
-    var cols= r.length;
-    var rows= r.eq(0).find('td').length;
-    var cell, next, tem, i = 0;
-    var tb= $('<tbody></tbody>');
-
-    while(i<rows){
-        cell= 0;
-        tem= $('<tr></tr>');
-        while(cell<cols){
-            next= r.eq(cell++).find('td').eq(0);
-            tem.append(next);
-        }
-        tb.append(tem);
-        ++i;
-    }
-    tableTopics.append(tb);
-    tableTopics.show();
-
+   $.get('/api/v1/user/hours', function(res, status) {
+     if (status === 'success') {
+       createBarChartHours("HoursDistribution", res.hours, "Nombre de tweets");
+       $('#HoursDistribution').parent().removeClass('loader');
+     }
+   });
+   $.get('/api/v1/user/wordcount', function(res, status) {
+     if (status === 'success') {
+       createBarChart("barCommonWords", res.words, "Occurence des mots");
+       $('#barCommonWords').parent().removeClass('loader');
+     }
+   });
+   $.get('/api/v1/user/lemmecount', function(res, status) {
+     if (status === 'success') {
+       createBarChart("barLemmatizedWords", res.lemmes, "Occurence des lemmes");
+       $('#barLemmatizedWords').parent().removeClass('loader');
+     }
+   });
+   $.get('/api/v1/user/nbtweets', function(res, status) {
+     if (status === 'success') {
+       var content= '';
+       for(var i=0 ; i < res.politics.length ; i++)
+         content += '<tr><td>'+ res.politics[i] + ':</td><td>' + res.nbTweets[i] + '</td></tr>';
+       $("#NbTweetsByPolitics").html("<table>"+content + "</table>");
+       $('#nbTweetsLoader').removeClass('loader');
+     }
+   });
+   $.get('/api/v1/nlp/lda/topics', function(res, status) {
+     if (status === 'success') {
+       var topics = JSON.parse(res).topics;
+       var tableHead = '';
+       var tableBody = '';
+       topics.forEach(function(topic, index) {
+         tableHead = tableHead + '<th>Sujet ' + (index+1) + '</th>';
+         tableBody = tableBody + '<tr>';
+         (topic.words).forEach(function(word) {
+           tableBody = tableBody + '<td style="font-size:' + (word.weight*8) + '%;">' + word.label + '</td>';
+         });
+         tableBody = tableBody + '</tr>';
+       });
+       var tableTopics = $('#LDAtopics');
+       tableTopics.html('<thead><tr>' + tableHead + '</tr></thead><tbody>' + tableBody + '</tbody>');
+       var t = $('#LDAtopics tbody').eq(0);
+       var r = t.find('tr');
+       var cols= r.length;
+       var rows= r.eq(0).find('td').length;
+       var cell, next, tem, i = 0;
+       var tb= $('<tbody></tbody>');
+       while(i<rows){
+         cell= 0;
+         tem= $('<tr></tr>');
+         while(cell<cols){
+           next= r.eq(cell++).find('td').eq(0);
+           tem.append(next);
+         }
+         tb.append(tem);
+         ++i;
+       }
+       tableTopics.append(tb);
+       tableTopics.show();
+       tableTopics.removeClass('loader');
+     }
+   });
 });
 </script>
 {% endblock %}
