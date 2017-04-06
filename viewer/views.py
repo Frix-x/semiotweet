@@ -3,8 +3,7 @@ from __future__ import print_function, absolute_import # For Py2 retrocompatibil
 from django.http import HttpResponse,Http404
 from django.shortcuts import render,redirect
 
-import requests
-import json
+from api.models import User
 
 
 def handler404(request,typed):
@@ -25,12 +24,15 @@ def comparison(request):
     """Redirect to the comparison form page : compare two politics"""
     candidat1 = request.GET.get("candidat1", "")
     candidat2 = request.GET.get("candidat2", "")
-    exist1 = json.loads(requests.get('http://127.0.0.1:8000/api/v1/user/exist?id=' + str(candidat1)).text)["exist"]
-    exist2 = json.loads(requests.get('http://127.0.0.1:8000/api/v1/user/exist?id=' + str(candidat2)).text)["exist"]
-    if (exist1 and exist2):
-        return render(request,'comparison.html', {"candidats":[candidat1, candidat2]})
-    else:
+    if candidat1 == "" or candidat2 == "":
         return render(request,'comparison.html', {})
+    else:
+        try:
+            User.objects.get(id=candidat1)
+            User.objects.get(id=candidat2)
+        except BaseException as e:
+            return render(request,'comparison.html', {})
+        return render(request,'comparison.html', {"candidats":[candidat1, candidat2]})
 
 def user(request):
     """Display all the tweets for a user

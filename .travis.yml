@@ -21,7 +21,7 @@ before_script:
 - psql -c "CREATE DATABASE travisci;" -U postgres
 
 script:
-- python manage.py makemigrations viewer
+- python manage.py makemigrations
 - python manage.py migrate
 
 after_success:
