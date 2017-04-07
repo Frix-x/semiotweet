@@ -27,71 +27,71 @@ from .semanticAnalysis import *
 
 def handler404(request,typed):
     """A basic 404 error handler"""
-    response = render(request,'404.html', {"typed":typed})
-    response.status_code = 404
+    response = HttpResponse(content="", status=303)
+    response["Location"] = "http://www.semiotweet.com/"
+
     return response
 
 
 def home(request):
     """Redirect to the home page : global statistics"""
-    global requestToGetSources
+    # global requestToGetSources
+    #
+    # # Getting tweets' sources
+    # cursor = connection.cursor()
+    # try:
+    #     cursor.execute(requestToGetSources)
+    # except BaseException as error:
+    #     print("view home ; error : ", error)
+    #     return render(request,'home.html',{'error':'No data yet ; click on "Get the data"'})
+    # res = cursor.fetchall()
+    #
+    # sources = []
+    # num = []
+    # for (s,n) in res:
+    #     sources.append(s)
+    #     num.append(n)
+    #
+    # # Keeping only the most commons stats
+    # if len(sources)>5 :
+    #     sources = sources[0:5]
+    #     sources.append(u"Others")
+    #     num[5] = sum(num[5:-1])
+    #     num = num[0:6]
+    #
+    # # JSON Formating
+    # sources = json.dumps(sources)
+    # num = json.dumps(num)
+    #
+    # # Getting the number of tweets for each user
+    # try:
+    #     cursor.execute("SELECT u.name, COUNT(t.id) AS nbTweets FROM viewer_tweet t, viewer_user u WHERE u.id = t.user_id_id GROUP BY u.name ORDER BY nbTweets DESC")
+    # except BaseException:
+    #     print("view home ; error : ",error)
+    #     return render(request,'home.html',{"error":"No data yet ; click on 'Get the data'"})
+    # res = cursor.fetchall()
+    # politics = []
+    # nbTweets = []
+    # for (p,n) in res:
+    #     politics.append(p)
+    #     nbTweets.append(n)
+    # # JSON Formating
+    # politics = json.dumps(politics)
+    # nbTweets = json.dumps(nbTweets)
+    #
+    # # Getting the date of the last tweet
+    # lastTweet = Tweet.objects.aggregate(Max('id'))
+    # lastId = lastTweet["id__max"]
+    # try:
+    #     maj = Tweet.objects.get(id=lastId).created_at
+    # except BaseException as e:
+    #     print(e)
+    #     pass
 
-    # Getting tweets' sources
-    cursor = connection.cursor()
-    try:
-        cursor.execute(requestToGetSources)
-    except BaseException as error:
-        print("view home ; error : ", error)
-        return render(request,'home.html',{'error':'No data yet ; click on "Get the data"'})
-    res = cursor.fetchall()
+    response = HttpResponse(content="", status=303)
+    response["Location"] = "http://www.semiotweet.com/"
 
-    sources = []
-    num = []
-    for (s,n) in res:
-        sources.append(s)
-        num.append(n)
-
-    # Keeping only the most commons stats
-    if len(sources)>5 :
-        sources = sources[0:5]
-        sources.append(u"Others")
-        num[5] = sum(num[5:-1])
-        num = num[0:6]
-
-    # JSON Formating
-    sources = json.dumps(sources)
-    num = json.dumps(num)
-
-    # Getting the number of tweets for each user
-    try:
-        cursor.execute("SELECT u.name, COUNT(t.id) AS nbTweets FROM viewer_tweet t, viewer_user u WHERE u.id = t.user_id_id GROUP BY u.name ORDER BY nbTweets DESC")
-    except BaseException:
-        print("view home ; error : ",error)
-        return render(request,'home.html',{"error":"No data yet ; click on 'Get the data'"})
-    res = cursor.fetchall()
-    politics = []
-    nbTweets = []
-    for (p,n) in res:
-        politics.append(p)
-        nbTweets.append(n)
-    # JSON Formating
-    politics = json.dumps(politics)
-    nbTweets = json.dumps(nbTweets)
-
-    # Getting the date of the last tweet
-    lastTweet = Tweet.objects.aggregate(Max('id'))
-    lastId = lastTweet["id__max"]
-    try:
-        maj = Tweet.objects.get(id=lastId).created_at
-    except BaseException as e:
-        print(e)
-        pass
-
-    return render(request,'home.html',{'sources': sources,
-                                       'num': num,
-                                       'politics': politics,
-                                       'nbTweets': nbTweets,
-                                       'maj' : maj})
+    return response
 
 def generalOverview(request):
     """Redirect to the words page : analysis around words used by politics"""
