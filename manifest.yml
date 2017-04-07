@@ -1,8 +1,0 @@
-applications:
-- name: Semiotweet
-  host: semiotweet
-  instances: 4
-  memory: 512M
-  path: .
-  buildpack: https://github.com/cloudfoundry/buildpack-python.git
-  command: chmod +x run.sh && ./run.sh
