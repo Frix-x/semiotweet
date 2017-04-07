@@ -1,0 +1,81 @@
+{% extends "template.html" %}
+{% block title %} | Methodologie {% endblock %}
+{% load static %}
+{% block content %}
+
+<div class="section no-pad-bot" id="index-banner">
+    <div class="container">
+        <br><br>
+        <h1 class="header center orange-text">Méthodologie</h1>
+        <div class="row center">
+            <h5 class="header col s12 light">Comment les tweets sont traités et les sujets analysés.</h5>
+        </div>
+        <br><br>
+    </div>
+</div>
+
+
+<div class="container">
+    <div class="section">
+          <div class="row">
+            <div class="col s12 m12">
+                <div class="icon-block">
+                  <h5 class="center">D'où proviennent les données et que contiennent-elles ?</h5>
+                  <p>
+                    Toutes les données, stockées comme récupérées à la volée proviennent de l'API de Twitter.
+                    <br/>Les données récupérées contiennent de nombreuses informations concernant les candidats.
+                    <br/>De toutes ces informations, nous ne gardons que :
+                    <div class="col s6 m6">
+                    <ul>
+                      <li> l'identifiant du candidat ; </li>
+                      <li> son nom ; </li>
+                      <li> son pseudo ; </li>
+                      <li> la date de création de son compte ; </li>
+                      <li> la participation de contributeurs au post de tweets ; </li>
+                      <li> si le compte est vérifié ou non ; </li>
+                      <li> la description du profil du candidat ; </li>
+                      <li> le nombre de followers ; </li>
+                      <li> l'url de l'image de profil ; </li>
+                    </ul>
+                    </div>
+
+                   Au niveau des tweets, il y a encore plus d'informations. Parmi celles-ci, nous gardons :
+                   <div class="col s6 m6">
+                   <ul>
+                     <li> son identifiant du tweet ; </li>
+                     <li> le candidat qui l'a posté ; </li>
+                     <li> son contenu textuel du tweet ; </li>
+                     <li> sa date de publication ; </li>
+                     <li> s'il répond ou non à un autre tweet (dans ce dernier cas on stocke aussi l'identificateur du tweet initial et l'identificateur de son auteur) ; </li>
+                     <li> le nombre de likes ; ; </li>
+                     <li> son nombre de retweets; ; </li>
+                     <li> la plateforme à partir de laquelle il fut posté ; </li>
+                     <li> sa langue (basée sur la reconnaissance de Twitter) ; </li>
+                   </ul>
+                   </div>
+                  </p>
+                </div>
+
+                <div class="icon-block">
+                  <h5 class="center">Comment sont traitées les données ?</h5>
+                  <p>
+                  </p>
+                </div>
+
+                <div class="icon-block">
+                  <h5 class="center">Est-ce légal ?</h5>
+                  <p>
+                  </p>
+                </div>
+
+                <div class="icon-block">
+                  <h5 class="center">Est-ce éthique ?</h5>
+                  <p>
+                  </p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <br><br>
+</div>
+{% endblock %}
