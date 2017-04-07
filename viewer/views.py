@@ -5,6 +5,8 @@ from django.shortcuts import render,redirect
 
 from api.models import User
 
+import requests
+import json
 
 def handler404(request,typed):
     """A basic 404 error handler"""
