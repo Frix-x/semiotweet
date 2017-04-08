@@ -20,38 +20,58 @@
           <div class="row">
             <div class="col s12 m12">
                 <div class="icon-block">
+                  <h5 class="center">Comment est née l'idée de SemioTweet ? Un projet d'étude ? Un constat ?</h5>
+                  <p> L'idée de ce projet est venue suite à la lecture d'un tweet particulièrement partisan : est-il possible
+                    d'analyser les termes employés pour dégager les sujets abordés par les candidats ?
+                    Julien a donc commencé à développer son idée ; très vite Félix et Valentin sommes venu l'épauler, trouvant l'idée très intéréssante.
+                  </p>
+                </div>
+                <div class="icon-block">
+                  <h5 class="center">Pourquoi se focaliser sur les mots choisis, les éléments de langage des candidats ?</h5>
+                  <p>
+                    Travailler sur des sondages ne nous plait pas (parce que c'est tout ou rien et parce que l'on vote
+                    plus contre des personnes que pour ne personne).
+                    Nous nous sommes intéressés à un traitement mathématique des textes des tweets en se ramenant à la sémantique des mots.
+                    Des modèles en traitement automatiques des langues permettent de faire cela ; nous avons fait le choix des modèles LDA.
+                  </p>
+                </div>
+                <div class="icon-block">
                   <h5 class="center">D'où proviennent les données et que contiennent-elles ?</h5>
                   <p>
                     Toutes les données, stockées comme récupérées à la volée proviennent de l'API de Twitter.
                     <br/>Les données récupérées contiennent de nombreuses informations concernant les candidats.
                     <br/>De toutes ces informations, nous ne gardons que :
                     <div class="col s6 m6">
-                    <ul>
-                      <li> l'identifiant du candidat ; </li>
-                      <li> son nom ; </li>
-                      <li> son pseudo ; </li>
-                      <li> la date de création de son compte ; </li>
-                      <li> la participation de contributeurs au post de tweets ; </li>
-                      <li> si le compte est vérifié ou non ; </li>
-                      <li> la description du profil du candidat ; </li>
-                      <li> le nombre de followers ; </li>
-                      <li> l'url de l'image de profil ; </li>
-                    </ul>
+                      <div class="icon-block">
+                        <ul>
+                          <li> l'identifiant du candidat ; </li>
+                          <li> son nom ; </li>
+                          <li> son pseudo ; </li>
+                          <li> la date de création de son compte ; </li>
+                          <li> la participation de contributeurs au post de tweets ; </li>
+                          <li> si le compte est vérifié ou non ; </li>
+                          <li> la description du profil du candidat ; </li>
+                          <li> le nombre de followers ; </li>
+                          <li> l'url de l'image de profil ; </li>
+                        </ul>
+                      </div>
                     </div>
 
                    Au niveau des tweets, il y a encore plus d'informations. Parmi celles-ci, nous gardons :
                    <div class="col s6 m6">
-                   <ul>
-                     <li> son identifiant du tweet ; </li>
-                     <li> le candidat qui l'a posté ; </li>
-                     <li> son contenu textuel du tweet ; </li>
-                     <li> sa date de publication ; </li>
-                     <li> s'il répond ou non à un autre tweet (dans ce dernier cas on stocke aussi l'identificateur du tweet initial et l'identificateur de son auteur) ; </li>
-                     <li> le nombre de likes ; ; </li>
-                     <li> son nombre de retweets; ; </li>
-                     <li> la plateforme à partir de laquelle il fut posté ; </li>
-                     <li> sa langue (basée sur la reconnaissance de Twitter) ; </li>
-                   </ul>
+                     <div class="icon-block">
+                       <ul>
+                         <li> son identifiant du tweet ; </li>
+                         <li> le candidat qui l'a posté ; </li>
+                         <li> son contenu textuel du tweet ; </li>
+                         <li> sa date de publication ; </li>
+                         <li> s'il répond ou non à un autre tweet (dans ce dernier cas on stocke aussi l'identificateur du tweet initial et l'identificateur de son auteur) ; </li>
+                         <li> le nombre de likes ; ; </li>
+                         <li> son nombre de retweets; ; </li>
+                         <li> la plateforme à partir de laquelle il fut posté ; </li>
+                         <li> sa langue (basée sur la reconnaissance de Twitter) ; </li>
+                       </ul>
+                    </div>
                    </div>
                   </p>
                 </div>
@@ -59,18 +79,49 @@
                 <div class="icon-block">
                   <h5 class="center">Comment sont traitées les données ?</h5>
                   <p>
+                    À venir.
+                  </p>
+                </div>
+
+                <div class="icon-block">
+                  <h5 class="center">Qu'est-ce que sont les modèles LDA ?</h5>
+                  <p>
+                    À venir.
+                  </p>
+                </div>
+
+                <div class="icon-block">
+                  <h5 class="center">Qu'elles seront les prochaines fonctionnalités ?</h5>
+                  <p>
+                    Nous sommes actuellement en train de travailer sur l'ajout de nouvelles fonctionnalités
+                    , et à l'introduction de nouveaux graphes et indicateurs.
+                    Notre but principal est avant tout de réaliser des analyes plus fines.
+                    Nous n'y sommes pas encore, mais nous sommes en train de développer tout cela.
+                    Aussi, si vous avez des idées, n'hésitez pas à nous contacter !
+                  </p>
+                </div>
+
+                <div class="icon-block">
+                  <h5 class="center">Que va-t-il devenir après l'élection présidentielle ? Suite aux législatives ?</h5>
+                  <p>
+                    Suite à l'élection, nous souhaitons étendre Semiotweet à l'ensemble de la sphére politique car on pense que l'analyse
+                    des dires des politiciens n'a pas seulement lieu d'être pendant des élections (même si le contexte s'y prête particulièrement).
+                    Comme le site a été fait de manière très modulaire, on peut aussi envisager de faire ce genre d'analyse
+                    sur des thèmes totalement différent (musiciens, présentateurs tv, ou même d'autre médias). À voir.
                   </p>
                 </div>
 
                 <div class="icon-block">
                   <h5 class="center">Est-ce légal ?</h5>
                   <p>
+                    À venir. Spoiler : oui.
                   </p>
                 </div>
 
                 <div class="icon-block">
                   <h5 class="center">Est-ce éthique ?</h5>
                   <p>
+                    À venir. Spoiler : question pas simple, grosse problématique actuelle.
                   </p>
                 </div>
             </div>
