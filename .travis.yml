@@ -29,6 +29,6 @@ after_success:
 
 notifications:
   email: false
-#addons:
-#  code_climate:
-#    repo_token: "$CODE_CLIMATE_REPO_TOKEN"
+addons:
+ code_climate:
+   repo_token: "$CODE_CLIMATE_REPO_TOKEN"
