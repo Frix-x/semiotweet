@@ -1,3 +1,9 @@
+[![Build Status](https://travis-ci.org/jjerphan/semiotweet.svg?branch=master)](https://travis-ci.org/jjerphan/semiotweet)
+[![Dependency Status](https://gemnasium.com/github.com/jjerphan/semiotweet.svg)](https://gemnasium.com/github.com/jjerphan/semiotweet)
+[![Code Climate](https://codeclimate.com/github/jjerphan/semiotweet/badges/gpa.svg)](https://codeclimate.com/github/jjerphan/semiotweet)
+[![Test Coverage](https://codeclimate.com/github/jjerphan/semiotweet/badges/coverage.svg)](https://codeclimate.com/github/jjerphan/semiotweet/coverage)
+[![Issue Count](https://codeclimate.com/github/jjerphan/semiotweet/badges/issue_count.svg)](https://codeclimate.com/github/jjerphan/semiotweet)
+
 # <img src="viewer/static/images/semiotweet.jpg" width="60" height="60" alt = "Logo"/> Semiotweet
 Tweets analysis from politics.
 
