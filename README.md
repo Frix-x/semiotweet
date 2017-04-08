@@ -1,11 +1,12 @@
+# <img src="viewer/static/images/semiotweet.jpg" width="60" height="60" alt = "Logo"/> Semiotweet
+Tweets analysis from politics.
+
 [![Build Status](https://travis-ci.org/jjerphan/semiotweet.svg?branch=master)](https://travis-ci.org/jjerphan/semiotweet)
-[![Dependency Status](https://gemnasium.com/github.com/jjerphan/semiotweet.svg)](https://gemnasium.com/github.com/jjerphan/semiotweet)
+[![Dependency Status](https://gemnasium.com/badges/github.com/jjerphan/semiotweet.svg)](https://gemnasium.com/github.com/jjerphan/semiotweet)
 [![Code Climate](https://codeclimate.com/github/jjerphan/semiotweet/badges/gpa.svg)](https://codeclimate.com/github/jjerphan/semiotweet)
 [![Test Coverage](https://codeclimate.com/github/jjerphan/semiotweet/badges/coverage.svg)](https://codeclimate.com/github/jjerphan/semiotweet/coverage)
 [![Issue Count](https://codeclimate.com/github/jjerphan/semiotweet/badges/issue_count.svg)](https://codeclimate.com/github/jjerphan/semiotweet)
 
-# <img src="viewer/static/images/semiotweet.jpg" width="60" height="60" alt = "Logo"/> Semiotweet
-Tweets analysis from politics.
 
 The project is online [here](http://www.semiotweet.com) !
 <img src="http://www.numerama.com/content/uploads/2017/03/fillon.png" alt = "François Fillon"/>
@@ -29,8 +30,11 @@ Stack is subjects to know changes.
 
 ## Architecture, data structures & models
 
-There's just one app called `viewer` yet. `urls.py` directly redirects to this app.
-`extraction.py` and `semanticAnalysis.py` contains functions that are used in the views.
+There's two apps called `viewer` and `api`.
+
+`urls.py` directly redirects to this first app (`viewer`).
+
+`api` is a classic REST API for the website.
 
 The one from `extraction.py` catch the tweets, those in `semanticAnalysis.py` process the analysis.
 The analysis is based on *LDA (Latent Dirichlet allocation)*.
@@ -38,7 +42,7 @@ The analysis is based on *LDA (Latent Dirichlet allocation)*.
 
 ## UML TO BE UPDATED !
 
-There are only two models : `Tweet` and `User` :
+There are three models : `Tweet`, `User` and `LdaModel` :
 ![DataBase](UML.png)
 
 Those models may change with new features.
@@ -131,7 +135,7 @@ Finally, `$ python manage.py runserver` runs the server locally.
 
 ## Getting users data and tweets
 
-Once the server is running, you can extact the data concerning the users and their tweets by clicking on `Update Data` or by getting to `http://127.0.0.1:8000/getData/`
+Once the server is running, you can extact the data concerning the users and their tweets using the api : `http://127.0.0.1:8000/api/v1.0/getData/`
 
 ## Project Progress
 
@@ -139,8 +143,8 @@ Once the server is running, you can extact the data concerning the users and the
 | -------------                                                       | -------------                 |
 | Connection to Twitter API (100%)                                    |  Semantic fields (80%)        |
 | Basic architecture (100%)                                           | JS libraries (90 %)           |
-| Defining models (100%)                                              |                               |
-| Defining Env' Variables (100%)                                      | README.md (60%)               |
+| Defining models (100%)                                              | README.md (60%)               |
+| Defining Env' Variables (100%)                                      |                |
 | Extracting user info (100%)                                         ||
 | Extracting old tweets (100%)                                        ||
 | Extracting latest tweets (100%)                                     ||
