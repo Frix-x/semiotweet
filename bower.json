@@ -1,0 +1,32 @@
+{
+  "name": "semiotweet",
+  "homepage": "https://github.com/jjerphan/semiotweet",
+  "authors": [
+    "jjerphan <julien.jerphanion@protonmail.com>",
+    "Frix-x",
+    "ValentinMntp <valentin.mntp@gmail.com>"
+  ],
+  "description": "Tweets Analysis from Politics",
+  "main": "",
+  "keywords": [
+    "Twitter",
+    "LDA",
+    "NLP"
+  ],
+  "license": "GNU General Public Licence (Version 3, 29 June 2007)",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "viewer/static/js/bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "jquery": "^3.2.1",
+    "materialize": "^0.98.1",
+    "chart.js": "Chart.js#^2.5.0",
+    "vis": "^4.19.1"
+  }
+}
