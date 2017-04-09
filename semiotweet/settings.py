@@ -32,7 +32,7 @@ def getEnvValue(varName):
 SECRET_KEY = getEnvValue('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = getEnvValue('DEBUG')
 
 # Application definition
 
