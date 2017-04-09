@@ -13,7 +13,7 @@ future==0.16.0
 gensim==1.0.1
 gunicorn==19.7.1
 httplib2==0.10.3
-json-table-schema==0.5.0
+json-table-schema==0.2.1
 jsonschema==2.6.0
 lxml==3.7.3
 numpy==1.12.1

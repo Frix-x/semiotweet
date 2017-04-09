@@ -3,4 +3,5 @@ exclude_paths:
 - "**materialize**"
 - "**Chart.js"
 - "**d3**"
+- "**vis.js**"
 - "**/vendor/"
