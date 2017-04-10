@@ -32,6 +32,13 @@ def comparison(request):
     candidat2 = request.GET.get("candidat2", "")
     if candidat1 == "" or candidat2 == "":
         return render(request,'comparison.html', {})
+    else:
+        try:
+            User.objects.get(id=candidat1)
+            User.objects.get(id=candidat2)
+        except BaseException as e:
+            return render(request,'comparison.html', {})
+        return render(request,'comparison.html', {"candidats":[candidat1, candidat2]})
 
 def user(request):
     """Display all the tweets for a user
