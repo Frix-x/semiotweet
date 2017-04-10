@@ -1,0 +1,164 @@
+{% extends "template.html" %} {% block title %} | Methodologie {% endblock %} {% load static %} {% block content %}
+
+<div class="section no-pad-bot" id="index-banner">
+    <div class="container">
+        <br><br>
+        <h1 class="header center orange-text">Méthodologie</h1>
+        <div class="row center">
+            <h5 class="header col s12 light">Tous les secrets derrière Semiotweet</h5>
+        </div>
+        <br><br>
+    </div>
+</div>
+
+
+<div class="container">
+    <div class="section">
+        <div class="row">
+            <div class="col s12 m12">
+                <div class="icon-block">
+                    <h5 class="header orange-text">Comment est née l'idée de Semiotweet ?</h5>
+                    <p>
+                        L'idée de Semiotweet est née suite à la lecture d'un tweet particulièrement partisan par Julien qui s'est alors demandé s'il était possible d'analyser informatiquement la masse de tweets disponible afin afin d'en dégager les sujets abordés par les différents
+                        candidats. Nous avons donc commencé à développer une première version de l'application pour nous fin février 2017, puis nous avons choisis de la rendre publique lorsque nous nous sommes rendu compte que ces informations pouvaient
+                        être intéressante pour le plus grand nombre.
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col s12 m12">
+                <div class="icon-block">
+                    <h5 class="header orange-text">Pourquoi se focaliser sur les mots et les éléments de langage des candidats ?</h5>
+                    <p>
+                        Aujourd'hui la plupart des études politiques sont basées sur des sondages et ne nous plaisent pas car c'est un choix "tout" ou "rien". De plus, de nos jours les français votent de plus en plus contre des candidats que pour un candidat. Nous avons donc
+                        choisis d'apporter une vision nouvelle par un traitement informatisé de la sémantique des textes disponibles dans les tweets des candidats (à l'aide d'une approche statistique et mathématique).
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col s12 m12">
+                <div class="icon-block">
+                    <h5 class="header orange-text">D'où proviennent les données et que contiennent-elles ?</h5>
+                    <p>
+                        Toutes les données sont récupérées à la volée de l'API de Twitter, puis sont stockées dans notre base de données afin de réaliser les calculs permettant la création des différents graphes et indicateurs présents sur le site. Ces données sont mises à jour
+                        régulièrement et de façon automatique par nos algorithmes (dernière mise à jour le <span id="MAJ"></span>).
+                        <br><br> Voici quelles sont les données stockées dans notre base de données :
+                    </p>
+                    <div class="col s12 m6">
+                        <ul class="collection with-header">
+                            <li class="collection-header">
+                                <h5>Au niveau des candidats</h5></li>
+                            <li class="collection-item">L'identifiant unique du compte</li>
+                            <li class="collection-item">Le nom complet</li>
+                            <li class="collection-item">Le pseudo</li>
+                            <li class="collection-item">La date d'inscription sur tweeter</li>
+                            <li class="collection-item">L'ouverture des posts aux contributeurs</li>
+                            <li class="collection-item">Si le compte est vérifié ou non</li>
+                            <li class="collection-item">La description du profil</li>
+                            <li class="collection-item">Le nombre de followers</li>
+                            <li class="collection-item">La photo de profil</li>
+                        </ul>
+                    </div>
+                    <div class="col s12 m6">
+                        <ul class="collection with-header">
+                            <li class="collection-header">
+                                <h5>Au niveau des tweets</h5></li>
+                            <li class="collection-item">L'identifiant unique du tweet</li>
+                            <li class="collection-item">Le candidat qui l'a posté</li>
+                            <li class="collection-item">Le contenu textuel</li>
+                            <li class="collection-item">La date et heure de publication</li>
+                            <li class="collection-item">S'il est en réponse à un autre tweet (et lequel)</li>
+                            <li class="collection-item">Le nombre de "likes"</li>
+                            <li class="collection-item">Le nombre de retweets</li>
+                            <li class="collection-item">La plateforme à partir de laquelle il fut posté</li>
+                            <li class="collection-item">La langue</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col s12 m12">
+                <div class="icon-block">
+                    <h5 class="header orange-text">Quel traitement est effectué sur les données ?</h5>
+                    <p>
+                        Pour l'instant, nous effectuons plusieurs traitements simples. Tout d'abord, chaque tweet est nettoyé puis stocké dans notre base de données afin de pouvoir effectuer des calculs dessus plus simplement. Ensuite, on commence par retirer les mots inutiles
+                        de la langue française tels que les déterminants, etc.. qui n'apportent aucun intérêt sémantique au message. Enfin, les mots sont comptés avant et après lemmatisation, les heures de tweets sont analysées, ... En parallèle, un modèle
+                        LDA (Latent Dirichlet Allocation) est calculé afin de faire de la "clusterisation de topics". C'est-à-dire qu'on cherche à déterminer de façon mathématique quels sont les "sujets" récurents dans les tweets des politiques. C'est
+                        ce modèle que l'on affiche dans le tableau des sujets. Ce tableau est avant tout un aperçu des possibilités offertes par le modèle LDA, mais une étude plus poussée est aujourd'hui en cours de développement.
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col s12 m12">
+                <div class="icon-block">
+                    <h5 class="header orange-text">Que signifie le mot "lemme" ?</h5>
+                    <p>
+                        Un lemme est un mot ramené à sa forme lexicale la plus simple. C'est-à-dire que les verbes sont ramenés à l'infinitif, les adjectifs et noms communs au masculin, singulier, etc... Cela permet de rassembler plus efficacement les mots de même signification
+                        lors de nos calculs, notamment pour le modèle LDA.
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col s12 m12">
+                <div class="icon-block">
+                    <h5 class="header orange-text">Quelles seront les prochaines fonctionnalités ?</h5>
+                    <p>
+                        Nous sommes continuellement en train de travailler sur l'ajout de nouvelles fonctionnalités et surtout à l'introduction de nouveaux graphes et indicateurs. Notre but principal est avant tout de réaliser des analyses plus fines. De plus, nous n'y sommes
+                        pas encore, mais nous aimerions aussi ajouter un côté "machine learning" afin de réaliser des prédictions ou d'analyser les sentiments qui se dégagent des tweets. Aussi, si vous avez des idées à nous suggérer, n'hésitez pas à nous
+                        contacter !
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col s12 m12">
+                <div class="icon-block">
+                    <h5 class="header orange-text">Que va devenir Semiotweet après l'élection présidentielle ? Suite aux législatives ?</h5>
+                    <p>
+                        Suite aux élections, nous souhaitons étendre Semiotweet à l'ensemble de la sphère politique car nous pensons que l'analyse des dires des politiciens n'a pas seulement lieu d'être pendant celles-ci (même si le contexte s'y prête particulièrement). Comme
+                        le site a été fait de manière modulaire, il est aussi envisageable de faire ce genre d'analyse sur des thèmes totalement différents (musiciens, séries TV, journaux, etc...).
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col s12 m12">
+                <div class="icon-block">
+                    <h5 class="header orange-text">Est-ce légal ?</h5>
+                    <p>
+                        La réponse est : <b>oui</b> ! En effet, nous ne faisons que l'exploitation de données publiques et visibles par tout le monde. L'originalité de Semiotweet est justement d'exploiter ces données "massives" de façon informatique afin
+                        d'en tirer des informations difficilement visibles pour un humain (ou alors nécessitant un temps inimaginable afin de réaliser les mêmes études). De plus, l'API de Twitter étant ouverte et gratuite, les tweets sont libres d'exploitation
+                        pour tout le monde (à condition de respecter quelques règles : <a target="_blank" href="https://dev.twitter.com/overview/terms/policy">voir ici</a>).
+                    </p>
+                </div>
+            </div>
+        </div>
+        <!-- <div class="row">
+            <div class="col s12 m12">
+                <div class="icon-block">
+                    <h5 class="header orange-text">Est-ce éthique ?</h5>
+                    <p>
+                        À venir. Spoiler : question pas simple, grosse problématique actuelle.
+                    </p>
+                </div>
+            </div>
+        </div> -->
+    </div>
+</div>
+{% endblock %} {% block script %}
+<script>
+    $(document).ready(function() {
+        $.get('/api/v1/tweet/last', function(res, status) {
+            if (status === 'success') {
+                var maj = new Date(res).toLocaleString();
+                $("#MAJ").html(maj);
+            }
+        });
+    });
+</script>
+{% endblock %}

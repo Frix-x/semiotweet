@@ -23,12 +23,13 @@ before_script:
 script:
 - python manage.py makemigrations
 - python manage.py migrate
+- coverage run --source=api,viewer --omit=*/migrations/* ./manage.py test --cover-inclusive --noinput
 
 after_success:
 - codeclimate-test-reporter
 
 notifications:
   email: false
-#addons:
-#  code_climate:
-#    repo_token: "$CODE_CLIMATE_REPO_TOKEN"
+addons:
+ code_climate:
+   repo_token: "$CODE_CLIMATE_REPO_TOKEN"

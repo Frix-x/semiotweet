@@ -22,6 +22,10 @@ def general(request):
     """Redirect to the words page : analysis around words used by politics"""
     return render(request,'generalOverview.html',{})
 
+def methodology(request):
+    """Redirects to the methodology page"""
+    return render(request,'methodology.html',{})
+
 def comparison(request):
     """Redirect to the comparison form page : compare two politics"""
     candidat1 = request.GET.get("candidat1", "")
