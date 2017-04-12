@@ -257,14 +257,19 @@ def netTweets(request):
 
     network = {"nodes":[], "edges":[]}
     nodeId = 1
+    appendedLemma = dict()
     for tweet in tweets:
         network["nodes"].append({"id":nodeId,"label":tweet["text"],"type":"tweet","user":tweet["user_id"]})
         currentTweetId = nodeId
         nodeId = nodeId + 1
-        # for lemme in tweet["lemmaArray"]:
-        #     network["nodes"].append({"id":nodeId,"label":lemme,"type":"lemme","user":0})
-        #     network["edges"].append({"from":currentTweetId,"to":nodeId})
-        #     nodeId = nodeId + 1
+        for lemme in tweet["lemmaArray"]:
+            if lemme not in appendedLemma:
+                network["nodes"].append({"id":nodeId,"label":lemme,"type":"lemme","user":0})
+                network["edges"].append({"from":currentTweetId,"to":nodeId})
+                appendedLemma[lemme] = nodeId
+                nodeId = nodeId + 1
+            else:
+                network["edges"].append({"from":currentTweetId,"to":appendedLemma[lemme]})
 
     return JsonResponse({"network":network}, status=200)
 

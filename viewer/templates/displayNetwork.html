@@ -26,36 +26,23 @@
 {% block script %}
 <script src="{% static "js/utils.js" %}"></script>
 <script type="text/javascript">
-  $(document).ready(function() {
-    // create an array with nodes
-    var nodes = new vis.DataSet([
-        {id: 1, label: 'Node 1'},
-        {id: 2, label: 'Node 2'},
-        {id: 3, label: 'Node 3'},
-        {id: 4, label: 'Node 4'},
-        {id: 5, label: 'Node 5'}
-    ]);
+    $(document).ready(function() {
+        $.get('/api/v1/nlp/network/tweets', function(res, status) {
+            if (status === 'success') {
+                var nodes = new vis.DataSet(res.network.nodes);
+                var edges = new vis.DataSet(res.network.edges);
+                var container = document.getElementById('keywordsNetwork');
 
-    // create an array with edges
-    var edges = new vis.DataSet([
-        {from: 1, to: 3},
-        {from: 1, to: 2},
-        {from: 2, to: 4},
-        {from: 2, to: 5}
-    ]);
-
-    // create a network
-    var container = document.getElementById('keywordsNetwork');
-
-    // provide the data in the vis format
-    var data = {
-        nodes: nodes,
-        edges: edges
-    };
-    var options = {};
-
-    // initialize your network!
-    var network = new vis.Network(container, data, options);
-  });
+                console.log(len(res.network.nodes));
+                console.log(len(res.network.edges));
+                // var data = {
+                //     nodes: nodes,
+                //     edges: edges
+                // };
+                // var options = {};
+                // var network = new vis.Network(container, data, options);
+            }
+        });
+    });
 </script>
 {% endblock %}
