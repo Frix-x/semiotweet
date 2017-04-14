@@ -250,7 +250,7 @@ def ldaTopics(request):
 def netTweets(request):
     # Get tweets and associated lemmes and make a json to put on a network
     try:
-        tweets = Tweet.objects.values('user_id', 'text', 'lemmaArray')
+        tweets = Tweet.objects.values('user_id', 'text', 'lemmaArray')[:50] # 50 last tweets for testing
     except BaseException as e:
         print("API - netTweets()\nError : ", e)
         return JsonResponse({"tweets":-1,"error":str(e)}, status=400)
@@ -262,7 +262,8 @@ def netTweets(request):
         network["nodes"].append({"id":nodeId,"label":tweet["text"],"type":"tweet","user":tweet["user_id"]})
         currentTweetId = nodeId
         nodeId = nodeId + 1
-        for lemme in tweet["lemmaArray"]:
+        lemmaArray = ast.literal_eval(tweet["lemmaArray"])
+        for lemme in lemmaArray:
             if lemme not in appendedLemma:
                 network["nodes"].append({"id":nodeId,"label":lemme,"type":"lemme","user":0})
                 network["edges"].append({"from":currentTweetId,"to":nodeId})
