@@ -79,7 +79,12 @@ def makeLdaModel(user=0):
 
         dictionary = corpora.Dictionary(allLemmaArray)
         corpus = [dictionary.doc2bow(document) for document in allLemmaArray]
-        ldamodel.update(corpus)
+        try:
+            ldamodel.update(corpus)
+        except IndexError:
+            print("Model update failed (Gensim error)... Building from scratch again")
+            LdaModel_db.delete()
+            return makeLdaModel(user)
 
     # Serializing the model & filling the data
     compressedLdaModel = pickle.dumps(ldamodel,protocol=-1)
