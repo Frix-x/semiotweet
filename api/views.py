@@ -11,7 +11,7 @@ from rest_framework.parsers import JSONParser
 
 
 # Forthe database
-from .models import Tweet,User,LdaModel
+from .models import Tweet,User,LdaModel,semanticField
 from django.db import connection #for direct SQL requests
 from django.db.models import Max
 
@@ -286,6 +286,7 @@ def getData(request):
     """Save the latest tweets from all the users defined in screen_nameToExtract
      and stores info about a users in the database not already done"""
     global screen_nameToExtract
+    global semanticWords
 
     # SAVING USERS
     for screen_name in screen_nameToExtract:
@@ -308,7 +309,7 @@ def getData(request):
     nbTweets = 0 # number of extracted tweets
 
     for screen_name in screen_nameToExtract:
-        print ("GET user tweets : "+screen_name)
+        print ("GET USER TWEETS : "+screen_name)
         try:
             idUser = User.objects.filter(screen_name=screen_name).values('id')[0]["id"]
         except SomeModel.DoesNotExist: # If the user does not exist
@@ -334,7 +335,7 @@ def getData(request):
         userFrom = User.objects.get(screen_name=screen_name)
         nbTweetsSaved = 1; #counter for printing
         for t in tweets:
-            print ("Saving {1} tweets from {0} ; {2:0.2f} %".format(screen_name,lenghtTweets,nbTweetsSaved/lenghtTweets*100))
+            print ("SAVING {1} TWEETS FROM {0} ; {2:0.2f} %".format(screen_name,lenghtTweets,nbTweetsSaved/lenghtTweets*100))
             success = saveTweet(t,userFrom) and success
             nbTweetsSaved += 1;
 
@@ -346,8 +347,39 @@ def getData(request):
         except SomeModel.DoesNotExist: # If the user does not exist
             continue # continue with the next user
         makeLdaModel(idUser)
-    print("MAKING GLOBAL LDA MODEL...")
+    print("MAKING GLOBAL LDA MODEL")
     makeLdaModel(0)
+
+    # POPULATING SEMANTIC FIELDS
+    for baseWord in semanticWords:
+        print("MAKING SEMANTIC FIELDS")
+        semanticField.objects.all().delete()
+        semanticFieldTable = getSemanticField(baseWord)
+        for word in semanticFieldTable:
+            semanticField_db = semanticField()
+            semanticField_db.baseWord = baseWord
+            semanticField_db.word = word
+            wordOccur = dict()
+            for screen_name in screen_nameToExtract:
+                try:
+                    idUser = User.objects.filter(screen_name=screen_name).values('id')[0]["id"]
+                except SomeModel.DoesNotExist: # If the user does not exist
+                    continue # continue with the next user
+
+                try: # We try to get the id of the user's last tweet
+                    tweets = Tweet.objects.filter(user_id=idUser)
+                except SomeModel.DoesNotExist:
+                    continue # continue with the next user
+
+                wordOccur[idUser] = 0
+                for tweet in tweets:
+                    lemmaArray = ast.literal_eval(tweet["lemmaArray"])
+                    if word in lemmaArray:
+                        wordOccur[screen_name] = wordOccur[screen_name] + 1
+
+            semanticField_db.usersScores = wordOccur
+            semanticField_db.save()
+
 
     print("\nEVERYTHING DONE !")
     return JsonResponse({"res":{"success":success,"error":0}}, status=200)
