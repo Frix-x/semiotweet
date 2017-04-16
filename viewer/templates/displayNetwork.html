@@ -64,7 +64,11 @@
                     autoResize: true,
                     height: '100%',
                     width: '100%',
-                    physics: spatialization
+                    physics: spatialization,
+                    clustering: {
+                        enabled: true
+                    },
+                    stabilize: false
                 };
 
                 var network = new vis.Network(container, data, options);

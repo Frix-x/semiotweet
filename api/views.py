@@ -250,27 +250,30 @@ def ldaTopics(request):
 def netTweets(request):
     # Get tweets and associated lemmes and make a json to put on a network
     try:
-        tweets = Tweet.objects.values('user_id', 'text', 'lemmaArray')[:50] # 50 last tweets for testing
+        tweets = Tweet.objects.values("user_id", "lemmaArray")
+        users = User.objects.values("id", "name")
     except BaseException as e:
         print("API - netTweets()\nError : ", e)
-        return JsonResponse({"tweets":-1,"error":str(e)}, status=400)
+        return JsonResponse({"error":str(e)}, status=400)
 
     network = {"nodes":[], "edges":[]}
     nodeId = 1
     appendedLemma = dict()
-    for tweet in tweets:
-        network["nodes"].append({"id":nodeId,"label":tweet["text"],"type":"tweet","user":tweet["user_id"]})
-        currentTweetId = nodeId
+    appendedUser = dict()
+    for user in users:
+        network["nodes"].append({"id":nodeId,"label":user["name"],"type":"user"})
+        appendedUser[user["id"]] = nodeId
         nodeId = nodeId + 1
+    for tweet in tweets:
         lemmaArray = ast.literal_eval(tweet["lemmaArray"])
         for lemme in lemmaArray:
             if lemme not in appendedLemma:
-                network["nodes"].append({"id":nodeId,"label":lemme,"type":"lemme","user":0})
-                network["edges"].append({"from":currentTweetId,"to":nodeId})
+                network["nodes"].append({"id":nodeId,"label":lemme,"type":"lemme"})
+                network["edges"].append({"from":appendedUser[tweet["user_id"]],"to":nodeId})
                 appendedLemma[lemme] = nodeId
                 nodeId = nodeId + 1
             else:
-                network["edges"].append({"from":currentTweetId,"to":appendedLemma[lemme]})
+                network["edges"].append({"from":appendedUser[tweet["user_id"]],"to":appendedLemma[lemme]})
 
     return JsonResponse({"network":network}, status=200)
 
