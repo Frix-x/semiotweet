@@ -37,6 +37,7 @@ try:
 except BaseException as e :
     print(e)
 
+
 def makeLdaModel(user=0):
     """Update LDA model to avoid long processing"""
     Lda = models.ldamodel.LdaModel
@@ -138,6 +139,7 @@ def tokenizeAndLemmatizeTweets(listTweets):
 
     return listTweets
 
+
 def countWords(listTweetText,nbWordsToExtract=20):
     """Takes a list of text and returns the words occurences"""
     wordOccurences = defaultdict(lambda: 0)
@@ -156,6 +158,22 @@ def toJsonForGraph(dict):
         output.append({"word":key,"occur":val})
 
     return output
+
+
+def getSemanticField(word):
+    """Get the semantic field of the word"""
+    page = requests.get('http://www.rimessolides.com/motscles.aspx?m='+word.lower())
+    tree = html.fromstring(page.content)
+    aim = "motscles.aspx?m="
+    semanticField = tree.xpath('//a[starts-with(@href,"'+aim+'")]/text()')
+
+    return semanticField
+
+
+# Base word used to build semantic fields
+semanticWords = ["france", "état", "sécurité", "peuple", "loi", "travail",
+                 "liberté", "démocratie", "république", "immigration", "terrorisme",
+                 "islam", "laïcité", "europe", "taxe"]
 
 # French Stop words (see : http://www.ranks.nl/stopwords/french)
 stopwords = ["alors","au","aucuns","aussi","autre","avant","avec","avoir","bon",

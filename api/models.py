@@ -77,3 +77,23 @@ class LdaModel(models.Model):
             return "LdaModel for user "+ str(self.user_id)
 
         return "General LdaModel"
+
+
+class semanticWord(models.Model):
+    """semanticWord class"""
+
+    word = models.CharField(primary_key=True,max_length=100)
+    semanticField = models.CharField(null=False,max_length=10000)
+    occurencesNum = models.ManyToManyField(User, through='Occurences')
+
+    def __str__(self):
+        return self.word + " (semantic field : "+ self.semanticField +")"
+
+class Occurences(models.Model):
+    """Occurences class for user semantic fields storage"""
+    occurencesNum = models.IntegerField(default=0)
+    user_id = models.ForeignKey(User)
+    word = models.ForeignKey(semanticWord)
+
+    def __str__(self):
+        return "{0} was said {1} times by the user of id : {2}".format(self.word, self.occurencesNum, self.user_id)
