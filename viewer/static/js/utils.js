@@ -1,19 +1,10 @@
 'use strict'
 function createBarChart (graphName, words, labelName) {
   // sorting desc by word.occur
-  words.sort(function (a, b) {
-    return b.occur - a.occur;
-  });
-  var word = [];
-  var occur = [];
-  for (var i = 0; i < words.length; i++) {
-    word.push(words[i].word);
-    occur.push(words[i].occur);
-  };
-  var colors = []
-  for (var i = 0; i < words.length; i++) {
-    colors[i] = 'rgba(54, 162, 235, 1)';
-  };
+  words.sort((a, b) => b.occur - a.occur)
+  var word = words.map(w => w.word)
+  var occur = words.map(w => w.occur)
+  var colors = words.map(w => 'rgba(54, 162, 235, 1)')
   new Chart(graphName, {
     type: 'bar',
     data: {
@@ -33,8 +24,8 @@ function createBarChart (graphName, words, labelName) {
         animateScale: true
       }
     }
-  });
-};
+  })
+}
 
 function createBarChartHours (graphName, hours, labelName) {
   new Chart(graphName, {
@@ -56,8 +47,8 @@ function createBarChartHours (graphName, hours, labelName) {
         animateScale: true
       }
     }
-  });
-};
+  })
+}
 
 function createDonut (graphName, sources, num) {
   new Chart(graphName, {
@@ -76,5 +67,5 @@ function createDonut (graphName, sources, num) {
         animateScale: true
       }
     }
-  });
-};
+  })
+}

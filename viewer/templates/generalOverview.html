@@ -89,9 +89,7 @@
         });
         $.get('/api/v1/user/nbtweets', function(res, status) {
             if (status === 'success') {
-                var content = '';
-                for (var i = 0; i < res.politics.length; i++)
-                    content += '<tr><td>' + res.politics[i] + ':</td><td>' + res.nbTweets[i] + '</td></tr>';
+                var content = res.politics.map((p, i) => '<tr><td>' + p + ':</td><td style="text-align: right;">' + res.nbTweets[i] + '</td></tr>').join('')
                 $("#NbTweetsByPolitics").html("<table>" + content + "</table>");
                 $('#nbTweetsLoader').removeClass('loader');
             }

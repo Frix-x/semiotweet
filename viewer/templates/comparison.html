@@ -92,7 +92,7 @@
   $(document).ready(function() {
       $.get('/api/v1/user', function(res, status) {
         if (status === 'success') {
-          for (let i=0 ; i < res.users.length ; i++) {
+          for (var i=0 ; i < res.users.length ; i++) {
             $( "select" ).append( "<option value='"+res.users[i].id+"' data-icon='"+ res.users[i].profile_image_url +"' class='left circle'>"+res.users[i].name +"</option>" );
           }
           {% if candidats %}
