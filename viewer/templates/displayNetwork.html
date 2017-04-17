@@ -16,7 +16,7 @@
         <div class="row">
           <div class="col s12 m12">
             <div class="icon-block">
-              <div class="loader" id="keywordsNetwork"></div>
+              <svg id="keywordsNetwork"></svg>
             </div>
         </div>
     </div>
@@ -27,56 +27,88 @@
 <script src="{% static "js/utils.js" %}"></script>
 <script type="text/javascript">
     $(document).ready(function() {
+        var graphWidth = $('#keywordsNetwork').width();
+        $('#keywordsNetwork').height(graphWidth);
+        console.log(graphWidth);
+
+        var svg = d3.select("svg"),
+            width = +svg.attr("width"),
+            height = +svg.attr("height");
+        var color = d3.scaleOrdinal(d3.schemeCategory20);
+        var simulation = d3.forceSimulation()
+            .force("link", d3.forceLink().id(function(d) {
+                return d.id;
+            }))
+            .force("charge", d3.forceManyBody())
+            .force("center", d3.forceCenter(width / 2, height / 2));
+
+        function dragstarted(d) {
+            if (!d3.event.active) simulation.alphaTarget(0.3).restart();
+            d.fx = d.x;
+            d.fy = d.y;
+        }
+
+        function dragged(d) {
+            d.fx = d3.event.x;
+            d.fy = d3.event.y;
+        }
+
+        function dragended(d) {
+            if (!d3.event.active) simulation.alphaTarget(0);
+            d.fx = null;
+            d.fy = null;
+        }
+
         $.get('/api/v1/nlp/network/tweets', function(res, status) {
             if (status === 'success') {
-                var nodes = new vis.DataSet(res.network.nodes);
-                var edges = new vis.DataSet(res.network.edges);
-                var container = document.getElementById('keywordsNetwork');
-
-                var data = {
-                    nodes: nodes,
-                    edges: edges
-                };
-                var spatialization = {
-                    enabled: true,
-                    forceAtlas2Based: {
-                        gravitationalConstant: -50,
-                        centralGravity: 0.01,
-                        springConstant: 0.08,
-                        springLength: 100,
-                        damping: 0.4,
-                        avoidOverlap: 0
-                    },
-                    maxVelocity: 50,
-                    minVelocity: 0.1,
-                    solver: 'forceAtlas2Based',
-                    stabilization: {
-                        enabled: true,
-                        iterations: 1000,
-                        updateInterval: 100,
-                        onlyDynamicEdges: false,
-                        fit: true
-                    },
-                    timestep: 0.5,
-                    adaptiveTimestep: true
-                };
-                var options = {
-                    autoResize: true,
-                    height: '100%',
-                    width: '100%',
-                    physics: spatialization,
-                    clustering: {
-                        enabled: true
-                    },
-                    stabilize: false
-                };
-
-                var network = new vis.Network(container, data, options);
-                $('#keywordsNetwork').removeClass('loader');
-                var graphWidth = $('#keywordsNetwork').width();
-                console.log(graphWidth);
-                $('#keywordsNetwork').height(graphWidth);
-                network.redraw();
+                var graph = res.network;
+                var link = svg.append("g")
+                    .attr("class", "links")
+                    .selectAll("line")
+                    .data(graph.links)
+                    .enter().append("line")
+                    .attr("stroke-width", function(d) {
+                        return Math.sqrt(d.value);
+                    });
+                var node = svg.append("g")
+                    .attr("class", "nodes")
+                    .selectAll("circle")
+                    .data(graph.nodes)
+                    .enter().append("circle")
+                    .attr("r", 5)
+                    .attr("fill", function(d) {
+                        return color(d.group);
+                    })
+                    .call(d3.drag()
+                        .on("start", dragstarted)
+                        .on("drag", dragged)
+                        .on("end", dragended));
+                node.append("title")
+                    .text(function(d) {
+                        return d.id;
+                    });
+                simulation.nodes(graph.nodes).on("tick", ticked);
+                simulation.force("link").links(graph.links);
+                function ticked() {
+                    link.attr("x1", function(d) {
+                            return d.source.x;
+                        })
+                        .attr("y1", function(d) {
+                            return d.source.y;
+                        })
+                        .attr("x2", function(d) {
+                            return d.target.x;
+                        })
+                        .attr("y2", function(d) {
+                            return d.target.y;
+                        });
+                    node.attr("cx", function(d) {
+                            return d.x;
+                        })
+                        .attr("cy", function(d) {
+                            return d.y;
+                        });
+                }
             }
         });
     });

@@ -249,32 +249,37 @@ def ldaTopics(request):
 
 
 def netTweets(request):
-    # Get tweets and associated lemmes and make a json to put on a network
+    # Get users and link them to semantic fields
     try:
-        tweets = Tweet.objects.values("user_id", "lemmaArray")
-        users = User.objects.values("id", "name")
+        semanticField_db = semanticField.objects.all().values()
+        users = User.objects.all().values("screen_name", "name")
     except BaseException as e:
         print("API - netTweets()\nError : ", e)
         return JsonResponse({"error":str(e)}, status=400)
 
     network = {"nodes":[], "edges":[]}
     nodeId = 1
-    appendedLemma = dict()
-    appendedUser = dict()
+    appendedNodes = dict()
     for user in users:
-        network["nodes"].append({"id":nodeId,"label":user["name"],"type":"user"})
-        appendedUser[user["id"]] = nodeId
-        nodeId = nodeId + 1
-    for tweet in tweets:
-        lemmaArray = ast.literal_eval(tweet["lemmaArray"])
-        for lemme in lemmaArray:
-            if lemme not in appendedLemma:
-                network["nodes"].append({"id":nodeId,"label":lemme,"type":"lemme"})
-                network["edges"].append({"from":appendedUser[tweet["user_id"]],"to":nodeId})
-                appendedLemma[lemme] = nodeId
-                nodeId = nodeId + 1
-            else:
-                network["edges"].append({"from":appendedUser[tweet["user_id"]],"to":appendedLemma[lemme]})
+        network["nodes"].append({"id":nodeId,"label":user["name"],"screen_name":user["screen_name"],"group":1})
+        appendedNodes[user["screen_name"]] = nodeId
+        nodeId += 1
+    for semanticLine in semanticField_db:
+        if semanticLine["baseWord"] not in appendedNodes:
+            network["nodes"].append({"id":nodeId,"label":semanticLine["baseWord"],"group":2})
+            appendedNodes[semanticLine["baseWord"]] = nodeId
+            nodeId += 1
+        if semanticLine["word"] not in appendedNodes:
+            network["nodes"].append({"id":nodeId,"label":semanticLine["word"],"group":3})
+            network["edges"].append({"source":appendedNodes[semanticLine["baseWord"]],"target":nodeId})
+            appendedNodes[semanticLine["word"]] = nodeId
+            nodeId += 1
+        else:
+            network["edges"].append({"source":appendedNodes[semanticLine["baseWord"]],"target":appendedNodes[semanticLine["word"]],"value":1})
+        uScores = ast.literal_eval(semanticLine["usersScores"])
+        for screen_name,score in uScores.items():
+            if score != 0:
+                network["edges"].append({"source":appendedNodes[screen_name],"target":appendedNodes[semanticLine["word"]],"value":score})
 
     return JsonResponse({"network":network}, status=200)
 
