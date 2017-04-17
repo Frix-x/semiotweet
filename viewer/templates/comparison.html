@@ -37,30 +37,49 @@
             </div>
         </form>
     </div>
-    <br><br> {% if candidats %}
+    <br><br>
+    {% if candidats %}
     <div class="section">
         <div class="row">
             {% for candidat in candidats %}
-            <div class="col s6 m6">
+            <div class="col s12 m6">
                 <div class="icon-block">
                     <h5 class="center">Mots les plus employés</h5>
                     <div class="loader"><canvas id="MostCommonWords{{candidat}}"></canvas></div>
                 </div>
+            </div>
+            {% endfor %}
+          </div>
+          <div class="row">
+            {% for candidat in candidats %}
+              <div class="col s12 m6">
                 <div class="icon-block">
                     <h5 class="center">Lemmes les plus employés</h5>
                     <div class="loader"><canvas id="MostCommonLemmes{{candidat}}"></canvas></div>
                 </div>
+              </div>
+              {% endfor %}
+          </div>
+          <div class="row">
+            {% for candidat in candidats %}
+              <div class="col s12 m6">
                 <div class="icon-block">
-                    <h5 class="center">Distribution des tweets selon les heures</h5>
-                    <div class="loader"><canvas id="HoursDistribution{{candidat}}"></canvas></div>
+                  <h5 class="center">Distribution des tweets selon les heures</h5>
+                  <div class="loader"><canvas id="HoursDistribution{{candidat}}"></canvas></div>
                 </div>
+              </div>
+              {% endfor %}
+          </div>
+          <div class="row">
+            {% for candidat in candidats %}
+              <div class="col s12 m6">
                 <div class="icon-block">
-                    <h5 class="center">Sources des tweets</h5>
-                    <div class="loader"><canvas id="doughnutSources{{candidat}}"></canvas></div>
+                  <h5 class="center">Sources des tweets</h5>
+                  <div class="loader"><canvas id="doughnutSources{{candidat}}"></canvas></div>
                 </div>
-            </div>
-            {% endfor %}
-        </div>
+              </div>
+              {% endfor %}
+          </div>
     </div>
     {% endif %}
 </div>
@@ -71,16 +90,20 @@
 <script src="{% static "js/utils.js" %}"></script>
 <script>
   $(document).ready(function() {
-      $('select').material_select();
       $.get('/api/v1/user', function(res, status) {
         if (status === 'success') {
           for (let i=0 ; i < res.users.length ; i++) {
             $( "select" ).append( "<option value='"+res.users[i].id+"' data-icon='"+ res.users[i].profile_image_url +"' class='left circle'>"+res.users[i].name +"</option>" );
           }
+          {% if candidats %}
+            document.getElementById('candidat1').value='{{candidats.0}}';
+            document.getElementById('candidat2').value='{{candidats.1}}';
+          {% endif %}
           $('select').material_select();
         }
       });
-      {% if candidats %} {% for candidat in candidats %}
+      {% if candidats %}
+      {% for candidat in candidats %}
       $.get('/api/v1/user/sources', {"id":{{candidat}}}, function(res, status) {
         if (status === 'success') {
           createDonut("doughnutSources{{candidat}}", res.sources, res.num);
@@ -105,7 +128,9 @@
           $('#MostCommonLemmes{{candidat}}').parent().removeClass('loader');
         }
       });
-      {% endfor %} {% endif %}
+      {% endfor %}
+      {% endif %}
+  $('select').material_select();
   });
 </script>
 {% endblock %}
