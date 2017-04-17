@@ -237,15 +237,14 @@ def ldaTopics(request):
         print("API - ldaTopics()\nError : ", e)
         return JsonResponse({"ldaTopics":-1,"error":str(e)}, status=400)
 
-    topics = ldamodel.show_topics(num_topics=10, num_words=5, log=False, formatted=False)
+    topics = ldamodel.show_topics(num_topics=-1, num_words=10, log=False, formatted=False)
     tableJson = {"label":"ldaTopics","topics":[]}
     for index, topic in enumerate(topics):
         tableJson["topics"].append({"label":topic[0],"words":[]})
         for word in topic[1]:
             tableJson["topics"][index]["words"].append({"label":word[0],"weight":math.floor(300*word[1])})
-    tableJson = json.dumps(tableJson,default=str)
 
-    return HttpResponse(tableJson, status=200)
+    return JsonResponse(tableJson, status=200)
 
 
 #==============================#

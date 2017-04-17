@@ -55,9 +55,7 @@
             <div class="col s12 m12">
                 <div class="icon-block">
                     <h5 class="center">Sujets abordés par les politiques et mots clés correspondants</h5>
-                    <table class="centered bordered loader" id="LDAtopics">
-                        <!-- To be filled with topics from LDA -->
-                    </table>
+                    <div class="loader"><svg id="wordcloud"></svg></div>
                 </div>
             </div>
         </div>
@@ -67,6 +65,8 @@
 {% endblock %} {% block script %}
 <script src="{% static "js/Chart.js" %}"></script>
 <script src="{% static "js/utils.js" %}"></script>
+<script src="{% static "js/d3.min.js" %}"></script>
+<script src="{% static "js/d3.layout.cloud.js" %}"></script>
 <script>
     $(document).ready(function() {
         $.get('/api/v1/user/hours', function(res, status) {
@@ -96,38 +96,53 @@
         });
         $.get('/api/v1/nlp/lda/topics', function(res, status) {
             if (status === 'success') {
-                var topics = JSON.parse(res).topics;
-                var tableHead = '';
-                var tableBody = '';
-                topics.forEach(function(topic, index) {
-                    tableHead = tableHead + '<th>Sujet ' + (index + 1) + '</th>';
-                    tableBody = tableBody + '<tr>';
-                    (topic.words).forEach(function(word) {
-                        tableBody = tableBody + '<td style="font-size:' + (word.weight * 8) + '%;">' + word.label + '</td>';
-                    });
-                    tableBody = tableBody + '</tr>';
-                });
-                var tableTopics = $('#LDAtopics');
-                tableTopics.html('<thead><tr>' + tableHead + '</tr></thead><tbody>' + tableBody + '</tbody>');
-                var t = $('#LDAtopics tbody').eq(0);
-                var r = t.find('tr');
-                var cols = r.length;
-                var rows = r.eq(0).find('td').length;
-                var cell, next, tem, i = 0;
-                var tb = $('<tbody></tbody>');
-                while (i < rows) {
-                    cell = 0;
-                    tem = $('<tr></tr>');
-                    while (cell < cols) {
-                        next = r.eq(cell++).find('td').eq(0);
-                        tem.append(next);
-                    }
-                    tb.append(tem);
-                    ++i;
+                var topics = res.topics;
+                // weight varie en gros de 5 à 50 => on doit remapper
+                function sizer(w) {
+                    return w + 10;
                 }
-                tableTopics.append(tb);
-                tableTopics.show();
-                tableTopics.removeClass('loader');
+                var words = Array.prototype.concat(...topics.map(t => t.words.map(w => ({
+                    text: w.label,
+                    poids: w.weight,
+                    size: sizer(w.weight),
+                    topic: t.label
+                }))));
+                var fill = d3.scaleOrdinal(d3.schemeCategory20);
+                var width = $('#wordcloud').parent().parent().width();
+
+                var layout = d3.layout.cloud()
+                    .size([width, 500])
+                    .words(words)
+                    .padding(5)
+                    .rotate(0)
+                    .fontSize(d => d.size)
+                    .font('Roboto')
+                    .fontWeight(500)
+                    .spiral('rectangular')
+                    .on("end", draw);
+
+                layout.start();
+
+                function draw(words) {
+                    d3.select("#wordcloud")
+                        .attr("width", layout.size()[0])
+                        .attr("height", layout.size()[1])
+                        .append("g")
+                        .attr("transform", "translate(" + layout.size()[0] / 2 + "," + layout.size()[1] / 2 + ")")
+                        .selectAll("text")
+                        .data(words)
+                        .enter().append("text")
+                        .style("font-size", d => d.size + "px")
+                        .style("font-family", "Roboto")
+                        .style("font-weight", d => 500)
+                        .style("fill", (d, i) => fill(d.topic))
+                        .attr("text-anchor", "middle")
+                        .attr("transform", d => "translate(" + [d.x, d.y] + ")rotate(" + d.rotate + ")")
+                        .text(d => d.text)
+                        .append("title")
+                        .text(d => "Sujet n°" + d.topic + ", poids : " + d.poids);
+                    $('#wordcloud').parent().removeClass('loader');
+                }
             }
         });
     });
