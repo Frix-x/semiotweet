@@ -30,6 +30,7 @@ import string
 import json
 import ast # convert string to list
 import math
+from collections import Counter,defaultdict
 
 
 # return JsonResponse(serializer.errors, status=400)
@@ -351,35 +352,39 @@ def getData(request):
     makeLdaModel(0)
 
     # POPULATING SEMANTIC FIELDS
+    print("MAKING SEMANTIC FIELDS")
+    semanticField.objects.all().delete()
+    globalLemmesOccurences = {}
+    # Pour chaque candidat, on compte l'occurence de ses lemmes à l'avance
+    for screen_name in screen_nameToExtract:
+        try:
+            idUser = User.objects.filter(screen_name=screen_name).values('id')[0]["id"]
+            allLemmaArray = Tweet.objects.filter(user_id=idUser).values("lemmaArray")
+        except SomeModel.DoesNotExist: # If the user does not exist
+            continue # continue with the next user
+        allLemmaArray = [ast.literal_eval(t["lemmaArray"]) for t in allLemmaArray]
+        userLemmesOccurences = defaultdict(lambda: 0)
+        for lemmaArray in allLemmaArray:
+            currentOccurences = dict(Counter(lemmaArray))
+            for k in list(currentOccurences.keys()):
+                userLemmesOccurences[k] += currentOccurences[k]
+        globalLemmesOccurences[screen_name] = userLemmesOccurences
+    # Pour chaque mot de base, on cherche le champs lexical associé
     for baseWord in semanticWords:
-        print("MAKING SEMANTIC FIELDS")
-        semanticField.objects.all().delete()
         semanticFieldTable = getSemanticField(baseWord)
+        # Pour chaque mot du champ lexical, on regarde le nombre d'occurence pour chaque candidat et on sauvegarde
         for word in semanticFieldTable:
+            wordOccur = {}
+            for screen_name in screen_nameToExtract:
+                wordOccur[screen_name] = globalLemmesOccurences[screen_name][word]
             semanticField_db = semanticField()
             semanticField_db.baseWord = baseWord
             semanticField_db.word = word
-            wordOccur = dict()
-            for screen_name in screen_nameToExtract:
-                try:
-                    idUser = User.objects.filter(screen_name=screen_name).values('id')[0]["id"]
-                except SomeModel.DoesNotExist: # If the user does not exist
-                    continue # continue with the next user
-
-                try: # We try to get the id of the user's last tweet
-                    tweets = Tweet.objects.filter(user_id=idUser)
-                except SomeModel.DoesNotExist:
-                    continue # continue with the next user
-
-                wordOccur[idUser] = 0
-                for tweet in tweets:
-                    lemmaArray = ast.literal_eval(tweet["lemmaArray"])
-                    if word in lemmaArray:
-                        wordOccur[screen_name] = wordOccur[screen_name] + 1
-
             semanticField_db.usersScores = wordOccur
-            semanticField_db.save()
-
+            try:
+                semanticField_db.save()
+            except BaseException as e:
+                print("getData() ; error in making semantic fields : ", e)
 
     print("\nEVERYTHING DONE !")
     return JsonResponse({"res":{"success":success,"error":0}}, status=200)
