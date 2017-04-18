@@ -28,18 +28,14 @@ main {
   padding: 3px 3px;
 }
 
-.svg-container {
-    display: inline-block;
-    position: relative;
-    width: 100%;
-    padding-bottom: 100%;
-    vertical-align: top;
-    overflow: hidden;
+.keywordNetwork {
+  /*width: 500px;
+  height: 500px;*/
+  position: relative;
 }
 
-.svg-content-responsive {
-    display: inline-block;
-    position: absolute;
-    top: 10px;
-    left: 0;
+.keywordNetworkCanvas {
+  position: absolute;
+  width: 100%;
+  height: 100%;
 }

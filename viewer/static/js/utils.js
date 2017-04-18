@@ -69,3 +69,34 @@ function createDonut (graphName, sources, num) {
     }
   })
 }
+
+function makeSigmaNetwork(container, networkJson, callback) {
+    var s = new sigma({
+        graph: networkJson,
+        container: container,
+        settings: {
+            edgeColor: 'default',
+            defaultEdgeColor: '#ccc',
+            animationsTime: 5000,
+            drawLabels: true,
+            scalingMode: 'outside',
+            batchEdgesDrawing: true,
+            hideEdgesOnMove: true,
+            sideMargin: 1
+        }
+    });
+    s.graph.nodes().forEach(function(node, i, a) {
+        node.x = Math.cos(Math.PI * 2 * i / a.length);
+        node.y = Math.sin(Math.PI * 2 * i / a.length);
+        node.size = 1;
+    });
+    s.refresh();
+    s.configForceAtlas2({
+      worker: true,
+      barnesHutOptimize: true,
+      edgeWeightInfluence: 1,
+      linLogMode: true,
+      scalingRatio: 1
+    });
+    callback(s);
+}
