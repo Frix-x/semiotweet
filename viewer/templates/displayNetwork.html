@@ -16,7 +16,7 @@
         <div class="row">
           <div class="col s12 m12">
             <div class="icon-block">
-              <svg id="keywordsNetwork"></svg>
+              <div id="keywordsNetwork"></div>
             </div>
         </div>
     </div>
@@ -25,14 +25,17 @@
 
 {% block script %}
 <script src="{% static "js/utils.js" %}"></script>
+<script src="{% static "js/d3.min.js" %}"></script>
 <script type="text/javascript">
     $(document).ready(function() {
-        var graphWidth = $('#keywordsNetwork').width();
-        $('#keywordsNetwork').height(graphWidth);
-        console.log(graphWidth);
-
-        var svg = d3.select("svg"),
-            width = +svg.attr("width"),
+        var svg = d3.select("div#keywordsNetwork")
+            .append("div")
+            .classed("svg-container", true)
+            .append("svg")
+            .attr("preserveAspectRatio", "xMinYMin meet")
+            .attr("viewBox", "0 0 600 400")
+            .classed("svg-content-responsive", true);
+        var width = +svg.attr("width"),
             height = +svg.attr("height");
         var color = d3.scaleOrdinal(d3.schemeCategory20);
         var simulation = d3.forceSimulation()
@@ -65,7 +68,7 @@
                 var link = svg.append("g")
                     .attr("class", "links")
                     .selectAll("line")
-                    .data(graph.links)
+                    .data(graph.edges)
                     .enter().append("line")
                     .attr("stroke-width", function(d) {
                         return Math.sqrt(d.value);
@@ -88,7 +91,8 @@
                         return d.id;
                     });
                 simulation.nodes(graph.nodes).on("tick", ticked);
-                simulation.force("link").links(graph.links);
+                simulation.force("link").links(graph.edges);
+
                 function ticked() {
                     link.attr("x1", function(d) {
                             return d.source.x;
