@@ -33,17 +33,17 @@ import math
 from collections import Counter,defaultdict
 
 
-# return JsonResponse(serializer.errors, status=400)
-
 #==============================#
 #=========== OTHERS ===========#
 #==============================#
+
 
 def handler404(request,typed):
     """A basic 404 error handler"""
     return JsonResponse({"error":"Page "+typed+" not found"}, status=404)
 
 
+@require_GET()
 def sources(request):
     """GET Tweets'sources for all or individual candidate"""
     # Getting tweets' sources
@@ -84,6 +84,7 @@ def sources(request):
     return JsonResponse({"sources":sources,"num":num}, status=200)
 
 
+@require_GET()
 def userExist(request):
     # GET user and check if he exist
     userId = request.GET.get("id", "")
@@ -97,6 +98,7 @@ def userExist(request):
         return JsonResponse({"id":userId,"exist":True}, status=200)
 
 
+@require_GET()
 def user(request):
     """GET candidate's informations such as followers_count, profile picture, profile description and screen name"""
     # GET user and check if he exist
@@ -124,6 +126,7 @@ def user(request):
     return JsonResponse({"users":users}, status=200)
 
 
+@require_GET()
 def nbTweets(request):
     """GET number of tweets for each candidates"""
     # Getting the number of tweets for each user
@@ -144,6 +147,7 @@ def nbTweets(request):
     return JsonResponse({"politics":politics,"nbTweets":nbTweets}, status=200)
 
 
+@require_GET()
 def lastTweet(request):
     """GET date of the last tweet saved in DB"""
     # Getting the date of the last tweet
@@ -158,6 +162,7 @@ def lastTweet(request):
     return HttpResponse(lastTweet, status=200)
 
 
+@require_GET()
 def hours(request):
     """GET tweets hours distribution for one or all candidates"""
     # GET user and check if he exist
@@ -186,7 +191,7 @@ def hours(request):
     # JSON Formating
     return JsonResponse({"hours":hours}, status=200)
 
-
+@require_GET()
 def wordCount(request):
     userId = request.GET.get("id", "")
 
@@ -206,7 +211,7 @@ def wordCount(request):
     # words is a JSON list of dict like : {"word":"foo", "occur":42}
     return JsonResponse({"words":words}, status=200)
 
-
+@require_GET()
 def lemmeCount(request):
     userId = request.GET.get("id", "")
 
@@ -227,6 +232,7 @@ def lemmeCount(request):
     return JsonResponse({"lemmes":lemmes}, status=200)
 
 
+@require_GET()
 def ldaTopics(request):
     # GET user and check if he exist
     userId = request.GET.get("id", 0)
@@ -248,6 +254,7 @@ def ldaTopics(request):
     return JsonResponse(tableJson, status=200)
 
 
+@require_GET()
 def netTweets(request):
     # Get users and link them to semantic fields
     try:
