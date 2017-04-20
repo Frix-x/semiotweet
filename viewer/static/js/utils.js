@@ -76,7 +76,7 @@ function makeSigmaNetwork(container, networkJson, callback) {
         container: container,
         settings: {
             edgeColor: 'default',
-            defaultEdgeColor: '#ccc',
+            defaultEdgeColor: '#fff3e0',
             animationsTime: 5000,
             drawLabels: true,
             scalingMode: 'outside',
@@ -85,15 +85,16 @@ function makeSigmaNetwork(container, networkJson, callback) {
             sideMargin: 1
         }
     });
-    s.graph.nodes().forEach(function(node, i, a) {
-        node.x = Math.cos(Math.PI * 2 * i / a.length);
-        node.y = Math.sin(Math.PI * 2 * i / a.length);
-        node.size = 1;
+    var width = $('#keywordsNetwork').width();
+    var height = $('#keywordsNetwork').height()
+    s.graph.nodes().forEach(function(node) {
+        node.x = Math.random()*width;
+        node.y = Math.random()*height;
     });
     s.refresh();
     s.configForceAtlas2({
       worker: true,
-      barnesHutOptimize: true,
+      barnesHutOptimize: false,
       edgeWeightInfluence: 1,
       linLogMode: true,
       scalingRatio: 1

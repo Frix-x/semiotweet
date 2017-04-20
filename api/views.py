@@ -270,28 +270,28 @@ def netTweets(request):
     edgeId = 1
     appendedNodes = dict()
     for user in users:
-        network["nodes"].append({"id":nodeId,"label":user["name"],"screen_name":user["screen_name"],"color":"#666"})
+        network["nodes"].append({"id":nodeId,"label":user["name"],"screen_name":user["screen_name"],"size":50,"color":"#ff9800"})
         appendedNodes[user["screen_name"]] = nodeId
         nodeId += 1
     for semanticLine in semanticField_db:
         uScores = ast.literal_eval(semanticLine["usersScores"])
         if not all(score == 0 for score in uScores.values()):
             if semanticLine["baseWord"] not in appendedNodes:
-                network["nodes"].append({"id":nodeId,"label":semanticLine["baseWord"],"color":"#666"})
+                network["nodes"].append({"id":nodeId,"label":semanticLine["baseWord"],"size": 50,"color":"#2196f3"})
                 appendedNodes[semanticLine["baseWord"]] = nodeId
                 nodeId += 1
             if semanticLine["word"] not in appendedNodes:
-                network["nodes"].append({"id":nodeId,"label":semanticLine["word"],"color":"#666"})
+                network["nodes"].append({"id":nodeId,"label":semanticLine["word"],"size":10,"color":"#607d8b"})
                 network["edges"].append({"id":edgeId,"source":appendedNodes[semanticLine["baseWord"]],"target":nodeId,"weight":50})
                 appendedNodes[semanticLine["word"]] = nodeId
                 nodeId += 1
             else:
-                network["edges"].append({"id":edgeId,"source":appendedNodes[semanticLine["baseWord"]],"target":appendedNodes[semanticLine["word"]],"weight":50})
+                network["edges"].append({"id":edgeId,"source":appendedNodes[semanticLine["baseWord"]],"target":appendedNodes[semanticLine["word"]],"weight":100})
             edgeId += 1
 
             for screen_name,score in uScores.items():
                 if score != 0:
-                    network["edges"].append({"id":edgeId,"source":appendedNodes[screen_name],"target":appendedNodes[semanticLine["word"]],"weight":score/10})
+                    network["edges"].append({"id":edgeId,"source":appendedNodes[screen_name],"target":appendedNodes[semanticLine["word"]],"weight":score})
                     edgeId += 1
 
     return JsonResponse({"network":network}, status=200)
