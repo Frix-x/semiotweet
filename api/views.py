@@ -282,16 +282,16 @@ def netTweets(request):
                 nodeId += 1
             if semanticLine["word"] not in appendedNodes:
                 network["nodes"].append({"id":nodeId,"label":semanticLine["word"],"size":10,"color":"#607d8b"})
-                network["edges"].append({"id":edgeId,"source":appendedNodes[semanticLine["baseWord"]],"target":nodeId,"weight":50})
+                network["edges"].append({"id":edgeId,"source":appendedNodes[semanticLine["baseWord"]],"target":nodeId,"weight":200,"color":"rgba(96,125,139,0.1)"})
                 appendedNodes[semanticLine["word"]] = nodeId
                 nodeId += 1
             else:
-                network["edges"].append({"id":edgeId,"source":appendedNodes[semanticLine["baseWord"]],"target":appendedNodes[semanticLine["word"]],"weight":100})
+                network["edges"].append({"id":edgeId,"source":appendedNodes[semanticLine["baseWord"]],"target":appendedNodes[semanticLine["word"]],"weight":200,"color":"rgba(96,125,139,0.01)"})
             edgeId += 1
 
             for screen_name,score in uScores.items():
                 if score != 0:
-                    network["edges"].append({"id":edgeId,"source":appendedNodes[screen_name],"target":appendedNodes[semanticLine["word"]],"weight":score})
+                    network["edges"].append({"id":edgeId,"source":appendedNodes[screen_name],"target":appendedNodes[semanticLine["word"]],"weight":score*2,"color":"rgba(255,152,0,0.01)"})
                     edgeId += 1
 
     return JsonResponse({"network":network}, status=200)

@@ -51,8 +51,9 @@
 
 {% block script %}
 <script src="{% static "js/utils.js" %}"></script>
-<script src="{% static "js/sigma.min.js" %}"></script>
-<script src="{% static "js/sigma.layout.forceAtlas2.min.js" %}"></script>
+<script src="{% static "js/sigma/sigma.min.js" %}"></script>
+<script src="{% static "js/sigma/sigma.layout.forceAtlas2.min.js" %}"></script>
+<script src="{% static "js/sigma/sigma.plugins.dragNodes.min.js" %}"></script>
 <script type="text/javascript">
     $(document).ready(function() {
         var width = $('#keywordsNetwork').parent().width();

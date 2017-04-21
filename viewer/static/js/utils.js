@@ -73,31 +73,35 @@ function createDonut (graphName, sources, num) {
 function makeSigmaNetwork(container, networkJson, callback) {
     var s = new sigma({
         graph: networkJson,
-        container: container,
+        renderer: {
+            container: container,
+            type: 'canvas'
+        },
         settings: {
-            edgeColor: 'default',
-            defaultEdgeColor: '#fff3e0',
             animationsTime: 5000,
             drawLabels: true,
-            scalingMode: 'outside',
+            labelColor: 'node',
+            labelSize: 'proportional',
+            labelThreshold: 10,
             batchEdgesDrawing: true,
             hideEdgesOnMove: true,
-            sideMargin: 1
+            font: 'Roboto'
         }
     });
     var width = $('#keywordsNetwork').width();
     var height = $('#keywordsNetwork').height()
     s.graph.nodes().forEach(function(node) {
-        node.x = Math.random()*width;
-        node.y = Math.random()*height;
+        node.x = Math.random() * width;
+        node.y = Math.random() * height;
     });
     s.refresh();
     s.configForceAtlas2({
-      worker: true,
-      barnesHutOptimize: false,
-      edgeWeightInfluence: 1,
-      linLogMode: true,
-      scalingRatio: 1
+        worker: true,
+        barnesHutOptimize: true,
+        edgeWeightInfluence: 1,
+        linLogMode: true,
+        scalingRatio: 1
     });
+    var dragListener = sigma.plugins.dragNodes(s, s.renderers[0]);
     callback(s);
 }
