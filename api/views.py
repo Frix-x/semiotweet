@@ -288,7 +288,7 @@ def netTweets(request):
         if semanticLine["baseWord"] not in appendedThemes:
             network["nodes"].append({"id":nodeId,"label":semanticLine["baseWord"],"weight":0,"size":50,"color":"#2196f3"})
             network["nodes"].append({"id":nodeId+1,"label":semanticLine["baseWord"],"size":10,"color":"#607d8b"})
-            network["edges"].append({"id":edgeId,"source":nodeId,"target":nodeId+1,"weight":50,"color":"rgba(96,125,139,0.1)"})
+            network["edges"].append({"id":edgeId,"source":nodeId,"target":nodeId+1,"weight":50,"color":"rgba(96,125,139,0.05)"})
             appendedThemes[semanticLine["baseWord"]] = nodeId
             appendedNodes[semanticLine["baseWord"]] = nodeId+1
             nodeId += 2
@@ -305,17 +305,17 @@ def netTweets(request):
         if not all(score == 0 for score in uScores.values()):
             if semanticLine["word"] not in appendedNodes:
                 network["nodes"].append({"id":nodeId,"label":semanticLine["word"],"size":10,"color":"#607d8b"})
-                network["edges"].append({"id":edgeId,"source":appendedThemes[semanticLine["baseWord"]],"target":nodeId,"weight":50,"color":"rgba(96,125,139,0.1)"})
+                network["edges"].append({"id":edgeId,"source":appendedThemes[semanticLine["baseWord"]],"target":nodeId,"weight":50,"color":"rgba(96,125,139,0.05)"})
                 appendedNodes[semanticLine["word"]] = nodeId
                 nodeId += 1
             else:
-                network["edges"].append({"id":edgeId,"source":appendedThemes[semanticLine["baseWord"]],"target":appendedNodes[semanticLine["word"]],"weight":50,"color":"rgba(96,125,139,0.1)"})
+                network["edges"].append({"id":edgeId,"source":appendedThemes[semanticLine["baseWord"]],"target":appendedNodes[semanticLine["word"]],"weight":50,"color":"rgba(96,125,139,0.05)"})
             edgeId += 1
 
             for screen_name,score in uScores.items():
                 if score != 0:
                     computedWeigth = (score/tweetCount[screen_name]*90/maxScore)+10
-                    network["edges"].append({"id":edgeId,"source":appendedNodes[screen_name],"target":appendedNodes[semanticLine["word"]],"weight":computedWeigth,"color":"rgba(255,152,0,0.02)"})
+                    network["edges"].append({"id":edgeId,"source":appendedNodes[screen_name],"target":appendedNodes[semanticLine["word"]],"weight":computedWeigth,"color":"rgba(255,152,0,0.01)"})
                     edgeId += 1
 
     return JsonResponse({"network":network}, status=200)

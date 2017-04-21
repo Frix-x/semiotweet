@@ -58,8 +58,13 @@
 <script type="text/javascript">
     $(document).ready(function() {
         var width = $('#keywordsNetwork').parent().width();
+        console.log(width);
         $('#keywordsNetwork').width(width);
-        $('#keywordsNetwork').height(width * 2 / 3);
+        if(width >= 400) {
+          $('#keywordsNetwork').height(width * 2 / 3);
+        } else {
+          $('#keywordsNetwork').height(width * 2);
+        }
         $.get('/api/v1/nlp/network/tweets', function(res, status) {
             if (status === 'success') {
                 makeSigmaNetwork('keywordsNetwork', res.network, function(s) {
