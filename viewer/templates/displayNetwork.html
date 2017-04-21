@@ -34,8 +34,8 @@
                 <div class="section">
                     <h5 class="header orange-text">Explications</h5>
                     <p>
-                        Le graph ci-contre est un réseau "tri-parti" représentant la proximité d'un candidat avec un thème donné (et ses mots clés associés).
-                        <br> Plus un candidat est proche d'un mot, plus cela signifie qu'il est présent dans son vocabulaire sur Twitter. De même, plus deux thèmes sont proches sur le graph et plus ceux-ci sont censés être proches sémantiquement.
+                        Le graphe ci-contre est un réseau "tri-parti" représentant la proximité d'un candidat avec un thème donné (et ses mots clés associés).
+                        <br> Plus un candidat est proche d'un mot, plus ce dernier est présent dans son vocabulaire sur Twitter. De même, plus deux thèmes sont proches sur le graphe et plus ceux-ci sont censés être proches sémantiquement.
                     </p>
                 </div>
                 <div class="divider"></div>
@@ -58,7 +58,6 @@
 <script type="text/javascript">
     $(document).ready(function() {
         var width = $('#keywordsNetwork').parent().width();
-        console.log(width);
         $('#keywordsNetwork').width(width);
         if(width >= 400) {
           $('#keywordsNetwork').height(width * 2 / 3);
