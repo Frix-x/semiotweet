@@ -105,6 +105,39 @@ function makeSigmaNetwork(container, networkJson, callback) {
         linLogMode: true,
         scalingRatio: 1
     });
+
+    // Drag n Drop plugin init
     var dragListener = sigma.plugins.dragNodes(s, s.renderers[0]);
+
+    // Binded event to show only nodes and neighbors on mouse over
+    s.bind('overNode', function(event) {
+        var node = event.data.node.id;
+        console.log(event);
+        var neighbors = {};
+        s.graph.edges().forEach(function(e) {
+            if ((e.source) == node || (e.target) == node) {
+                neighbors[e.source] = 1;
+                neighbors[e.target] = 1;
+            }
+        });
+        console.log(neighbors);
+        s.graph.nodes().forEach(function(n) {
+            if (!neighbors[n.id]) {
+                n.hidden = 1;
+            } else {
+                n.hidden = 0;
+            }
+        });
+        s.refresh();
+    }).bind('outNode', function() {
+        s.graph.edges().forEach(function(e) {
+            e.hidden = 0;
+        });
+        s.graph.nodes().forEach(function(n) {
+            n.hidden = 0;
+        });
+        s.refresh();
+    });
+
     callback(s);
 }
