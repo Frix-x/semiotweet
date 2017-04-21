@@ -171,9 +171,9 @@ def getSemanticField(word):
 
 
 # Base word used to build semantic fields
-semanticWords = ["france", "état", "sécurité", "peuple", "loi", "travail",
-                 "liberté", "démocratie", "république", "immigration", "terrorisme",
-                 "islam", "laïcité", "europe", "taxe"]
+semanticWords = ["france","état","sécurité","peuple","loi","travail","chômage",
+                 "liberté","démocratie","république","immigration","terrorisme",
+                 "islam","laïcité","europe","taxe","impôts","cannabis","santé"]
 
 # French Stop words (see : http://www.ranks.nl/stopwords/french)
 stopwords = ["alors","au","aucuns","aussi","autre","avant","avec","avoir","bon",
