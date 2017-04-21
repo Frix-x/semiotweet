@@ -79,10 +79,13 @@ function makeSigmaNetwork(container, networkJson, callback) {
         },
         settings: {
             animationsTime: 5000,
+            defaultEdgeType: 'curve',
             drawLabels: true,
-            labelColor: 'node',
+            labelColor: 'default',
+            defaultLabelColor: '#37474f',
             labelSize: 'proportional',
-            labelThreshold: 10,
+            labelSizeRatio: 1.5,
+            labelThreshold: 5,
             batchEdgesDrawing: true,
             hideEdgesOnMove: true,
             font: 'Roboto'
