@@ -84,7 +84,7 @@ function makeSigmaNetwork(container, networkJson, callback) {
             labelColor: 'node',
             defaultLabelColor: '#37474f',
             labelSize: 'proportional',
-            labelSizeRatio: 1.5,
+            labelSizeRatio: 2,
             labelThreshold: 5,
             batchEdgesDrawing: true,
             hideEdgesOnMove: true,
