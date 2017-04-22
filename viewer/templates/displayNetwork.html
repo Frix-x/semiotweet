@@ -59,10 +59,10 @@
     $(document).ready(function() {
         var width = $('#keywordsNetwork').parent().width();
         $('#keywordsNetwork').width(width);
-        if(width >= 400) {
-          $('#keywordsNetwork').height(width * 2 / 3);
+        if (width >= 400) {
+            $('#keywordsNetwork').height(width * 2 / 3);
         } else {
-          $('#keywordsNetwork').height(width * 2);
+            $('#keywordsNetwork').height(width * 2);
         }
         $.get('/api/v1/nlp/network/tweets', function(res, status) {
             if (status === 'success') {
@@ -72,6 +72,10 @@
                         '<a id="simuOn" style="margin-left: 10px;" class="waves-effect waves-light btn green"><i class="material-icons">play_arrow</i></a>');
                     $('#simuOn').click(function() {
                         sigmaInst.startForceAtlas2();
+                        // Security to stop the forceAtlas2 algorithm if not stopped in 20s
+                        setTimeout(function() {
+                            sigmaInst.stopForceAtlas2();
+                        }, 20000);
                     });
                     $('#simuOff').click(function() {
                         sigmaInst.stopForceAtlas2();
