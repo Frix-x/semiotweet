@@ -43,7 +43,7 @@
         <div class="row">
             {% for candidat in candidats %}
             <div class="col s12 m6">
-                <div class="icon-block">
+                <div class="section">
                     <h5 class="center">Mots les plus employés</h5>
                     <div class="loader"><canvas id="MostCommonWords{{candidat}}"></canvas></div>
                 </div>
@@ -53,7 +53,7 @@
           <div class="row">
             {% for candidat in candidats %}
               <div class="col s12 m6">
-                <div class="icon-block">
+                <div class="section">
                     <h5 class="center">Lemmes les plus employés</h5>
                     <div class="loader"><canvas id="MostCommonLemmes{{candidat}}"></canvas></div>
                 </div>
@@ -63,7 +63,7 @@
           <div class="row">
             {% for candidat in candidats %}
               <div class="col s12 m6">
-                <div class="icon-block">
+                <div class="section">
                   <h5 class="center">Distribution des tweets selon les heures</h5>
                   <div class="loader"><canvas id="HoursDistribution{{candidat}}"></canvas></div>
                 </div>
@@ -73,7 +73,7 @@
           <div class="row">
             {% for candidat in candidats %}
               <div class="col s12 m6">
-                <div class="icon-block">
+                <div class="section">
                   <h5 class="center">Sources des tweets</h5>
                   <div class="loader"><canvas id="doughnutSources{{candidat}}"></canvas></div>
                 </div>
