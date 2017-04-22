@@ -110,7 +110,7 @@ function makeSigmaNetwork(container, networkJson, callback) {
     var dragListener = sigma.plugins.dragNodes(s, s.renderers[0]);
 
     // Binded event to show only nodes and neighbors on mouse over
-    s.bind('overNode', function(event) {
+    s.bind('clickNode', function(event) {
         var node = event.data.node.id;
         console.log(event);
         var neighbors = {};
@@ -129,7 +129,7 @@ function makeSigmaNetwork(container, networkJson, callback) {
             }
         });
         s.refresh();
-    }).bind('outNode', function() {
+    }).bind('clickStage', function() {
         s.graph.edges().forEach(function(e) {
             e.hidden = 0;
         });
