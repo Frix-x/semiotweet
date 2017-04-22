@@ -69,3 +69,75 @@ function createDonut (graphName, sources, num) {
     }
   })
 }
+
+function makeSigmaNetwork(container, networkJson, callback) {
+    var s = new sigma({
+        graph: networkJson,
+        renderer: {
+            container: container,
+            type: 'canvas'
+        },
+        settings: {
+            animationsTime: 5000,
+            defaultEdgeType: 'curve',
+            drawLabels: true,
+            labelColor: 'node',
+            defaultLabelColor: '#37474f',
+            labelSize: 'proportional',
+            labelSizeRatio: 2,
+            labelThreshold: 5,
+            batchEdgesDrawing: true,
+            hideEdgesOnMove: true,
+            font: 'Roboto'
+        }
+    });
+    var width = $('#keywordsNetwork').width();
+    var height = $('#keywordsNetwork').height()
+    s.graph.nodes().forEach(function(node) {
+        node.x = Math.random() * width;
+        node.y = Math.random() * height;
+    });
+    s.refresh();
+    s.configForceAtlas2({
+        worker: true,
+        barnesHutOptimize: true,
+        edgeWeightInfluence: 1,
+        linLogMode: true,
+        scalingRatio: 1
+    });
+
+    // Drag n Drop plugin init
+    var dragListener = sigma.plugins.dragNodes(s, s.renderers[0]);
+
+    // Binded event to show only nodes and neighbors on mouse over
+    s.bind('clickNode', function(event) {
+        var node = event.data.node.id;
+        console.log(event);
+        var neighbors = {};
+        s.graph.edges().forEach(function(e) {
+            if ((e.source) == node || (e.target) == node) {
+                neighbors[e.source] = 1;
+                neighbors[e.target] = 1;
+            }
+        });
+        console.log(neighbors);
+        s.graph.nodes().forEach(function(n) {
+            if (!neighbors[n.id]) {
+                n.hidden = 1;
+            } else {
+                n.hidden = 0;
+            }
+        });
+        s.refresh();
+    }).bind('clickStage', function() {
+        s.graph.edges().forEach(function(e) {
+            e.hidden = 0;
+        });
+        s.graph.nodes().forEach(function(n) {
+            n.hidden = 0;
+        });
+        s.refresh();
+    });
+
+    callback(s);
+}

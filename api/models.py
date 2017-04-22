@@ -77,3 +77,15 @@ class LdaModel(models.Model):
             return "LdaModel for user "+ str(self.user_id)
 
         return "General LdaModel"
+
+
+class semanticField(models.Model):
+    """semanticField class : master word for semanticField"""
+
+    id = models.AutoField(primary_key=True)
+    baseWord = models.CharField(null=False,max_length=100)
+    word = models.CharField(null=False,max_length=100)
+    usersScores = models.CharField(null=True,max_length=1000)
+
+    def __str__(self):
+        return self.Word + " is related to : "+ self.baseWord

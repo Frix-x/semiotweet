@@ -12,5 +12,6 @@ urlpatterns = [
     url(r'^user/lemmecount/?$',views.lemmeCount,name='lemmeCount'),
     url(r'^tweet/last/?$',views.lastTweet,name='lastTweet'),
     url(r'^nlp/lda/topics/?$',views.ldaTopics,name='ldaTopics'),
+    url(r'^nlp/network/tweets/?$',views.netTweets,name='netTweets'),
     url(r'(?P<typed>.+)$',views.handler404,name='handler404')
 ]

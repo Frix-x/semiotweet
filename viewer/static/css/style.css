@@ -27,3 +27,15 @@ main {
 #NbTweetsByPolitics table > th, td{
   padding: 3px 3px;
 }
+
+.keywordNetwork {
+  /*width: 500px;
+  height: 500px;*/
+  position: relative;
+}
+
+.keywordNetworkCanvas {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+}

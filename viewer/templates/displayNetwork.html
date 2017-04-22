@@ -14,9 +14,35 @@
 <div class="container">
     <div class="section">
         <div class="row">
-          <div class="col s12 m12">
-            <div class="icon-block">
-              <div id="keywordsNetwork"></div>
+            <div class="col s12 m9">
+                <div class="section">
+                    <div class="keywordNetwork" id="keywordsNetwork">
+                        <div class="keywordNetworkCanvas loader"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col s12 m3">
+                <div class="section">
+                    <h5 class="header orange-text">Légende</h5>
+                    <p>
+                        <i class="material-icons orange-text">fiber_manual_record</i>Candidat<br>
+                        <i class="material-icons blue-text">fiber_manual_record</i>Thème<br>
+                        <i class="material-icons blue-grey-text">fiber_manual_record</i>Mot clé associé à un thème
+                    </p>
+                </div>
+                <div class="divider"></div>
+                <div class="section">
+                    <h5 class="header orange-text">Explications</h5>
+                    <p>
+                        Le graphe ci-contre est un réseau "tri-parti" représentant la proximité d'un candidat avec un thème donné (et ses mots clés associés).
+                        <br> Plus un candidat est proche d'un mot, plus ce dernier est présent dans son vocabulaire sur Twitter. De même, plus deux thèmes sont proches sur le graphe et plus ceux-ci sont censés être proches sémantiquement.
+                    </p>
+                </div>
+                <div class="divider"></div>
+                <div class="section">
+                    <h5 class="header orange-text">Contrôles</h5>
+                    <div id="actionButton"></div>
+                </div>
             </div>
         </div>
     </div>
@@ -25,37 +51,39 @@
 
 {% block script %}
 <script src="{% static "js/utils.js" %}"></script>
+<script src="{% static "js/sigma/sigma.min.js" %}"></script>
+<script src="{% static "js/sigma/sigma.layout.forceAtlas2.min.js" %}"></script>
+<script src="{% static "js/sigma/sigma.plugins.dragNodes.min.js" %}"></script>
+<script src="{% static "js/sigma/sigma.canvas.edges.curve.js" %}"></script>
 <script type="text/javascript">
-  $(document).ready(function() {
-    // create an array with nodes
-    var nodes = new vis.DataSet([
-        {id: 1, label: 'Node 1'},
-        {id: 2, label: 'Node 2'},
-        {id: 3, label: 'Node 3'},
-        {id: 4, label: 'Node 4'},
-        {id: 5, label: 'Node 5'}
-    ]);
-
-    // create an array with edges
-    var edges = new vis.DataSet([
-        {from: 1, to: 3},
-        {from: 1, to: 2},
-        {from: 2, to: 4},
-        {from: 2, to: 5}
-    ]);
-
-    // create a network
-    var container = document.getElementById('keywordsNetwork');
-
-    // provide the data in the vis format
-    var data = {
-        nodes: nodes,
-        edges: edges
-    };
-    var options = {};
-
-    // initialize your network!
-    var network = new vis.Network(container, data, options);
-  });
+    $(document).ready(function() {
+        var width = $('#keywordsNetwork').parent().width();
+        $('#keywordsNetwork').width(width);
+        if (width >= 400) {
+            $('#keywordsNetwork').height(width * 2 / 3);
+        } else {
+            $('#keywordsNetwork').height(width * 2);
+        }
+        $.get('/api/v1/nlp/network/tweets', function(res, status) {
+            if (status === 'success') {
+                makeSigmaNetwork('keywordsNetwork', res.network, function(s) {
+                    sigmaInst = s;
+                    $('#actionButton').html('<a id="simuOff" class="waves-effect waves-light btn red"><i class="material-icons">stop</i></a>' +
+                        '<a id="simuOn" style="margin-left: 10px;" class="waves-effect waves-light btn green"><i class="material-icons">play_arrow</i></a>');
+                    $('#simuOn').click(function() {
+                        sigmaInst.startForceAtlas2();
+                        // Security to stop the forceAtlas2 algorithm if not stopped in 20s
+                        setTimeout(function() {
+                            sigmaInst.stopForceAtlas2();
+                        }, 20000);
+                    });
+                    $('#simuOff').click(function() {
+                        sigmaInst.stopForceAtlas2();
+                    });
+                    $('#keywordsNetwork').children().removeClass('loader');
+                });
+            }
+        });
+    });
 </script>
 {% endblock %}

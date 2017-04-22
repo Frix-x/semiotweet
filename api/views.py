@@ -11,7 +11,7 @@ from rest_framework.parsers import JSONParser
 
 
 # Forthe database
-from .models import Tweet,User,LdaModel
+from .models import Tweet,User,LdaModel,semanticField
 from django.db import connection #for direct SQL requests
 from django.db.models import Max
 
@@ -30,19 +30,21 @@ import string
 import json
 import ast # convert string to list
 import math
+from collections import Counter,defaultdict
 
-
-# return JsonResponse(serializer.errors, status=400)
-
+# Decorators
+from django.views.decorators.http import require_GET
 #==============================#
 #=========== OTHERS ===========#
 #==============================#
+
 
 def handler404(request,typed):
     """A basic 404 error handler"""
     return JsonResponse({"error":"Page "+typed+" not found"}, status=404)
 
 
+@require_GET
 def sources(request):
     """GET Tweets'sources for all or individual candidate"""
     # Getting tweets' sources
@@ -54,7 +56,7 @@ def sources(request):
         if userId != "":
             User.objects.get(id=userId)
     except BaseException as e:
-        return JsonResponse({"sources":-1,"num":-1,"error":str(e)}, status=400)
+        return JsonResponse({"sources":-1,"num":-1,"error":str(e)}, status=500)
 
     cursor = connection.cursor()
     try:
@@ -64,7 +66,7 @@ def sources(request):
             cursor.execute("SELECT DISTINCT source, COUNT(source) AS nb FROM api_tweet WHERE user_id_id ='"+ str(userId)+"' GROUP BY source ORDER BY nb DESC")
     except BaseException as e: # No data in DB
         print("API - sources()\nError : ", e)
-        return JsonResponse({"sources":-1,"num":-1,"error":str(e)}, status=400)
+        return JsonResponse({"sources":-1,"num":-1,"error":str(e)}, status=500)
     res = cursor.fetchall()
 
     sources = []
@@ -83,6 +85,7 @@ def sources(request):
     return JsonResponse({"sources":sources,"num":num}, status=200)
 
 
+@require_GET
 def userExist(request):
     # GET user and check if he exist
     userId = request.GET.get("id", "")
@@ -96,6 +99,7 @@ def userExist(request):
         return JsonResponse({"id":userId,"exist":True}, status=200)
 
 
+@require_GET
 def user(request):
     """GET candidate's informations such as followers_count, profile picture, profile description and screen name"""
     # GET user and check if he exist
@@ -104,7 +108,7 @@ def user(request):
         if userId != "":
             User.objects.get(id=userId)
     except BaseException as e:
-        return JsonResponse({"users":-1,"error":str(e)}, status=400)
+        return JsonResponse({"users":-1,"error":str(e)}, status=500)
 
     cursor = connection.cursor()
     try:
@@ -114,7 +118,7 @@ def user(request):
             cursor.execute("SELECT id, screen_name, name, description, followers_count, verified, profile_image_url FROM api_user WHERE id ='"+ str(userId)+ "'")
     except BaseException as e: # No data in DB
         print("API - userInfo()\nError : ", e)
-        return JsonResponse({"users":-1,"error":str(e)}, status=400)
+        return JsonResponse({"users":-1,"error":str(e)}, status=500)
     res = cursor.fetchall()
     users = []
     for user in res:
@@ -123,6 +127,7 @@ def user(request):
     return JsonResponse({"users":users}, status=200)
 
 
+@require_GET
 def nbTweets(request):
     """GET number of tweets for each candidates"""
     # Getting the number of tweets for each user
@@ -143,6 +148,7 @@ def nbTweets(request):
     return JsonResponse({"politics":politics,"nbTweets":nbTweets}, status=200)
 
 
+@require_GET
 def lastTweet(request):
     """GET date of the last tweet saved in DB"""
     # Getting the date of the last tweet
@@ -152,11 +158,12 @@ def lastTweet(request):
         lastTweet = Tweet.objects.get(id=lastId).created_at
     except BaseException as e:
         print("API - lestTweet()\nError : ", e)
-        return JsonResponse({"lasttweet":-1,"error":str(e)}, status=400)
+        return JsonResponse({"lasttweet":-1,"error":str(e)}, status=500)
 
     return HttpResponse(lastTweet, status=200)
 
 
+@require_GET
 def hours(request):
     """GET tweets hours distribution for one or all candidates"""
     # GET user and check if he exist
@@ -165,7 +172,7 @@ def hours(request):
         if userId != "":
             User.objects.get(id=userId)
     except BaseException as e:
-        return JsonResponse({"hours":-1,"error":str(e)}, status=400)
+        return JsonResponse({"hours":-1,"error":str(e)}, status=500)
 
     cursor = connection.cursor()
     try:
@@ -185,7 +192,7 @@ def hours(request):
     # JSON Formating
     return JsonResponse({"hours":hours}, status=200)
 
-
+@require_GET
 def wordCount(request):
     userId = request.GET.get("id", "")
 
@@ -197,7 +204,7 @@ def wordCount(request):
             allTokenArray = Tweet.objects.filter(user_id=userId).values('tokenArray')
     except BaseException as e:
         print("API - wordCount()\nError : ", e)
-        return JsonResponse({"words":-1,"error":str(e)}, status=400)
+        return JsonResponse({"words":-1,"error":str(e)}, status=500)
 
     words = [ast.literal_eval(t["tokenArray"]) for t in allTokenArray]
     words = toJsonForGraph(countWords(words))
@@ -205,7 +212,7 @@ def wordCount(request):
     # words is a JSON list of dict like : {"word":"foo", "occur":42}
     return JsonResponse({"words":words}, status=200)
 
-
+@require_GET
 def lemmeCount(request):
     userId = request.GET.get("id", "")
 
@@ -217,7 +224,7 @@ def lemmeCount(request):
             allLemmaArray = Tweet.objects.filter(user_id=userId).values('lemmaArray')
     except BaseException as e:
         print("API - lemmeCount()\nError : ", e)
-        return JsonResponse({"lemmes":-1,"error":str(e)}, status=400)
+        return JsonResponse({"lemmes":-1,"error":str(e)}, status=500)
 
     lemmes = [ast.literal_eval(t["lemmaArray"]) for t in allLemmaArray]
     lemmes = toJsonForGraph(countWords(lemmes))
@@ -226,6 +233,7 @@ def lemmeCount(request):
     return JsonResponse({"lemmes":lemmes}, status=200)
 
 
+@require_GET
 def ldaTopics(request):
     # GET user and check if he exist
     userId = request.GET.get("id", 0)
@@ -235,7 +243,7 @@ def ldaTopics(request):
         ldamodel = pickle.loads(LdaModel.objects.get(user_id=userId).ldamodel)
     except BaseException as e:
         print("API - ldaTopics()\nError : ", e)
-        return JsonResponse({"ldaTopics":-1,"error":str(e)}, status=400)
+        return JsonResponse({"ldaTopics":-1,"error":str(e)}, status=500)
 
     topics = ldamodel.show_topics(num_topics=-1, num_words=10, log=False, formatted=False)
     tableJson = {"label":"ldaTopics","topics":[]}
@@ -247,6 +255,72 @@ def ldaTopics(request):
     return JsonResponse(tableJson, status=200)
 
 
+@require_GET
+def netTweets(request):
+    # Get users and link them to semantic fields
+    try:
+        semanticField_db = semanticField.objects.all().values()
+        users = User.objects.all().values("screen_name", "name")
+        cursor = connection.cursor()
+        cursor.execute("SELECT u.screen_name, COUNT(t.id) AS nbTweets FROM api_tweet t, api_user u WHERE u.id = t.user_id_id GROUP BY u.screen_name")
+    except BaseException as e:
+        print("API - netTweets()\nError : ", e)
+        return JsonResponse({"error":str(e)}, status=500)
+
+    tweetCount = dict(cursor.fetchall())
+    # tweetCount['total'] = sum(tweetCount.values())
+
+    network = {"nodes":[], "edges":[]}
+    nodeId = 1
+    edgeId = 1
+    appendedNodes = dict()
+    appendedThemes = dict()
+    maxScore = 0
+
+    # User nodes
+    for user in users:
+        network["nodes"].append({"id":nodeId,"label":user["name"],"screen_name":user["screen_name"],"size":50,"color":"#ff9800"})
+        appendedNodes[user["screen_name"]] = nodeId
+        nodeId += 1
+
+    # Semantic theme nodes
+    for semanticLine in semanticField_db:
+        if semanticLine["baseWord"] not in appendedThemes:
+            network["nodes"].append({"id":nodeId,"label":semanticLine["baseWord"],"weight":0,"size":50,"color":"#2196f3"})
+            network["nodes"].append({"id":nodeId+1,"label":semanticLine["baseWord"],"size":10,"color":"#607d8b"})
+            network["edges"].append({"id":edgeId,"source":nodeId,"target":nodeId+1,"weight":50,"color":"rgba(96,125,139,0.05)"})
+            appendedThemes[semanticLine["baseWord"]] = nodeId
+            appendedNodes[semanticLine["baseWord"]] = nodeId+1
+            nodeId += 2
+            edgeId += 1
+
+        uScores = ast.literal_eval(semanticLine["usersScores"])
+        for screen_name,score in uScores.items():
+            if (score/tweetCount[screen_name]) > maxScore:
+                maxScore = score/tweetCount[screen_name]
+
+    # Associated semantic words nodes + links all those nodes together
+    for semanticLine in semanticField_db:
+        uScores = ast.literal_eval(semanticLine["usersScores"])
+        if not all(score == 0 for score in uScores.values()):
+            if semanticLine["word"] not in appendedNodes:
+                network["nodes"].append({"id":nodeId,"label":semanticLine["word"],"size":10,"color":"#607d8b"})
+                network["edges"].append({"id":edgeId,"source":appendedThemes[semanticLine["baseWord"]],"target":nodeId,"weight":50,"color":"rgba(96,125,139,0.05)"})
+                appendedNodes[semanticLine["word"]] = nodeId
+                nodeId += 1
+            else:
+                network["edges"].append({"id":edgeId,"source":appendedThemes[semanticLine["baseWord"]],"target":appendedNodes[semanticLine["word"]],"weight":50,"color":"rgba(96,125,139,0.05)"})
+            edgeId += 1
+
+            for screen_name,score in uScores.items():
+                if score != 0:
+                    computedWeigth = (score/tweetCount[screen_name]*90/maxScore)+10
+                    network["edges"].append({"id":edgeId,"source":appendedNodes[screen_name],"target":appendedNodes[semanticLine["word"]],"weight":computedWeigth,"color":"rgba(255,152,0,0.01)"})
+                    edgeId += 1
+
+    return JsonResponse({"network":network}, status=200)
+
+
 #==============================#
 #===========  DATA  ===========#
 #==============================#
@@ -255,6 +329,7 @@ def getData(request):
     """Save the latest tweets from all the users defined in screen_nameToExtract
      and stores info about a users in the database not already done"""
     global screen_nameToExtract
+    global semanticWords
 
     # SAVING USERS
     for screen_name in screen_nameToExtract:
@@ -264,31 +339,32 @@ def getData(request):
         if not(userInfo): #If the user doesn't exist
             success = False
             error = "The user doesn't exist"
-            return JsonResponse({"res":{"success":success,"error":error}}, status=400)
+            return JsonResponse({"res":{"success":success,"error":error}}, status=500)
 
         # Saving the user
         success = saveUser(userInfo)
         if not(success):
             error = "Error during saving in DB"
-            return JsonResponse({"res":{"success":success,"error":error}}, status=400)
+            return JsonResponse({"res":{"success":success,"error":error}}, status=500)
 
     # SAVING TWEETS
     lastId = 0
     nbTweets = 0 # number of extracted tweets
 
     for screen_name in screen_nameToExtract:
-        print ("GET user tweets : "+screen_name)
+        print ("GET USER TWEETS : "+screen_name)
         try:
             idUser = User.objects.filter(screen_name=screen_name).values('id')[0]["id"]
-        except SomeModel.DoesNotExist: # If the user does not exist
+        except BaseException as e : # If the user does not exist
             continue # continue with the next user
 
         try: # We try to get the id of the user's last tweet
             lastTweet = Tweet.objects.filter(user_id=idUser).aggregate(Max('id'))
             lastId = lastTweet["id__max"]
-            # maj = Tweet.objects.get(id=lastId).created_at
-        except SomeModel.DoesNotExist:
-            lastId = 0 # No tweet in the data base
+            if lastId == None: # No tweet in the data base
+                lastId = 0
+        except BaseException as e :
+            return JsonResponse({"res":{"success":success,"error":error}}, status=500)
 
         # The important request here : returns the new tweets from the Twitter API
         tweets = returnTweetsMultiple(screen_name,lastId)
@@ -303,7 +379,7 @@ def getData(request):
         userFrom = User.objects.get(screen_name=screen_name)
         nbTweetsSaved = 1; #counter for printing
         for t in tweets:
-            print ("Saving {1} tweets from {0} ; {2:0.2f} %".format(screen_name,lenghtTweets,nbTweetsSaved/lenghtTweets*100))
+            print ("SAVING {1} TWEETS FROM {0} ; {2:0.2f} %".format(screen_name,lenghtTweets,nbTweetsSaved/lenghtTweets*100))
             success = saveTweet(t,userFrom) and success
             nbTweetsSaved += 1;
 
@@ -312,11 +388,47 @@ def getData(request):
         print ("MAKING LDA MODEL FOR : "+screen_name)
         try:
             idUser = User.objects.filter(screen_name=screen_name).values('id')[0]["id"]
-        except SomeModel.DoesNotExist: # If the user does not exist
-            continue # continue with the next user
+        except BaseException as e : # If the user does not exist or table not present
+            return JsonResponse({"res":{"success":success,"error":error}}, status=500)
+
         makeLdaModel(idUser)
-    print("MAKING GLOBAL LDA MODEL...")
+    print("MAKING GLOBAL LDA MODEL")
     makeLdaModel(0)
+
+    # POPULATING SEMANTIC FIELDS
+    print("MAKING SEMANTIC FIELDS")
+    semanticField.objects.all().delete()
+    globalLemmesOccurences = {}
+    # Pour chaque candidat, on compte l'occurence de ses lemmes à l'avance
+    for screen_name in screen_nameToExtract:
+        try:
+            idUser = User.objects.filter(screen_name=screen_name).values('id')[0]["id"]
+            allLemmaArray = Tweet.objects.filter(user_id=idUser).values("lemmaArray")
+        except BaseException: # If the user does not exist or table to present
+            continue # continue with the next user
+        allLemmaArray = [ast.literal_eval(t["lemmaArray"]) for t in allLemmaArray]
+        userLemmesOccurences = defaultdict(lambda: 0)
+        for lemmaArray in allLemmaArray:
+            currentOccurences = dict(Counter(lemmaArray))
+            for k in list(currentOccurences.keys()):
+                userLemmesOccurences[k] += currentOccurences[k]
+        globalLemmesOccurences[screen_name] = userLemmesOccurences
+    # Pour chaque mot de base, on cherche le champs lexical associé
+    for baseWord in semanticWords:
+        semanticFieldTable = getSemanticField(baseWord)
+        # Pour chaque mot du champ lexical, on regarde le nombre d'occurence pour chaque candidat et on sauvegarde
+        for word in semanticFieldTable:
+            wordOccur = {}
+            for screen_name in screen_nameToExtract:
+                wordOccur[screen_name] = globalLemmesOccurences[screen_name][word]
+            semanticField_db = semanticField()
+            semanticField_db.baseWord = baseWord
+            semanticField_db.word = word
+            semanticField_db.usersScores = wordOccur
+            try:
+                semanticField_db.save()
+            except BaseException as e:
+                print("getData() ; error in making semantic fields : ", e)
 
     print("\nEVERYTHING DONE !")
     return JsonResponse({"res":{"success":success,"error":0}}, status=200)
