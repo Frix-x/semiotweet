@@ -18,7 +18,7 @@
 <div class="container">
     <div class="section" id="Graphs">
         <div class="row">
-            <div class="col s12 m6">
+            <div class="col s12 m9">
                 <div class="section">
                     <h5 class="header">Aperçu</h5>
                     <p id="apercu">
@@ -27,11 +27,9 @@
                         <br>N'hésitez pas à y jeter un coup d'oeil et à partager vos retours !<br><br> Dernière mise à jour le : <b><span id="MAJ"></span></b>
                     </p>
                 </div>
-            </div>
-            <div class="col s12 m3">
-                <div class="section">
-                    <h5 class="center">Sources des tweets</h5>
-                    <div class="loader"><canvas id="doughnutSources"></canvas></div>
+                <div class="section loader">
+                    <h5 class="header">Il aurait pu tweeter...</h5>
+                    <p id="faketweet"></p>
                 </div>
             </div>
             <div class="col s12 m3">
@@ -63,10 +61,10 @@
                 $("#MAJ").html(maj);
             }
         });
-        $.get('/api/v1/user/sources', function(res, status) {
+        $.get('/api/v1/nlp/faketweet', function(res, status) {
             if (status === 'success') {
-                createDonut("doughnutSources", res.sources, res.num);
-                $('#doughnutSources').parent().removeClass('loader');
+                $('#faketweet').html('<b>' + res.name + '</b> : ' + res.fakeTweet);
+                $('#faketweet').parent().removeClass('loader');
             }
         });
         $.get('/api/v1/user/nbtweets', function(res, status) {

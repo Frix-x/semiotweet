@@ -273,7 +273,7 @@ def fakeTweet(request):
         return JsonResponse({"fakeTweet":-1,"userId":-1,"error":str(e)}, status=500)
 
     textGenerator = pickle.loads(markovModel_db.markovModel)
-    fakeTweetJson = {"fakeTweet":textGenerator.make_sentence(),"userId":markovModel_db.user_id.id}
+    fakeTweetJson = {"fakeTweet":textGenerator.make_sentence(),"name":markovModel_db.user_id.name}
     return JsonResponse(fakeTweetJson, status=200)
 
 
