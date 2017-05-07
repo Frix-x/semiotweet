@@ -89,3 +89,14 @@ class semanticField(models.Model):
 
     def __str__(self):
         return self.Word + " is related to : "+ self.baseWord
+
+
+class MarkovModel(models.Model):
+    """MarkovModel Class : filled with models of markov chains to make fake tweets"""
+
+    id = models.AutoField(primary_key=True)
+    user_id = models.ForeignKey('User')
+    markovModel = models.BinaryField(null=False)
+
+    def __str__(self):
+        return "Markov chains Model for user "+ str(self.user_id)

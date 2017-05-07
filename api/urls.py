@@ -7,11 +7,12 @@ urlpatterns = [
     url(r'^user/sources/?$',views.sources,name='sources'),
     url(r'^user/nbtweets/?$',views.nbTweets,name='nbTweets'),
     url(r'^user/hours/?$',views.hours,name='hours'),
-#    url(r'^getData/?$',views.getData,name='getData'),
+    url(r'^getData/?$',views.getData,name='getData'),
     url(r'^user/wordcount/?$',views.wordCount,name='wordCount'),
     url(r'^user/lemmecount/?$',views.lemmeCount,name='lemmeCount'),
     url(r'^tweet/last/?$',views.lastTweet,name='lastTweet'),
     url(r'^nlp/lda/topics/?$',views.ldaTopics,name='ldaTopics'),
+    url(r'^nlp/faketweet/?$',views.fakeTweet,name='fakeTweet'),
     url(r'^nlp/network/tweets/?$',views.netTweets,name='netTweets'),
     url(r'(?P<typed>.+)$',views.handler404,name='handler404')
 ]

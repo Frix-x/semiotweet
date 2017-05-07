@@ -11,7 +11,7 @@ from rest_framework.parsers import JSONParser
 
 
 # Forthe database
-from .models import Tweet,User,LdaModel,semanticField
+from .models import Tweet,User,LdaModel,MarkovModel,semanticField
 from django.db import connection #for direct SQL requests
 from django.db.models import Max
 
@@ -31,6 +31,7 @@ import json
 import ast # convert string to list
 import math
 from collections import Counter,defaultdict
+import markovify
 
 # Decorators
 from django.views.decorators.http import require_GET
@@ -256,6 +257,27 @@ def ldaTopics(request):
 
 
 @require_GET
+def fakeTweet(request):
+    # GET user and check if he exist
+    userId = request.GET.get("id", 0)
+
+    # Get LDA topics distribution for table
+    try :
+        if userId != 0:
+            markovModel_db = MarkovModel.objects.get(user_id=userId)
+        else:
+            random_idx = random.randint(0, MarkovModel.objects.count() - 1)
+            markovModel_db = MarkovModel.objects.all()[random_idx]
+    except BaseException as e:
+        print("API - fakeTweet()\nError : ", e)
+        return JsonResponse({"fakeTweet":-1,"userId":-1,"error":str(e)}, status=500)
+
+    textGenerator = pickle.loads(markovModel_db.markovModel)
+    fakeTweetJson = {"fakeTweet":textGenerator.make_sentence(),"userId":markovModel_db.user_id.id}
+    return JsonResponse(fakeTweetJson, status=200)
+
+
+@require_GET
 def netTweets(request):
     # Get users and link them to semantic fields
     try:
@@ -347,7 +369,9 @@ def getData(request):
             error = "Error during saving in DB"
             return JsonResponse({"res":{"success":success,"error":error}}, status=500)
 
+
     # SAVING TWEETS
+    print("\n")
     lastId = 0
     nbTweets = 0 # number of extracted tweets
 
@@ -383,7 +407,37 @@ def getData(request):
             success = saveTweet(t,userFrom) and success
             nbTweetsSaved += 1;
 
+
+    # MAKING MARKOV CHAINS MODEL TO MAKE FAKE TWEETS
+    print("\n")
+    MarkovModel.objects.all().delete()
+    for screen_name in screen_nameToExtract:
+        print ("MAKING MARKOV CHAINS MODEL FOR : "+screen_name)
+        try:
+            user = User.objects.get(screen_name=screen_name)
+            allTweets_raw = Tweet.objects.all().filter(user_id=user.id).values('text','id')
+        except BaseException as e : # If the user does not exist or table not present
+            continue
+        allTweets = [t["text"] for t in allTweets_raw]
+        allTweets = "\n".join(allTweets)
+
+        markovModel = markovify.NewlineText(allTweets, state_size=2)
+        markovModelExport = pickle.dumps(markovModel,protocol=-1)
+
+        markovModel_db = MarkovModel()
+        markovModel_db.user_id = user
+        markovModel_db.markovModel = markovModelExport
+        try:
+            markovModel_db.save()
+        except BaseException as e:
+            print("getData() ; error in making Markov models : ", e)
+        # for i in range(10):
+        #     test = markovModel.make_sentence()
+        #     print(test)
+
+
     # MAKING LDA MODELS
+    print("\n")
     for screen_name in screen_nameToExtract:
         print ("MAKING LDA MODEL FOR : "+screen_name)
         try:
@@ -395,7 +449,9 @@ def getData(request):
     print("MAKING GLOBAL LDA MODEL")
     makeLdaModel(0)
 
+
     # POPULATING SEMANTIC FIELDS
+    print("\n")
     print("MAKING SEMANTIC FIELDS")
     semanticField.objects.all().delete()
     globalLemmesOccurences = {}
@@ -429,6 +485,7 @@ def getData(request):
                 semanticField_db.save()
             except BaseException as e:
                 print("getData() ; error in making semantic fields : ", e)
+
 
     print("\nEVERYTHING DONE !")
     return JsonResponse({"res":{"success":success,"error":0}}, status=200)
